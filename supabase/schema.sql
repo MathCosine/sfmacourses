@@ -103,10 +103,12 @@ security definer
 set search_path = public
 stable
 as $$
-  select coalesce(
-    (select p.role = 'staff' from public.profiles p where p.id = auth.uid()),
-    false
-  );
+  select
+    coalesce(lower(auth.jwt() ->> 'email') = 'sfmathopen@gmail.com', false)
+    or coalesce(
+      (select p.role = 'staff' from public.profiles p where p.id = auth.uid()),
+      false
+    );
 $$;
 
 -- ------------------------------------------------------ Auto-create profile
