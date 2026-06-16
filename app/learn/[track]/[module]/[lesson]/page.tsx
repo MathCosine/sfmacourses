@@ -136,7 +136,7 @@ export default async function LessonPage({
             {prevHref ? (
               <Link
                 href={prevHref}
-                className="group rounded-xl border border-border bg-surface px-4 py-3 transition-colors hover:border-gold/50"
+                className="group card hover-lift rounded-2xl px-4.5 py-3.5 hover:border-gold/40"
               >
                 <div className="text-[11px] uppercase tracking-wide text-tfaint">
                   ← Previous
@@ -151,7 +151,7 @@ export default async function LessonPage({
             {nextHref && (
               <Link
                 href={nextHref}
-                className="group rounded-xl border border-border bg-surface px-4 py-3 text-right transition-colors hover:border-gold/50"
+                className="group card hover-lift rounded-2xl px-4.5 py-3.5 text-right hover:border-gold/40"
               >
                 <div className="text-[11px] uppercase tracking-wide text-tfaint">
                   Next →

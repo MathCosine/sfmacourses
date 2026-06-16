@@ -193,7 +193,7 @@ function ContentTab({
                     </button>
                     <button
                       onClick={() => onDeleteModule(m.id, m.title)}
-                      className="rounded-md p-1.5 text-tmuted transition-colors hover:bg-[#e0566b]/10 hover:text-[#e0566b]"
+                      className="rounded-md p-1.5 text-tmuted transition-colors hover:bg-danger/10 hover:text-danger"
                       title="Delete module"
                     >
                       <TrashIcon className="h-3.5 w-3.5" />
@@ -361,7 +361,7 @@ function AnnouncementsTab({
     <div className="space-y-6">
       <form
         onSubmit={post}
-        className="rounded-2xl border border-border bg-surface p-5"
+        className="card rounded-2xl p-5"
       >
         <h3 className="mb-3 font-serif text-xl text-tprimary">
           Post Announcement
@@ -379,7 +379,7 @@ function AnnouncementsTab({
           onChange={(e) => setBody(e.target.value)}
         />
         {error && (
-          <p className="mt-2 text-[12.5px] text-[#e0566b]">{error}</p>
+          <p className="mt-2 text-[12.5px] text-danger">{error}</p>
         )}
         <button
           type="submit"
@@ -394,7 +394,7 @@ function AnnouncementsTab({
         {announcements.map((a) => (
           <article
             key={a.id}
-            className="rounded-2xl border border-border bg-surface px-5 py-4"
+            className="card rounded-2xl px-5 py-4"
           >
             <div className="flex items-baseline justify-between gap-3">
               <h3 className="font-serif text-lg text-tprimary">{a.title}</h3>
@@ -404,7 +404,7 @@ function AnnouncementsTab({
                 </time>
                 <button
                   onClick={() => remove(a.id)}
-                  className="rounded-md p-1 text-tmuted transition-colors hover:bg-[#e0566b]/10 hover:text-[#e0566b]"
+                  className="rounded-md p-1 text-tmuted transition-colors hover:bg-danger/10 hover:text-danger"
                 >
                   <TrashIcon className="h-3.5 w-3.5" />
                 </button>

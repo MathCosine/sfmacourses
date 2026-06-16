@@ -124,7 +124,7 @@ export function BlockEditor({
           {msg && (
             <span
               className={`text-[12.5px] ${
-                msg === "Saved" ? "text-green" : "text-[#e0566b]"
+                msg === "Saved" ? "text-green" : "text-danger"
               }`}
             >
               {msg}
@@ -133,7 +133,7 @@ export function BlockEditor({
           <button
             onClick={onDelete}
             disabled={pending}
-            className="rounded-lg border border-[#e0566b]/40 px-3 py-1.5 text-[12.5px] font-medium text-[#e0566b] transition-colors hover:bg-[#e0566b]/10"
+            className="rounded-lg border border-danger/40 px-3 py-1.5 text-[12.5px] font-medium text-danger transition-colors hover:bg-danger/10"
           >
             Delete
           </button>
@@ -259,7 +259,7 @@ function IconBtn({
       disabled={disabled}
       className={`rounded-md p-1.5 transition-colors disabled:opacity-30 ${
         danger
-          ? "text-tmuted hover:bg-[#e0566b]/10 hover:text-[#e0566b]"
+          ? "text-tmuted hover:bg-danger/10 hover:text-danger"
           : "text-tmuted hover:bg-surface hover:text-tprimary"
       }`}
     >

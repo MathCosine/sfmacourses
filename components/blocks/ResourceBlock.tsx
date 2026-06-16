@@ -5,7 +5,7 @@ export function ResourceBlock({ block }: { block: ResourceBlockType }) {
   const stars = Math.max(0, Math.min(5, Math.round(block.stars || 0)));
   const card = (
     <div
-      className="my-5 rounded-xl border px-4 py-3.5"
+      className="my-5 rounded-2xl border px-4.5 py-4 shadow-card transition-shadow hover:shadow-lift"
       style={{
         background: "var(--color-resource)",
         borderColor: "var(--color-resource-border)",

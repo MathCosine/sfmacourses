@@ -66,7 +66,7 @@ export default async function TrackPage({
             return (
               <section
                 key={m.id}
-                className="rounded-2xl border border-border bg-surface p-5"
+                className="card rounded-2xl p-5"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div>

@@ -71,7 +71,7 @@ export function AuthForm({ redirectTo }: { redirectTo?: string }) {
   }
 
   return (
-    <div className="w-full max-w-[380px] rounded-2xl border border-border bg-surface p-7">
+    <div className="card w-full max-w-[400px] rounded-3xl p-8">
       <h1 className="font-serif text-3xl text-tprimary">Welcome to SFMA</h1>
       <p className="mt-1 text-[13.5px] text-tmuted">
         {mode === "signin"
@@ -132,7 +132,7 @@ export function AuthForm({ redirectTo }: { redirectTo?: string }) {
         />
 
         {error && (
-          <div className="rounded-lg border border-[#e0566b]/40 bg-[#e0566b]/10 px-3 py-2 text-[12.5px] text-[#e0566b]">
+          <div className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-[12.5px] text-danger">
             {error}
           </div>
         )}

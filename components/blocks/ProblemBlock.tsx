@@ -16,10 +16,10 @@ export interface PreparedProblem {
 }
 
 const DIFFICULTY_STYLE: Record<Difficulty, { color: string; bg: string }> = {
-  Easy: { color: "#22c55e", bg: "rgba(34,197,94,0.13)" },
-  Medium: { color: "#f0a500", bg: "rgba(240,165,0,0.13)" },
-  Hard: { color: "#f7bc35", bg: "rgba(247,188,53,0.14)" },
-  "Very Hard": { color: "#e0566b", bg: "rgba(224,86,107,0.13)" },
+  Easy: { color: "#1a7f47", bg: "rgba(26,127,71,0.10)" },
+  Medium: { color: "#a86a0a", bg: "rgba(168,106,10,0.11)" },
+  Hard: { color: "#c2410c", bg: "rgba(194,65,12,0.10)" },
+  "Very Hard": { color: "#b3261e", bg: "rgba(179,38,30,0.10)" },
 };
 
 interface ProblemBlockProps {
@@ -56,8 +56,8 @@ export function ProblemBlock({
   return (
     <div
       className={cn(
-        "my-4 overflow-hidden rounded-xl border bg-surface transition-colors",
-        solved ? "border-green/40" : "border-border",
+        "my-4 overflow-hidden rounded-2xl border bg-surface shadow-card transition-all",
+        solved ? "border-green/50 ring-1 ring-green/15" : "border-border",
       )}
     >
       {/* Header */}
@@ -130,7 +130,7 @@ export function ProblemBlock({
           </div>
 
           {showHint && block.hintHtml && (
-            <div className="mt-3 rounded-lg border border-border bg-bg/40 px-3.5 py-2.5">
+            <div className="mt-3 rounded-lg border border-border bg-bg px-3.5 py-3">
               <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-gold">
                 Hint
               </div>
@@ -142,7 +142,7 @@ export function ProblemBlock({
           )}
 
           {showSolution && block.solutionHtml && (
-            <div className="mt-3 rounded-lg border border-border bg-bg/40 px-3.5 py-2.5">
+            <div className="mt-3 rounded-lg border border-border bg-bg px-3.5 py-3">
               <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-green">
                 Solution
               </div>

@@ -59,18 +59,24 @@ export default async function DashboardPage() {
         {resume && (
           <Link
             href={resume.href}
-            className="group mt-7 flex items-center justify-between gap-4 rounded-2xl border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent px-6 py-5 transition-colors hover:border-gold"
+            className="group hover-lift mt-7 flex items-center justify-between gap-4 rounded-3xl border border-gold/35 px-7 py-6 shadow-card transition-colors hover:border-gold/60"
+            style={{
+              background:
+                "linear-gradient(110deg, rgba(168,106,10,0.10), rgba(255,255,255,0) 60%), #ffffff",
+            }}
           >
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
                 Continue where you left off
               </div>
-              <div className="mt-1 font-serif text-xl text-tprimary">
+              <div className="mt-1.5 font-serif text-[1.55rem] text-tprimary">
                 {resume.title}
               </div>
-              <div className="text-[12.5px] text-tmuted">{resume.track}</div>
+              <div className="mt-0.5 text-[12.5px] text-tmuted">
+                {resume.track}
+              </div>
             </div>
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold text-bg transition-transform group-hover:translate-x-0.5">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold text-white shadow-card transition-transform group-hover:translate-x-0.5">
               <ArrowRight className="h-5 w-5" />
             </span>
           </Link>
@@ -92,7 +98,7 @@ export default async function DashboardPage() {
               <Link
                 key={t.id}
                 href={`/learn/${t.slug}`}
-                className="flex flex-col items-center rounded-2xl border border-border bg-surface p-6 text-center transition-colors hover:border-gold/50"
+                className="card hover-lift flex flex-col items-center rounded-3xl p-7 text-center hover:border-gold/40"
               >
                 <ProgressRing value={done} total={total} size={72} stroke={6} />
                 <div className="mt-3.5 font-serif text-lg text-tprimary">
@@ -111,7 +117,7 @@ export default async function DashboardPage() {
           Announcements
         </h2>
         {announcements.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-surface px-5 py-6 text-[14px] text-tfaint">
+          <div className="card rounded-2xl px-5 py-6 text-[14px] text-tfaint">
             No announcements yet.
           </div>
         ) : (
@@ -119,7 +125,7 @@ export default async function DashboardPage() {
             {announcements.map((a) => (
               <article
                 key={a.id}
-                className="rounded-2xl border border-border bg-surface px-5 py-4"
+                className="card rounded-2xl px-5 py-4"
               >
                 <div className="flex items-baseline justify-between gap-3">
                   <h3 className="font-serif text-lg text-tprimary">
