@@ -99,7 +99,7 @@ export function Sidebar({
             <div key={m.id} className="mb-1">
               <button
                 onClick={() => toggle(m.id)}
-                className="group flex w-full items-center gap-1.5 rounded-md px-2.5 py-1.5 text-left text-[13.5px] font-semibold text-tprimary transition-colors hover:bg-surface/60"
+                className="group flex w-full items-center gap-1.5 rounded-md px-2.5 py-1.5 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-tmuted transition-colors hover:text-tprimary"
               >
                 <ChevronRight
                   className={cn(
@@ -124,8 +124,8 @@ export function Sidebar({
                           className={cn(
                             "group -ml-px flex items-center gap-2 border-l-2 py-1.5 pl-3 pr-2 text-[13.5px] transition-colors",
                             isActive
-                              ? "border-gold bg-gold/8 font-medium text-tprimary"
-                              : "border-transparent text-tmuted hover:text-tprimary",
+                              ? "border-gold bg-highlight font-medium text-tprimary"
+                              : "border-transparent text-tmuted hover:bg-gold-tint/50 hover:pl-3.5 hover:text-tprimary",
                           )}
                         >
                           <span

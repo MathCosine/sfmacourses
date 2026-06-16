@@ -28,7 +28,10 @@ export function ShellFrame({
   return (
     <div className="flex min-h-screen">
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] border-r border-border lg:block">
+      <aside
+        className="fixed inset-y-0 left-0 z-30 hidden w-[260px] lg:block"
+        style={{ boxShadow: "2px 0 12px rgba(30,42,58,0.08)" }}
+      >
         <Sidebar
           tracks={tracks}
           statuses={statuses}

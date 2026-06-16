@@ -30,17 +30,14 @@ function StatPill({
   color: string;
 }) {
   return (
-    <div className="flex flex-col items-center">
-      <div
-        className="flex h-12 w-12 items-center justify-center rounded-full text-[16px] font-bold"
-        style={{ background: `${color}1f`, color }}
-      >
-        {count}
-      </div>
-      <div className="mt-1.5 text-[10.5px] font-semibold uppercase tracking-wide text-tmuted">
-        {label}
-      </div>
-    </div>
+    <span className="inline-flex items-center gap-1.5">
+      <span
+        className="inline-block h-2 w-2 rounded-full"
+        style={{ background: color }}
+      />
+      <span className="font-semibold text-tprimary">{count}</span>
+      <span>{label}</span>
+    </span>
   );
 }
 
@@ -75,13 +72,13 @@ export default async function TrackPage({
 
   return (
     <AppShell activeTrackSlug={t.slug}>
-      <div className="mx-auto max-w-[880px] px-6 py-10 sm:px-10">
-        <div className="flex items-start justify-between gap-6">
+      <div className="fade-up mx-auto max-w-[840px] px-6 py-10 sm:px-10">
+        <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-gold">
+          Course
+        </div>
+        <div className="mt-1.5 flex items-start justify-between gap-6">
           <div>
-            <div className="text-[12px] font-semibold uppercase tracking-[0.14em] text-gold">
-              Course
-            </div>
-            <h1 className="mt-1.5 font-serif text-4xl text-tprimary">
+            <h1 className="font-serif text-[2.5rem] leading-tight text-tprimary">
               {t.title}
             </h1>
             {t.description && (
@@ -93,30 +90,36 @@ export default async function TrackPage({
           <ProgressRing value={counts.complete} total={total} size={68} />
         </div>
 
-        {/* Status summary */}
-        <div className="card mt-7 flex items-center justify-around rounded-2xl px-4 py-5">
-          <StatPill count={counts.complete} label="Completed" color="#2f9e44" />
-          <StatPill
-            count={counts.inProgress}
-            label="In Progress"
-            color="#f08c00"
-          />
-          <StatPill count={counts.skipped} label="Skipped" color="#7048e8" />
-          <StatPill
-            count={counts.notStarted}
-            label="Not Started"
-            color="#868e96"
-          />
+        {/* Slim gradient progress bar */}
+        <div className="mt-6">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-border/70">
+            <div
+              className="progress-fill h-full rounded-full"
+              style={{
+                width: `${total ? (counts.complete / total) * 100 : 0}%`,
+                background: "linear-gradient(90deg, #2563eb, #16a34a)",
+              }}
+            />
+          </div>
+          <div className="mt-2.5 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-tmuted">
+            <StatPill count={counts.complete} label="Completed" color="#16a34a" />
+            <StatPill count={counts.inProgress} label="In Progress" color="#ca8a04" />
+            <StatPill count={counts.skipped} label="Skipped" color="#2563eb" />
+            <StatPill count={counts.notStarted} label="Not Started" color="#718096" />
+          </div>
         </div>
 
-        <div className="mt-8 space-y-5">
+        <div className="mt-8 space-y-3">
           {t.modules.map((m) => {
             const mDone = m.lessons.filter(
               (l) => statusOf(l.id) === "complete",
             ).length;
             return (
-              <section key={m.id} className="card rounded-2xl p-5">
-                <div className="flex items-center justify-between gap-3">
+              <section
+                key={m.id}
+                className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm"
+              >
+                <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
                   <div>
                     <h2 className="font-serif text-xl text-tprimary">
                       {m.title}
@@ -132,7 +135,7 @@ export default async function TrackPage({
                   </span>
                 </div>
 
-                <ul className="mt-3.5 divide-y divide-border border-t border-border">
+                <ul className="divide-y divide-border border-t border-border px-5">
                   {m.lessons.map((l) => {
                     const s = statusOf(l.id);
                     const sm = STATUS_META[s];

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSessionUser, getNavTree } from "@/lib/data";
 import { ArrowRight } from "@/components/icons";
+import { HeroBackground } from "@/components/HeroBackground";
 
 const TRACK_INFO: Record<
   string,
@@ -73,7 +74,7 @@ export default async function HomePage() {
             </a>
             <Link
               href={cta}
-              className="rounded-full bg-gold px-4 py-1.5 font-semibold text-white transition-colors hover:bg-gold-hover"
+              className="rounded-md bg-gold px-4 py-1.5 font-semibold text-white shadow-accent transition-colors hover:bg-gold-hover"
             >
               {user ? "Dashboard" : "Sign in"}
             </Link>
@@ -83,25 +84,34 @@ export default async function HomePage() {
 
       {/* ---------------------------------------------------------- Hero */}
       <section className="relative">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[680px]"
-          style={{
-            background:
-              "radial-gradient(55% 60% at 50% -5%, rgba(59,91,219,0.12), transparent 70%), radial-gradient(40% 45% at 88% 8%, rgba(47,158,68,0.07), transparent 70%)",
-          }}
-        />
-        <div className="mx-auto max-w-4xl px-6 pt-20 pb-12 text-center sm:pt-28">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-[12.5px] font-medium text-tmuted shadow-card">
+        <HeroBackground />
+        <div className="mx-auto max-w-4xl px-6 pt-20 pb-14 text-center sm:pt-28">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-md border border-border bg-surface px-3.5 py-1.5 text-[12.5px] font-medium text-tmuted shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-green" />
             Free &amp; open · by the San Francisco Math Initiative
           </div>
-          <h1 className="font-serif text-[3.25rem] font-medium leading-[1.03] tracking-tight text-tprimary sm:text-[5.25rem]">
+          <h1 className="font-serif text-[3rem] font-semibold leading-[1.04] tracking-tight text-tprimary sm:text-[5rem]">
             Competition math,
             <br />
-            <span className="italic text-gold">done right.</span>
+            <span className="relative inline-block italic text-gold">
+              done right.
+              <svg
+                className="absolute -bottom-2 left-0 w-full"
+                height="12"
+                viewBox="0 0 300 12"
+                preserveAspectRatio="none"
+                fill="none"
+              >
+                <path
+                  d="M2 8 C 80 2, 220 2, 298 7"
+                  stroke="#ca8a04"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
           </h1>
-          <p className="mx-auto mt-7 max-w-2xl text-[18px] leading-relaxed text-tmuted">
+          <p className="mx-auto mt-8 max-w-2xl text-[17.5px] leading-relaxed text-tmuted">
             A free, structured guide that takes you from your first AMC 8 to AP
             Calculus BC — clear lessons, real problems, and progress tracking
             that keeps you moving.
@@ -109,14 +119,14 @@ export default async function HomePage() {
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
             <Link
               href={cta}
-              className="group inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 text-[15px] font-semibold text-white shadow-lift transition-colors hover:bg-gold-hover"
+              className="group inline-flex items-center gap-2 rounded-md bg-gold px-7 py-3.5 text-[15px] font-semibold text-white shadow-accent transition-transform hover:-translate-y-0.5 hover:bg-gold-hover"
             >
               {user ? "Go to your dashboard" : "Start learning — it's free"}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
               href="#about"
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-6 py-3.5 text-[15px] font-medium text-tprimary transition-colors hover:border-gold/50"
+              className="inline-flex items-center gap-2 rounded-md border border-border bg-surface px-6 py-3.5 text-[15px] font-medium text-tprimary transition-colors hover:border-gold/50"
             >
               Learn more
             </a>
@@ -138,7 +148,7 @@ export default async function HomePage() {
               Three courses, one path
             </h2>
           </div>
-          <span className="hidden rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-[11.5px] font-medium text-gold sm:inline">
+          <span className="hidden rounded-md border border-gold/30 bg-gold/10 px-3 py-1 text-[11.5px] font-medium text-gold sm:inline">
             Still under construction
           </span>
         </div>
@@ -287,7 +297,7 @@ export default async function HomePage() {
               href="https://sfmathacademy.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-gold px-7 py-3.5 text-[15px] font-semibold text-white shadow-lift transition-colors hover:bg-gold-hover"
+              className="group inline-flex shrink-0 items-center gap-2 rounded-md bg-gold px-7 py-3.5 text-[15px] font-semibold text-white shadow-lift transition-colors hover:bg-gold-hover"
             >
               Learn more at sfmathacademy.com
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -307,7 +317,7 @@ export default async function HomePage() {
         </p>
         <Link
           href={cta}
-          className="group mt-7 inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 text-[15px] font-semibold text-white shadow-lift transition-colors hover:bg-gold-hover"
+          className="group mt-7 inline-flex items-center gap-2 rounded-md bg-gold px-7 py-3.5 text-[15px] font-semibold text-white shadow-lift transition-colors hover:bg-gold-hover"
         >
           {user ? "Go to your dashboard" : "Get started for free"}
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
