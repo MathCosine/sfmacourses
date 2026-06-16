@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
 import { LessonView } from "@/components/LessonView";
@@ -47,8 +47,9 @@ export default async function LessonPage({
   if (!ctx) notFound();
 
   const user = await getSessionUser();
-  const userId = user!.id;
-  const isStaff = user?.isStaff ?? false;
+  if (!user) redirect("/auth");
+  const userId = user.id;
+  const isStaff = user.isStaff;
 
   const meta = extractMeta(ctx.lesson.content);
   const blocks = contentBlocks(ctx.lesson.content);

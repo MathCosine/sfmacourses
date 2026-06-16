@@ -20,16 +20,26 @@ export interface SessionUser {
 
 export async function getSessionUser(): Promise<SessionUser | null> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user;
+  try {
+    const res = await supabase.auth.getUser();
+    user = res.data.user;
+  } catch {
+    return null;
+  }
   if (!user) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+  let profile: Profile | null = null;
+  try {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
+    profile = (data as Profile) ?? null;
+  } catch {
+    profile = null;
+  }
 
   const email = user.email ?? profile?.email ?? "";
   const superAdmin = isSuperAdmin(email);

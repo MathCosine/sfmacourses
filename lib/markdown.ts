@@ -23,6 +23,15 @@ const processor = unified()
  */
 export async function renderMarkdown(markdown: string): Promise<string> {
   if (!markdown?.trim()) return "";
-  const file = await processor.process(markdown);
-  return String(file);
+  try {
+    const file = await processor.process(markdown);
+    return String(file);
+  } catch {
+    // Never let a single malformed block crash the whole lesson render.
+    const escaped = markdown
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    return `<p>${escaped}</p>`;
+  }
 }
