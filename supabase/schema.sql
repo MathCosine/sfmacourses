@@ -65,6 +65,21 @@ create table if not exists public.announcements (
   created_at timestamptz not null default now()
 );
 
+-- ------------------------------------------------------ Unique constraints
+-- Created separately (not just inline in CREATE TABLE) so they are also added
+-- to tables that already existed before this script was first run. These back
+-- the ON CONFLICT upserts in supabase/seed.sql.
+create unique index if not exists tracks_slug_key
+  on public.tracks (slug);
+create unique index if not exists modules_track_slug_key
+  on public.modules (track_id, slug);
+create unique index if not exists lessons_module_slug_key
+  on public.lessons (module_id, slug);
+create unique index if not exists progress_user_lesson_key
+  on public.progress (user_id, lesson_id);
+create unique index if not exists problem_completions_user_lesson_idx_key
+  on public.problem_completions (user_id, lesson_id, problem_index);
+
 -- ------------------------------------------------ Staff helper (no recursion)
 create or replace function public.is_staff()
 returns boolean
