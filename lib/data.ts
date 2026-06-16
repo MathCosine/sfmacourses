@@ -73,41 +73,38 @@ export interface TrackWithModules extends Track {
 
 /** Full nav tree: tracks → modules → lessons, ordered. */
 export async function getNavTree(): Promise<TrackWithModules[]> {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: tracks } = await supabase
-    .from("tracks")
-    .select("*")
-    .order("order_index", { ascending: true });
+    const [{ data: tracks }, { data: modules }, { data: lessons }] =
+      await Promise.all([
+        supabase.from("tracks").select("*").order("order_index", { ascending: true }),
+        supabase.from("modules").select("*").order("order_index", { ascending: true }),
+        supabase.from("lessons").select("*").order("order_index", { ascending: true }),
+      ]);
 
-  const { data: modules } = await supabase
-    .from("modules")
-    .select("*")
-    .order("order_index", { ascending: true });
+    const lessonsByModule = new Map<string, Lesson[]>();
+    for (const l of (lessons ?? []) as Lesson[]) {
+      const arr = lessonsByModule.get(l.module_id) ?? [];
+      arr.push(l);
+      lessonsByModule.set(l.module_id, arr);
+    }
 
-  const { data: lessons } = await supabase
-    .from("lessons")
-    .select("*")
-    .order("order_index", { ascending: true });
+    const modulesByTrack = new Map<string, ModuleWithLessons[]>();
+    for (const m of (modules ?? []) as Module[]) {
+      const arr = modulesByTrack.get(m.track_id) ?? [];
+      arr.push({ ...m, lessons: lessonsByModule.get(m.id) ?? [] });
+      modulesByTrack.set(m.track_id, arr);
+    }
 
-  const lessonsByModule = new Map<string, Lesson[]>();
-  for (const l of (lessons ?? []) as Lesson[]) {
-    const arr = lessonsByModule.get(l.module_id) ?? [];
-    arr.push(l);
-    lessonsByModule.set(l.module_id, arr);
+    return ((tracks ?? []) as Track[]).map((t) => ({
+      ...t,
+      modules: modulesByTrack.get(t.id) ?? [],
+    }));
+  } catch (e) {
+    console.error("getNavTree failed", e);
+    return [];
   }
-
-  const modulesByTrack = new Map<string, ModuleWithLessons[]>();
-  for (const m of (modules ?? []) as Module[]) {
-    const arr = modulesByTrack.get(m.track_id) ?? [];
-    arr.push({ ...m, lessons: lessonsByModule.get(m.id) ?? [] });
-    modulesByTrack.set(m.track_id, arr);
-  }
-
-  return ((tracks ?? []) as Track[]).map((t) => ({
-    ...t,
-    modules: modulesByTrack.get(t.id) ?? [],
-  }));
 }
 
 /** Map of lesson_id -> status for a user (lessons with no row are not_started). */
