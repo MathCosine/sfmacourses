@@ -11,6 +11,7 @@ import type {
 import { DIFFICULTIES } from "@/lib/types";
 import { contentBlocks, extractMeta } from "@/lib/utils";
 import { updateLesson, deleteLesson } from "./actions";
+import { MarkdownField } from "@/components/admin/MarkdownField";
 import { ArrowUp, ArrowDown, TrashIcon, PlusIcon } from "@/components/icons";
 
 const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
@@ -18,6 +19,15 @@ const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
   resource: "Resource",
   problem: "Problem",
   section: "Section",
+  video: "Video",
+};
+
+const BLOCK_HINT: Record<ContentBlock["type"], string> = {
+  text: "Prose with markdown + LaTeX.",
+  resource: "A linked reference card.",
+  problem: "A practice problem with a status circle.",
+  section: "A heading that appears in the contents and carries its own status.",
+  video: "An embedded YouTube or Vimeo video.",
 };
 
 function emptyBlock(type: ContentBlock["type"]): ContentBlock {
@@ -38,11 +48,13 @@ function emptyBlock(type: ContentBlock["type"]): ContentBlock {
       };
     case "section":
       return { type: "section", title: "" };
+    case "video":
+      return { type: "video", url: "", title: "", caption: "" };
   }
 }
 
 const inputCls =
-  "w-full rounded-lg border border-border bg-bg px-3 py-2 text-[13.5px] text-tprimary outline-none transition-colors placeholder:text-tfaint focus:border-gold";
+  "w-full rounded-lg border border-border bg-surface px-3 py-2 text-[13.5px] text-tprimary outline-none transition-colors placeholder:text-tfaint focus:border-gold";
 const labelCls = "mb-1 block text-[11.5px] font-medium text-tmuted";
 
 export function BlockEditor({
@@ -62,14 +74,19 @@ export function BlockEditor({
   );
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
 
+  function update(updater: (prev: ContentBlock[]) => ContentBlock[]) {
+    setBlocks(updater);
+    setDirty(true);
+  }
   function patchBlock(i: number, patch: Partial<ContentBlock>) {
-    setBlocks((prev) =>
+    update((prev) =>
       prev.map((b, idx) => (idx === i ? ({ ...b, ...patch } as ContentBlock) : b)),
     );
   }
   function move(i: number, dir: -1 | 1) {
-    setBlocks((prev) => {
+    update((prev) => {
       const j = i + dir;
       if (j < 0 || j >= prev.length) return prev;
       const next = [...prev];
@@ -78,10 +95,10 @@ export function BlockEditor({
     });
   }
   function remove(i: number) {
-    setBlocks((prev) => prev.filter((_, idx) => idx !== i));
+    update((prev) => prev.filter((_, idx) => idx !== i));
   }
   function add(type: ContentBlock["type"]) {
-    setBlocks((prev) => [...prev, emptyBlock(type)]);
+    update((prev) => [...prev, emptyBlock(type)]);
   }
 
   function save() {
@@ -94,7 +111,8 @@ export function BlockEditor({
         frequency,
       });
       if (res.ok) {
-        setMsg("Saved");
+        setMsg("Saved ✓");
+        setDirty(false);
         router.refresh();
       } else {
         setMsg(res.error ?? "Save failed");
@@ -117,14 +135,26 @@ export function BlockEditor({
   }
 
   return (
-    <div className="rounded-2xl border border-gold/40 bg-surface p-5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="font-serif text-xl text-tprimary">Edit Chapter</h3>
+    <div>
+      {/* Sticky toolbar */}
+      <div className="sticky top-0 z-20 -mx-2 mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border bg-bg/90 px-2 py-3 backdrop-blur">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onClose}
+            className="rounded-lg border border-border px-3 py-1.5 text-[12.5px] font-medium text-tmuted transition-colors hover:text-tprimary"
+          >
+            ← Back
+          </button>
+          <h3 className="font-serif text-lg text-tprimary">Edit Chapter</h3>
+          {dirty && (
+            <span className="text-[11.5px] text-tfaint">unsaved changes</span>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           {msg && (
             <span
               className={`text-[12.5px] ${
-                msg === "Saved" ? "text-green" : "text-danger"
+                msg.startsWith("Saved") ? "text-green" : "text-danger"
               }`}
             >
               {msg}
@@ -138,29 +168,26 @@ export function BlockEditor({
             Delete
           </button>
           <button
-            onClick={onClose}
-            className="rounded-lg border border-border px-3 py-1.5 text-[12.5px] font-medium text-tmuted transition-colors hover:text-tprimary"
-          >
-            Close
-          </button>
-          <button
             onClick={save}
             disabled={pending}
-            className="rounded-lg bg-gold px-4 py-1.5 text-[12.5px] font-semibold text-bg transition-colors hover:bg-gold-hover disabled:opacity-60"
+            className="rounded-lg bg-gold px-4 py-1.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-gold-hover disabled:opacity-60"
           >
             {pending ? "Saving…" : "Save"}
           </button>
         </div>
       </div>
 
-      {/* Lesson meta */}
-      <div className="grid gap-3 sm:grid-cols-3">
+      {/* Chapter meta */}
+      <div className="mb-6 grid gap-3 rounded-xl border border-border bg-surface p-4 sm:grid-cols-3">
         <div className="sm:col-span-3">
-          <label className={labelCls}>Title</label>
+          <label className={labelCls}>Chapter title</label>
           <input
             className={inputCls}
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setDirty(true);
+            }}
           />
         </div>
         <div className="sm:col-span-2">
@@ -168,7 +195,10 @@ export function BlockEditor({
           <input
             className={inputCls}
             value={author}
-            onChange={(e) => setAuthor(e.target.value)}
+            onChange={(e) => {
+              setAuthor(e.target.value);
+              setDirty(true);
+            }}
           />
         </div>
         <div>
@@ -176,7 +206,10 @@ export function BlockEditor({
           <select
             className={inputCls}
             value={frequency}
-            onChange={(e) => setFrequency(e.target.value as Frequency)}
+            onChange={(e) => {
+              setFrequency(e.target.value as Frequency);
+              setDirty(true);
+            }}
           >
             <option value="essential">● Essential</option>
             <option value="important">●● Important</option>
@@ -186,32 +219,38 @@ export function BlockEditor({
       </div>
 
       {/* Blocks */}
-      <div className="mt-5 space-y-3">
+      <div className="space-y-3">
         {blocks.length === 0 && (
-          <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-[13px] text-tfaint">
-            No blocks yet. Add one below.
+          <p className="rounded-xl border border-dashed border-border px-4 py-8 text-center text-[13px] text-tfaint">
+            This chapter is empty. Add a block below to start building.
           </p>
         )}
         {blocks.map((block, i) => (
           <div
             key={i}
-            className="rounded-xl border border-border bg-bg/50 p-3.5"
+            className="rounded-xl border border-border bg-surface p-4 shadow-card"
           >
-            <div className="mb-2.5 flex items-center justify-between">
-              <span className="rounded-md bg-gold/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-gold">
-                {BLOCK_LABEL[block.type]}
-              </span>
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="rounded-md bg-gold/12 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-gold">
+                  {BLOCK_LABEL[block.type]}
+                </span>
+                <span className="hidden text-[11.5px] text-tfaint sm:inline">
+                  {BLOCK_HINT[block.type]}
+                </span>
+              </div>
               <div className="flex items-center gap-1">
-                <IconBtn onClick={() => move(i, -1)} disabled={i === 0}>
+                <IconBtn onClick={() => move(i, -1)} disabled={i === 0} title="Move up">
                   <ArrowUp className="h-3.5 w-3.5" />
                 </IconBtn>
                 <IconBtn
                   onClick={() => move(i, 1)}
                   disabled={i === blocks.length - 1}
+                  title="Move down"
                 >
                   <ArrowDown className="h-3.5 w-3.5" />
                 </IconBtn>
-                <IconBtn onClick={() => remove(i)} danger>
+                <IconBtn onClick={() => remove(i)} danger title="Delete block">
                   <TrashIcon className="h-3.5 w-3.5" />
                 </IconBtn>
               </div>
@@ -225,18 +264,24 @@ export function BlockEditor({
       </div>
 
       {/* Add block */}
-      <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4">
-        <span className="text-[12px] text-tmuted">Add block:</span>
-        {(["text", "resource", "problem", "section"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => add(t)}
-            className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-[12.5px] font-medium text-tmuted transition-colors hover:border-gold/50 hover:text-gold"
-          >
-            <PlusIcon className="h-3 w-3" />
-            {BLOCK_LABEL[t]}
-          </button>
-        ))}
+      <div className="mt-5 rounded-xl border border-dashed border-border-strong bg-surface/60 p-4">
+        <div className="mb-2.5 text-[12px] font-medium text-tmuted">
+          Add a block
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {(["text", "section", "problem", "resource", "video"] as const).map(
+            (t) => (
+              <button
+                key={t}
+                onClick={() => add(t)}
+                className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 text-[12.5px] font-medium text-tprimary transition-colors hover:border-gold/50 hover:text-gold"
+              >
+                <PlusIcon className="h-3.5 w-3.5 text-gold" />
+                {BLOCK_LABEL[t]}
+              </button>
+            ),
+          )}
+        </div>
       </div>
     </div>
   );
@@ -247,20 +292,23 @@ function IconBtn({
   onClick,
   disabled,
   danger,
+  title,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
   danger?: boolean;
+  title?: string;
 }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
+      title={title}
       className={`rounded-md p-1.5 transition-colors disabled:opacity-30 ${
         danger
           ? "text-tmuted hover:bg-danger/10 hover:text-danger"
-          : "text-tmuted hover:bg-surface hover:text-tprimary"
+          : "text-tmuted hover:bg-bg hover:text-tprimary"
       }`}
     >
       {children}
@@ -277,28 +325,56 @@ function BlockFields({
 }) {
   if (block.type === "text") {
     return (
-      <div>
-        <label className={labelCls}>Markdown (supports $math$ and $$display$$)</label>
-        <textarea
-          className={`${inputCls} min-h-[120px] font-mono text-[12.5px]`}
-          value={block.content}
-          onChange={(e) => onChange({ content: e.target.value })}
-          placeholder="Write markdown here…"
-        />
-      </div>
+      <MarkdownField
+        value={block.content}
+        onChange={(v) => onChange({ content: v })}
+        placeholder="Write the lesson text. Use the toolbar for LaTeX."
+      />
     );
   }
 
   if (block.type === "section") {
     return (
       <div>
-        <label className={labelCls}>Section Heading</label>
+        <label className={labelCls}>Section heading</label>
         <input
           className={inputCls}
           value={block.title}
           onChange={(e) => onChange({ title: e.target.value })}
           placeholder="Introduction"
         />
+      </div>
+    );
+  }
+
+  if (block.type === "video") {
+    return (
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <label className={labelCls}>Video URL (YouTube or Vimeo)</label>
+          <input
+            className={inputCls}
+            value={block.url}
+            onChange={(e) => onChange({ url: e.target.value })}
+            placeholder="https://www.youtube.com/watch?v=…"
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Title (optional)</label>
+          <input
+            className={inputCls}
+            value={block.title ?? ""}
+            onChange={(e) => onChange({ title: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Caption (optional)</label>
+          <input
+            className={inputCls}
+            value={block.caption ?? ""}
+            onChange={(e) => onChange({ caption: e.target.value })}
+          />
+        </div>
       </div>
     );
   }
@@ -397,27 +473,28 @@ function BlockFields({
         </div>
       </div>
       <div className="sm:col-span-2">
-        <label className={labelCls}>Statement (markdown + math)</label>
-        <textarea
-          className={`${inputCls} min-h-[80px] font-mono text-[12.5px]`}
+        <label className={labelCls}>Statement</label>
+        <MarkdownField
           value={block.statement}
-          onChange={(e) => onChange({ statement: e.target.value })}
+          onChange={(v) => onChange({ statement: v })}
+          minHeight={90}
+          placeholder="The problem statement (supports LaTeX)."
         />
       </div>
       <div>
         <label className={labelCls}>Hint (optional)</label>
-        <textarea
-          className={`${inputCls} min-h-[60px] font-mono text-[12.5px]`}
+        <MarkdownField
           value={block.hint ?? ""}
-          onChange={(e) => onChange({ hint: e.target.value })}
+          onChange={(v) => onChange({ hint: v })}
+          minHeight={70}
         />
       </div>
       <div>
         <label className={labelCls}>Solution (optional)</label>
-        <textarea
-          className={`${inputCls} min-h-[60px] font-mono text-[12.5px]`}
+        <MarkdownField
           value={block.solution ?? ""}
-          onChange={(e) => onChange({ solution: e.target.value })}
+          onChange={(v) => onChange({ solution: v })}
+          minHeight={70}
         />
       </div>
     </div>

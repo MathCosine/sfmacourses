@@ -1,5 +1,5 @@
 import "server-only";
-import type { ContentBlock, ResourceBlock } from "./types";
+import type { ContentBlock, ResourceBlock, VideoBlock } from "./types";
 import { renderMarkdown } from "./markdown";
 import { headingId } from "./utils";
 import type { PreparedProblem } from "@/components/blocks/ProblemBlock";
@@ -7,26 +7,36 @@ import type { PreparedProblem } from "@/components/blocks/ProblemBlock";
 export type PreparedBlock =
   | { kind: "text"; html: string }
   | { kind: "resource"; block: ResourceBlock }
-  | { kind: "section"; id: string; title: string }
+  | { kind: "video"; block: VideoBlock }
+  | { kind: "section"; id: string; title: string; sectionIndex: number }
   | { kind: "problem"; problemIndex: number; prepared: PreparedProblem };
 
 /**
- * Render every block's markdown to HTML on the server and assign problem
- * indices (used as the stable key for per-problem completion tracking).
+ * Render every block's markdown to HTML on the server and assign stable
+ * per-block indices (used as the key for per-problem / per-section tracking).
  */
 export async function prepareBlocks(
   blocks: ContentBlock[],
 ): Promise<PreparedBlock[]> {
   const out: PreparedBlock[] = [];
   let problemIndex = 0;
+  let sectionIndex = 0;
 
   for (const block of blocks) {
     if (block.type === "text") {
       out.push({ kind: "text", html: await renderMarkdown(block.content) });
     } else if (block.type === "resource") {
       out.push({ kind: "resource", block });
+    } else if (block.type === "video") {
+      out.push({ kind: "video", block });
     } else if (block.type === "section") {
-      out.push({ kind: "section", id: headingId(block.title), title: block.title });
+      out.push({
+        kind: "section",
+        id: headingId(block.title),
+        title: block.title,
+        sectionIndex,
+      });
+      sectionIndex += 1;
     } else if (block.type === "problem") {
       const prepared: PreparedProblem = {
         title: block.title,

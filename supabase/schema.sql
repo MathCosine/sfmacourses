@@ -101,10 +101,11 @@ returns boolean
 language sql
 security definer
 set search_path = public
+stable
 as $$
-  select exists (
-    select 1 from public.profiles
-    where id = auth.uid() and role = 'staff'
+  select coalesce(
+    (select p.role = 'staff' from public.profiles p where p.id = auth.uid()),
+    false
   );
 $$;
 
@@ -143,17 +144,30 @@ alter table public.problem_completions enable row level security;
 alter table public.announcements       enable row level security;
 
 -- Profiles: anyone signed in can read; users edit themselves; staff edit anyone.
-drop policy if exists profiles_select on public.profiles;
-create policy profiles_select on public.profiles
-  for select using (true);
+-- Policies must never query `profiles` directly (that causes infinite
+-- recursion) — staff checks go through the SECURITY DEFINER is_staff().
+do $$
+declare pol record;
+begin
+  for pol in
+    select policyname from pg_policies
+    where schemaname = 'public' and tablename = 'profiles'
+  loop
+    execute format('drop policy if exists %I on public.profiles;', pol.policyname);
+  end loop;
+end $$;
 
-drop policy if exists profiles_insert on public.profiles;
-create policy profiles_insert on public.profiles
-  for insert with check (auth.uid() = id);
+create policy profiles_select_all on public.profiles
+  for select to authenticated using (true);
 
-drop policy if exists profiles_update on public.profiles;
-create policy profiles_update on public.profiles
-  for update using (auth.uid() = id or public.is_staff());
+create policy profiles_insert_self on public.profiles
+  for insert to authenticated with check (auth.uid() = id);
+
+create policy profiles_update_self on public.profiles
+  for update to authenticated using (auth.uid() = id);
+
+create policy profiles_update_staff on public.profiles
+  for update to authenticated using (public.is_staff()) with check (true);
 
 -- Content: world-readable; only staff may write.
 do $$
@@ -167,6 +181,20 @@ begin
   end loop;
 end $$;
 
+-- Per-section status (one row per (user, lesson, section_index)).
+create table if not exists public.section_completions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  lesson_id uuid not null references public.lessons (id) on delete cascade,
+  section_index int not null,
+  status text not null default 'not_started',
+  created_at timestamptz not null default now(),
+  unique (user_id, lesson_id, section_index)
+);
+create unique index if not exists section_completions_key
+  on public.section_completions (user_id, lesson_id, section_index);
+alter table public.section_completions enable row level security;
+
 -- Progress: each user owns their rows.
 drop policy if exists progress_rw on public.progress;
 create policy progress_rw on public.progress
@@ -174,6 +202,10 @@ create policy progress_rw on public.progress
 
 drop policy if exists problem_completions_rw on public.problem_completions;
 create policy problem_completions_rw on public.problem_completions
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+drop policy if exists section_completions_rw on public.section_completions;
+create policy section_completions_rw on public.section_completions
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- Announcements: world-readable; only staff may write.

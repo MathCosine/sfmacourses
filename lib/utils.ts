@@ -58,6 +58,32 @@ export function countProblems(content: Block[] | null | undefined): number {
   return (content ?? []).filter((b) => b.type === "problem").length;
 }
 
+/** Parse a YouTube/Vimeo watch URL into an embeddable iframe URL. */
+export function toEmbedUrl(url: string): string | null {
+  if (!url?.trim()) return null;
+  try {
+    const u = new URL(url.trim());
+    const host = u.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") {
+      return `https://www.youtube.com/embed/${u.pathname.slice(1)}`;
+    }
+    if (host.endsWith("youtube.com")) {
+      const v = u.searchParams.get("v");
+      if (v) return `https://www.youtube.com/embed/${v}`;
+      if (u.pathname.startsWith("/embed/")) return url;
+      if (u.pathname.startsWith("/shorts/"))
+        return `https://www.youtube.com/embed/${u.pathname.split("/")[2]}`;
+    }
+    if (host.endsWith("vimeo.com")) {
+      const id = u.pathname.split("/").filter(Boolean)[0];
+      if (id) return `https://player.vimeo.com/video/${id}`;
+    }
+    return url;
+  } catch {
+    return null;
+  }
+}
+
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
     year: "numeric",

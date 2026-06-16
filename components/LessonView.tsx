@@ -5,7 +5,8 @@ import type { LessonStatus, ProblemStatus } from "@/lib/types";
 import { TextBlock } from "@/components/blocks/TextBlock";
 import { ResourceBlock } from "@/components/blocks/ResourceBlock";
 import { ProblemBlock } from "@/components/blocks/ProblemBlock";
-import { SectionDivider } from "@/components/blocks/SectionDivider";
+import { VideoBlock } from "@/components/blocks/VideoBlock";
+import { SectionBlock } from "@/components/blocks/SectionBlock";
 import { LessonStatusControl } from "@/components/LessonStatusControl";
 
 interface LessonViewProps {
@@ -14,6 +15,7 @@ interface LessonViewProps {
   lessonId: string;
   lessonStatus: LessonStatus;
   problemStatuses: Record<number, ProblemStatus>;
+  sectionStatuses: Record<number, LessonStatus>;
 }
 
 export function LessonView({
@@ -22,6 +24,7 @@ export function LessonView({
   lessonId,
   lessonStatus,
   problemStatuses,
+  sectionStatuses,
 }: LessonViewProps) {
   return (
     <>
@@ -32,9 +35,20 @@ export function LessonView({
               return <TextBlock key={i} html={block.html} />;
             case "resource":
               return <ResourceBlock key={i} block={block.block} />;
+            case "video":
+              return <VideoBlock key={i} block={block.block} />;
             case "section":
               return (
-                <SectionDivider key={i} id={block.id} title={block.title} />
+                <SectionBlock
+                  key={i}
+                  id={block.id}
+                  title={block.title}
+                  lessonId={lessonId}
+                  sectionIndex={block.sectionIndex}
+                  initialStatus={
+                    sectionStatuses[block.sectionIndex] ?? "not_started"
+                  }
+                />
               );
             case "problem":
               return (

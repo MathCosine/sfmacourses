@@ -10,6 +10,7 @@ import {
   getLessonStatus,
   getSessionUser,
   getProblemStatuses,
+  getSectionStatuses,
 } from "@/lib/data";
 import { prepareBlocks } from "@/lib/prepare";
 import {
@@ -51,11 +52,13 @@ export default async function LessonPage({
 
   const meta = extractMeta(ctx.lesson.content);
   const blocks = contentBlocks(ctx.lesson.content);
-  const [prepared, lessonStatus, problemStatuses] = await Promise.all([
-    prepareBlocks(blocks),
-    getLessonStatus(userId, ctx.lesson.id),
-    getProblemStatuses(userId, ctx.lesson.id),
-  ]);
+  const [prepared, lessonStatus, problemStatuses, sectionStatuses] =
+    await Promise.all([
+      prepareBlocks(blocks),
+      getLessonStatus(userId, ctx.lesson.id),
+      getProblemStatuses(userId, ctx.lesson.id),
+      getSectionStatuses(userId, ctx.lesson.id),
+    ]);
   const problemCount = countProblems(ctx.lesson.content);
   const dots = FREQUENCY_DOTS[meta.frequency];
 
@@ -139,6 +142,7 @@ export default async function LessonPage({
               lessonId={ctx.lesson.id}
               lessonStatus={lessonStatus}
               problemStatuses={problemStatuses}
+              sectionStatuses={sectionStatuses}
             />
           </div>
 

@@ -3,10 +3,16 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils";
+import { renderMarkdown } from "@/lib/markdown";
 import { isSuperAdmin } from "@/lib/admin";
 import type { Block, ContentBlock, MetaBlock, Frequency } from "@/lib/types";
 
 type Result = { ok: boolean; error?: string; id?: string };
+
+/** Render markdown + LaTeX to HTML for the live editor preview. */
+export async function previewMarkdown(md: string): Promise<string> {
+  return renderMarkdown(md ?? "");
+}
 
 async function requireStaff() {
   const supabase = await createClient();
@@ -46,6 +52,53 @@ async function nextOrder(
     .order("order_index", { ascending: false })
     .limit(1);
   return (data?.[0]?.order_index ?? -1) + 1;
+}
+
+/** Swap order_index with the neighbour in the given direction. */
+async function moveItem(
+  table: "modules" | "lessons",
+  id: string,
+  dir: -1 | 1,
+): Promise<Result> {
+  const { supabase, error } = await requireStaff();
+  if (error) return { ok: false, error };
+
+  const { data: row } = await supabase
+    .from(table)
+    .select("id, order_index, track_id, module_id")
+    .eq("id", id)
+    .maybeSingle();
+  if (!row) return { ok: false, error: "Not found" };
+
+  const parentCol = table === "modules" ? "track_id" : "module_id";
+  const parentId = (row as Record<string, string>)[parentCol];
+
+  const { data: siblings } = await supabase
+    .from(table)
+    .select("id, order_index")
+    .eq(parentCol, parentId)
+    .order("order_index", { ascending: true });
+
+  const list = siblings ?? [];
+  const idx = list.findIndex((s) => s.id === id);
+  const swapIdx = idx + dir;
+  if (idx === -1 || swapIdx < 0 || swapIdx >= list.length)
+    return { ok: true }; // already at the edge
+
+  const a = list[idx];
+  const b = list[swapIdx];
+  await supabase.from(table).update({ order_index: b.order_index }).eq("id", a.id);
+  await supabase.from(table).update({ order_index: a.order_index }).eq("id", b.id);
+  refresh();
+  return { ok: true };
+}
+
+export async function moveModule(id: string, dir: -1 | 1): Promise<Result> {
+  return moveItem("modules", id, dir);
+}
+
+export async function moveLesson(id: string, dir: -1 | 1): Promise<Result> {
+  return moveItem("lessons", id, dir);
 }
 
 /* ---------------- Modules ---------------- */

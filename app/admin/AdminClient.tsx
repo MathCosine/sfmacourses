@@ -11,12 +11,20 @@ import {
   createModule,
   createLesson,
   deleteModule,
-  updateModule,
+  deleteLesson,
+  moveModule,
+  moveLesson,
   toggleRole,
   createAnnouncement,
   deleteAnnouncement,
 } from "./actions";
-import { PlusIcon, TrashIcon, ChevronRight } from "@/components/icons";
+import {
+  PlusIcon,
+  TrashIcon,
+  ChevronRight,
+  ArrowUp,
+  ArrowDown,
+} from "@/components/icons";
 
 type Tab = "content" | "students" | "announcements";
 
@@ -100,136 +108,220 @@ function ContentTab({
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
-  const [editing, setEditing] = useState<Lesson | null>(
-    () => {
-      for (const t of tree)
-        for (const m of t.modules)
-          for (const l of m.lessons) if (l.id === openLessonId) return l;
-      return null;
-    },
-  );
+  const [editing, setEditing] = useState<Lesson | null>(() => {
+    for (const t of tree)
+      for (const m of t.modules)
+        for (const l of m.lessons) if (l.id === openLessonId) return l;
+    return null;
+  });
 
-  function onNewModule(trackId: string) {
-    const title = prompt("New unit title:");
-    if (!title?.trim()) return;
+  function run(fn: () => Promise<{ ok: boolean; error?: string }>) {
     startTransition(async () => {
-      const res = await createModule(trackId, title.trim());
-      if (res.ok) router.refresh();
-      else alert(res.error);
-    });
-  }
-  function onNewLesson(moduleId: string) {
-    const title = prompt("New chapter title:");
-    if (!title?.trim()) return;
-    startTransition(async () => {
-      const res = await createLesson(moduleId, title.trim());
-      if (res.ok) router.refresh();
-      else alert(res.error);
-    });
-  }
-  function onDeleteModule(id: string, title: string) {
-    if (!confirm(`Delete unit “${title}” and all its chapters?`)) return;
-    startTransition(async () => {
-      const res = await deleteModule(id);
-      if (res.ok) router.refresh();
-      else alert(res.error);
-    });
-  }
-  function onRenameModule(id: string, current: string) {
-    const title = prompt("Rename unit:", current);
-    if (!title?.trim() || title === current) return;
-    startTransition(async () => {
-      const res = await updateModule(id, { title: title.trim() });
+      const res = await fn();
       if (res.ok) router.refresh();
       else alert(res.error);
     });
   }
 
   if (editing) {
-    return (
-      <BlockEditor lesson={editing} onClose={() => setEditing(null)} />
-    );
+    return <BlockEditor lesson={editing} onClose={() => setEditing(null)} />;
   }
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-8">
       {tree.map((track) => (
         <section key={track.id}>
-          <div className="mb-2.5 flex items-center justify-between">
-            <h2 className="font-serif text-2xl text-tprimary">{track.title}</h2>
-            <button
-              onClick={() => onNewModule(track.id)}
-              className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-[12.5px] font-medium text-tmuted transition-colors hover:border-gold/50 hover:text-gold"
-            >
-              <PlusIcon className="h-3.5 w-3.5" /> New Unit
-            </button>
-          </div>
+          <h2 className="mb-3 font-serif text-2xl text-tprimary">
+            {track.title}
+          </h2>
 
           <div className="space-y-2.5">
-            {track.modules.length === 0 && (
-              <p className="rounded-xl border border-dashed border-border px-4 py-5 text-[13px] text-tfaint">
-                No modules yet.
-              </p>
-            )}
-            {track.modules.map((m) => (
+            {track.modules.map((m, mi) => (
               <div
                 key={m.id}
-                className="rounded-xl border border-border bg-surface p-4"
+                className="overflow-hidden rounded-xl border border-border bg-surface"
               >
-                <div className="flex items-center justify-between gap-3">
-                  <button
-                    onClick={() => onRenameModule(m.id, m.title)}
-                    className="text-left text-[15px] font-semibold text-tprimary hover:text-gold"
-                    title="Rename unit"
-                  >
+                <div className="flex items-center gap-2 border-b border-border bg-bg/40 px-3 py-2">
+                  <span className="text-[15px] font-semibold text-tprimary">
                     {m.title}
-                  </button>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => onNewLesson(m.id)}
-                      className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-[12px] font-medium text-tmuted transition-colors hover:border-gold/50 hover:text-gold"
+                  </span>
+                  <span className="text-[11.5px] text-tfaint">
+                    Unit · {m.lessons.length} chapters
+                  </span>
+                  <div className="ml-auto flex items-center gap-0.5">
+                    <MiniBtn
+                      onClick={() => run(() => moveModule(m.id, -1))}
+                      disabled={mi === 0}
+                      title="Move unit up"
                     >
-                      <PlusIcon className="h-3 w-3" /> New Chapter
-                    </button>
-                    <button
-                      onClick={() => onDeleteModule(m.id, m.title)}
-                      className="rounded-md p-1.5 text-tmuted transition-colors hover:bg-danger/10 hover:text-danger"
+                      <ArrowUp className="h-3.5 w-3.5" />
+                    </MiniBtn>
+                    <MiniBtn
+                      onClick={() => run(() => moveModule(m.id, 1))}
+                      disabled={mi === track.modules.length - 1}
+                      title="Move unit down"
+                    >
+                      <ArrowDown className="h-3.5 w-3.5" />
+                    </MiniBtn>
+                    <MiniBtn
+                      danger
                       title="Delete unit"
+                      onClick={() => {
+                        if (
+                          confirm(
+                            `Delete unit “${m.title}” and all its chapters?`,
+                          )
+                        )
+                          run(() => deleteModule(m.id));
+                      }}
                     >
                       <TrashIcon className="h-3.5 w-3.5" />
-                    </button>
+                    </MiniBtn>
                   </div>
                 </div>
 
-                <ul className="mt-2 divide-y divide-border border-t border-border">
-                  {m.lessons.map((l) => (
-                    <li key={l.id}>
+                <ul className="divide-y divide-border">
+                  {m.lessons.map((l, li) => (
+                    <li
+                      key={l.id}
+                      className="flex items-center gap-2 px-3 py-2 hover:bg-bg/40"
+                    >
                       <button
                         onClick={() => setEditing(l)}
-                        className="group flex w-full items-center gap-2 py-2 text-left"
+                        className="group flex min-w-0 flex-1 items-center gap-2 text-left"
                       >
-                        <ChevronRight className="h-3.5 w-3.5 text-tfaint" />
-                        <span className="flex-1 text-[13.5px] text-tprimary group-hover:text-gold">
+                        <ChevronRight className="h-3.5 w-3.5 shrink-0 text-tfaint" />
+                        <span className="truncate text-[13.5px] text-tprimary group-hover:text-gold">
                           {l.title}
                         </span>
-                        <span className="text-[11.5px] text-tfaint">
+                        <span className="shrink-0 text-[11.5px] text-tfaint">
                           {countProblems(l.content)} problems
                         </span>
                       </button>
+                      <div className="flex items-center gap-0.5">
+                        <MiniBtn
+                          onClick={() => run(() => moveLesson(l.id, -1))}
+                          disabled={li === 0}
+                          title="Move chapter up"
+                        >
+                          <ArrowUp className="h-3.5 w-3.5" />
+                        </MiniBtn>
+                        <MiniBtn
+                          onClick={() => run(() => moveLesson(l.id, 1))}
+                          disabled={li === m.lessons.length - 1}
+                          title="Move chapter down"
+                        >
+                          <ArrowDown className="h-3.5 w-3.5" />
+                        </MiniBtn>
+                        <MiniBtn
+                          onClick={() => setEditing(l)}
+                          title="Edit chapter"
+                        >
+                          <span className="text-[11px] font-medium">Edit</span>
+                        </MiniBtn>
+                        <MiniBtn
+                          danger
+                          title="Delete chapter"
+                          onClick={() => {
+                            if (confirm(`Delete chapter “${l.title}”?`))
+                              run(() => deleteLesson(l.id));
+                          }}
+                        >
+                          <TrashIcon className="h-3.5 w-3.5" />
+                        </MiniBtn>
+                      </div>
                     </li>
                   ))}
-                  {m.lessons.length === 0 && (
-                    <li className="py-2 text-[12.5px] text-tfaint">
-                      No lessons yet.
-                    </li>
-                  )}
                 </ul>
+
+                <div className="border-t border-border px-3 py-2">
+                  <InlineAdd
+                    placeholder="New chapter title…"
+                    onAdd={(title) => run(() => createLesson(m.id, title))}
+                  />
+                </div>
               </div>
             ))}
+
+            {/* Add unit */}
+            <div className="rounded-xl border border-dashed border-border-strong bg-surface/50 px-3 py-2.5">
+              <InlineAdd
+                placeholder="New unit title…"
+                button="Add Unit"
+                onAdd={(title) => run(() => createModule(track.id, title))}
+              />
+            </div>
           </div>
         </section>
       ))}
     </div>
+  );
+}
+
+function MiniBtn({
+  children,
+  onClick,
+  disabled,
+  danger,
+  title,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  danger?: boolean;
+  title?: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      className={`rounded-md px-1.5 py-1 transition-colors disabled:opacity-30 ${
+        danger
+          ? "text-tmuted hover:bg-danger/10 hover:text-danger"
+          : "text-tmuted hover:bg-bg hover:text-gold"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function InlineAdd({
+  placeholder,
+  button = "Add Chapter",
+  onAdd,
+}: {
+  placeholder: string;
+  button?: string;
+  onAdd: (title: string) => void;
+}) {
+  const [value, setValue] = useState("");
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const t = value.trim();
+    if (!t) return;
+    onAdd(t);
+    setValue("");
+  }
+  return (
+    <form onSubmit={submit} className="flex items-center gap-2">
+      <PlusIcon className="h-3.5 w-3.5 shrink-0 text-gold" />
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder={placeholder}
+        className="min-w-0 flex-1 bg-transparent text-[13px] text-tprimary outline-none placeholder:text-tfaint"
+      />
+      {value.trim() && (
+        <button
+          type="submit"
+          className="shrink-0 rounded-md bg-gold px-2.5 py-1 text-[11.5px] font-semibold text-white transition-colors hover:bg-gold-hover"
+        >
+          {button}
+        </button>
+      )}
+    </form>
   );
 }
 

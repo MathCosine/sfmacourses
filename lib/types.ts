@@ -50,6 +50,13 @@ export interface SectionBlock {
   title: string;
 }
 
+export interface VideoBlock {
+  type: "video";
+  url: string;
+  title?: string;
+  caption?: string;
+}
+
 /**
  * Lesson-level metadata. Stored as an optional first element of the content
  * array (the `lessons` table has no dedicated columns for these), and filtered
@@ -65,7 +72,8 @@ export type ContentBlock =
   | TextBlock
   | ResourceBlock
   | ProblemBlock
-  | SectionBlock;
+  | SectionBlock
+  | VideoBlock;
 
 export type Block = ContentBlock | MetaBlock;
 
