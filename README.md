@@ -22,6 +22,35 @@ npm run dev
 
 Open <http://localhost:3000>.
 
+## Deployment (Vercel)
+
+This is a server-rendered Next.js app (Server Components, Server Actions,
+middleware-based auth). It needs a Node server at runtime, so **static hosts
+like GitHub Pages cannot run it** — deploy it on Vercel (or any Next.js-capable
+host such as Netlify or Cloudflare).
+
+1. Push this repo to GitHub (already done).
+2. At <https://vercel.com/new>, **Import** the `sfmacourses` repository. Vercel
+   auto-detects Next.js — no build settings to change.
+3. Under **Environment Variables**, add the two public keys (same as
+   `.env.example`), for all environments:
+
+   | Name | Value |
+   | --- | --- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | `https://vqioilvbdqpmywmppqtg.supabase.co` |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `sb_publishable_U2nygA2laev0pwVm1wMfYQ_kggTjskv` |
+
+4. Click **Deploy**. You'll get a URL like `https://sfmacourses.vercel.app`.
+5. In **Supabase → Authentication → URL Configuration**, set the **Site URL**
+   to your Vercel URL and add it under **Redirect URLs**, so signup
+   confirmation emails point at the deployed site.
+
+Make sure `supabase/schema.sql` and `supabase/seed.sql` have been run (see
+below) before visiting the deployed site, or the content tree will be empty.
+
+> Note: GitHub Pages serves only static files. If you point Pages at this repo
+> it will just render this `README.md` — that is expected, not a build error.
+
 ## Database
 
 The schema and seed live in `supabase/`:
