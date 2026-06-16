@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { Difficulty } from "@/lib/types";
-import { setProblemSolved } from "@/app/learn/actions";
+import type { Difficulty, ProblemStatus } from "@/lib/types";
+import { setProblemStatus } from "@/app/learn/actions";
+import { PROBLEM_STATUS_OPTIONS } from "@/lib/status";
 import { cn } from "@/lib/utils";
-import { ChevronRight, Check } from "@/components/icons";
+import { ChevronRight } from "@/components/icons";
+import { StatusControl } from "@/components/StatusControl";
 
 export interface PreparedProblem {
   title: string;
@@ -16,64 +18,62 @@ export interface PreparedProblem {
 }
 
 const DIFFICULTY_STYLE: Record<Difficulty, { color: string; bg: string }> = {
-  Easy: { color: "#1a7f47", bg: "rgba(26,127,71,0.10)" },
-  Medium: { color: "#a86a0a", bg: "rgba(168,106,10,0.11)" },
-  Hard: { color: "#c2410c", bg: "rgba(194,65,12,0.10)" },
-  "Very Hard": { color: "#b3261e", bg: "rgba(179,38,30,0.10)" },
+  Easy: { color: "#2f9e44", bg: "rgba(47,158,68,0.10)" },
+  Medium: { color: "#1c7ed6", bg: "rgba(28,126,214,0.10)" },
+  Hard: { color: "#e8590c", bg: "rgba(232,89,12,0.10)" },
+  "Very Hard": { color: "#c92a2a", bg: "rgba(201,42,42,0.10)" },
 };
 
 interface ProblemBlockProps {
   block: PreparedProblem;
   lessonId: string;
   problemIndex: number;
-  initialSolved: boolean;
+  initialStatus: ProblemStatus;
 }
 
 export function ProblemBlock({
   block,
   lessonId,
   problemIndex,
-  initialSolved,
+  initialStatus,
 }: ProblemBlockProps) {
   const [open, setOpen] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
-  const [solved, setSolved] = useState(initialSolved);
+  const [status, setStatus] = useState<ProblemStatus>(initialStatus);
   const [, startTransition] = useTransition();
 
   const diff = DIFFICULTY_STYLE[block.difficulty] ?? DIFFICULTY_STYLE.Medium;
+  const done = status === "solved";
 
-  function toggleSolved(e: React.MouseEvent) {
-    e.stopPropagation();
-    const next = !solved;
-    setSolved(next);
+  function changeStatus(next: string) {
+    const prev = status;
+    setStatus(next as ProblemStatus);
     startTransition(async () => {
-      const res = await setProblemSolved(lessonId, problemIndex, next);
-      if (!res.ok) setSolved(!next); // revert on failure
+      const res = await setProblemStatus(
+        lessonId,
+        problemIndex,
+        next as ProblemStatus,
+      );
+      if (!res.ok) setStatus(prev);
     });
   }
 
   return (
     <div
       className={cn(
-        "my-4 overflow-hidden rounded-2xl border bg-surface shadow-card transition-all",
-        solved ? "border-green/50 ring-1 ring-green/15" : "border-border",
+        "my-2.5 overflow-hidden rounded-xl border bg-surface transition-colors",
+        done ? "border-green/40" : "border-border",
       )}
     >
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3">
-        <button
-          onClick={toggleSolved}
-          title={solved ? "Mark as unsolved" : "Mark as solved"}
-          className={cn(
-            "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors",
-            solved
-              ? "border-green bg-green text-bg"
-              : "border-tfaint bg-transparent hover:border-gold",
-          )}
-        >
-          {solved && <Check className="h-3.5 w-3.5" />}
-        </button>
+        <StatusControl
+          value={status}
+          options={PROBLEM_STATUS_OPTIONS}
+          onChange={changeStatus}
+          size={22}
+        />
 
         <button
           onClick={() => setOpen((o) => !o)}

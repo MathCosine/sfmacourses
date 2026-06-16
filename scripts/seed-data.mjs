@@ -375,160 +375,162 @@ The remainder is $1$.`,
     ],
   },
 
-  /* ============================================================== AIME */
+  /* ===================================================== AP Calculus BC */
   {
-    title: "AIME",
-    slug: "aime",
+    title: "AP Calculus BC",
+    slug: "ap-calculus-bc",
     description:
-      "Olympiad-level techniques — the lemmas and tools that crack the hardest AIME problems.",
+      "Limits, derivatives, integrals, and series — the full AP Calculus BC curriculum.",
     order_index: 2,
     modules: [
       {
-        title: "Algebraic Techniques",
-        slug: "algebraic-techniques",
-        description: "Powerful lemmas for the integers.",
+        title: "Limits and Continuity",
+        slug: "limits-and-continuity",
+        description: "The foundation of calculus.",
         order_index: 0,
         lessons: [
           {
-            title: "Lifting the Exponent Lemma",
-            slug: "lifting-the-exponent-lemma",
+            title: "Evaluating Limits",
+            slug: "evaluating-limits",
             order_index: 0,
-            author: "Divyanshu Upreti",
-            frequency: "supplemental",
+            author: "SFMA Staff",
+            frequency: "essential",
             blocks: [
               { type: "section", title: "Introduction" },
               {
                 type: "text",
-                content: R`The **Lifting the Exponent** lemma (LTE) computes the exact power of a prime $p$ dividing expressions like $a^n - b^n$. Write $v_p(N)$ for the **$p$-adic valuation** of $N$ — the exponent of $p$ in the prime factorization of $N$. LTE turns a hard factoring question into a one-line formula.`,
+                content: R`A **limit** describes the value a function approaches as its input approaches some point. We write
+$$\lim_{x \to a} f(x) = L$$
+to mean that $f(x)$ gets arbitrarily close to $L$ as $x$ gets close to $a$ (from either side). Limits are the foundation on which derivatives and integrals are built.`,
               },
-              { type: "section", title: "Statement" },
+              { type: "section", title: "Techniques" },
               {
                 type: "text",
-                content: R`Let $p$ be an **odd** prime and let $a, b$ be integers not divisible by $p$, with $p \mid (a - b)$. Then for every positive integer $n$,
-$$v_p\!\left(a^n - b^n\right) = v_p(a - b) + v_p(n).$$
+                content: R`**Direct substitution.** If $f$ is continuous at $a$, then $\lim_{x\to a} f(x) = f(a)$. Always try this first.
 
-There is a companion for sums: if $p \mid (a+b)$ and $n$ is **odd**, then
-$$v_p\!\left(a^n + b^n\right) = v_p(a + b) + v_p(n).$$
+**Factoring.** When substitution gives the indeterminate form $\tfrac{0}{0}$, factor and cancel:
+$$\lim_{x \to 2} \frac{x^2 - 4}{x - 2} = \lim_{x \to 2} \frac{(x-2)(x+2)}{x-2} = \lim_{x\to 2}(x+2) = 4.$$
 
-The prime $p = 2$ needs a separate, slightly different statement.`,
-              },
-              { type: "section", title: "Proof Sketch" },
-              {
-                type: "text",
-                content: R`The base case is the factorization
-$$a^n - b^n = (a - b)\left(a^{n-1} + a^{n-2}b + \cdots + b^{n-1}\right).$$
-When $p \nmid n$, the second factor is $\equiv n a^{n-1} \not\equiv 0 \pmod p$ (using $a \equiv b$), so it contributes no extra factors of $p$ and $v_p(a^n - b^n) = v_p(a-b)$.
-
-To handle a factor of $p$ in $n$, one shows $v_p(a^p - b^p) = v_p(a - b) + 1$ by expanding $a = b + pk$ with the binomial theorem. Writing $n = p^t m$ with $p \nmid m$ and iterating gives the $+\,v_p(n)$ term.`,
+**L'Hôpital's Rule.** For a $\tfrac{0}{0}$ or $\tfrac{\infty}{\infty}$ form,
+$$\lim_{x\to a}\frac{f(x)}{g(x)} = \lim_{x\to a}\frac{f'(x)}{g'(x)},$$
+provided the right-hand limit exists.`,
               },
               {
                 type: "resource",
-                source: "AoPS",
+                source: "Khan Academy",
                 stars: 5,
-                title: "Lifting the Exponent Lemma",
+                title: "Limits and continuity",
                 description:
-                  "Full statement (including the p = 2 case), a complete proof, and olympiad problems.",
-                url: "https://artofproblemsolving.com/wiki/index.php/Lifting_the_Exponent",
+                  "Video-based walkthroughs of every limit technique on the AP exam.",
+                url: "https://www.khanacademy.org/math/ap-calculus-bc",
               },
-              { type: "section", title: "Worked AIME-Style Examples" },
+              { type: "section", title: "Practice Problems" },
               {
                 type: "problem",
-                title: "Power of 3 in a difference",
-                source: "AIME (practice)",
+                title: "A removable discontinuity",
+                source: "AP Calculus BC (practice)",
+                difficulty: "Easy",
+                statement: R`Evaluate
+$$\lim_{x \to 3} \frac{x^2 - 9}{x - 3}.$$`,
+                hint: R`The form is $\tfrac{0}{0}$. Factor the numerator as a difference of squares.`,
+                solution: R`Factor and cancel:
+$$\frac{x^2-9}{x-3} = \frac{(x-3)(x+3)}{x-3} = x+3.$$
+So the limit is $3 + 3 = 6.$`,
+              },
+              {
+                type: "problem",
+                title: "A trigonometric limit",
+                source: "AP Calculus BC (practice)",
                 difficulty: "Medium",
-                statement: R`Find the largest power of $3$ dividing $10^{27} - 1$.`,
-                hint: R`Apply LTE with $p = 3$, $a = 10$, $b = 1$. Check that $3 \mid (a - b)$ first.`,
-                solution: R`Here $a - b = 9$, so $v_3(a-b) = 2$, and $v_3(27) = 3$. By LTE,
-$$v_3\!\left(10^{27} - 1\right) = v_3(9) + v_3(27) = 2 + 3 = 5.$$
-So $3^5 = 243$ is the largest power of $3$ dividing the number.`,
+                statement: R`Evaluate
+$$\lim_{x \to 0} \frac{\sin(5x)}{3x}.$$`,
+                hint: R`Use the standard limit $\lim_{u\to 0}\tfrac{\sin u}{u} = 1$ after matching the argument.`,
+                solution: R`Rewrite to expose $\tfrac{\sin u}{u}$ with $u = 5x$:
+$$\frac{\sin 5x}{3x} = \frac{5}{3}\cdot\frac{\sin 5x}{5x} \longrightarrow \frac{5}{3}\cdot 1 = \frac{5}{3}.$$`,
               },
               {
                 type: "problem",
-                title: "A divisibility count",
-                source: "AIME (practice)",
-                difficulty: "Hard",
-                statement: R`Let $N = 7^{2024} - 1$. Find $v_2(N) + v_3(N)$, the total number of factors of $2$ and $3$ in $N$.`,
-                hint: R`For $p=3$ use standard LTE. For $p = 2$, use the even version: $v_2(a^n - b^n) = v_2(a-b) + v_2(a+b) + v_2(n) - 1$ when $n$ is even.`,
-                solution: R`**Prime $3$:** with $a = 7,\ b = 1$, we have $v_3(a-b) = v_3(6) = 1$ and $v_3(2024) = 0$, so $v_3(N) = 1$.
-
-**Prime $2$:** since $2024$ is even, the $p=2$ formula gives
-$$v_2(N) = v_2(7-1) + v_2(7+1) + v_2(2024) - 1 = 1 + 3 + 3 - 1 = 6,$$
-because $2024 = 2^3 \cdot 11 \cdot 23$. Hence $v_2(N) + v_3(N) = 6 + 1 = 7.$`,
+                title: "L'Hôpital's Rule",
+                source: "AP Calculus BC (practice)",
+                difficulty: "Medium",
+                statement: R`Evaluate
+$$\lim_{x \to 0} \frac{e^x - 1 - x}{x^2}.$$`,
+                hint: R`The form is $\tfrac{0}{0}$. Apply L'Hôpital's Rule twice.`,
+                solution: R`Differentiating top and bottom: $\tfrac{e^x - 1}{2x}$, still $\tfrac00$. Again: $\tfrac{e^x}{2} \to \tfrac12$. So the limit is $\tfrac{1}{2}.$`,
               },
             ],
           },
         ],
       },
       {
-        title: "Combinatorics",
-        slug: "combinatorics",
-        description: "Encoding counting problems as algebra.",
+        title: "Integration",
+        slug: "integration",
+        description: "Accumulation and the antiderivative.",
         order_index: 1,
         lessons: [
           {
-            title: "Generating Functions",
-            slug: "generating-functions",
+            title: "The Fundamental Theorem of Calculus",
+            slug: "fundamental-theorem-of-calculus",
             order_index: 0,
-            author: "Jason Chen",
-            frequency: "supplemental",
+            author: "SFMA Staff",
+            frequency: "important",
             blocks: [
               { type: "section", title: "Introduction" },
               {
                 type: "text",
-                content: R`A **generating function** packages a sequence $a_0, a_1, a_2, \dots$ into a single power series
-$$A(x) = \sum_{n \ge 0} a_n x^n.$$
-Counting problems become algebra: the coefficient of $x^n$, written $[x^n]A(x)$, recovers $a_n$. Multiplying generating functions corresponds to combining independent choices.`,
+                content: R`The **Fundamental Theorem of Calculus** (FTC) ties together the two central operations of calculus — differentiation and integration — showing they are inverses of one another.`,
               },
-              { type: "section", title: "The Key Tool" },
+              { type: "section", title: "The Two Parts" },
               {
                 type: "text",
-                content: R`The single most useful identity is the geometric series
-$$\frac{1}{1 - x} = 1 + x + x^2 + x^3 + \cdots = \sum_{n \ge 0} x^n,$$
-and its generalization, the **binomial series**
-$$\frac{1}{(1-x)^k} = \sum_{n \ge 0} \binom{n + k - 1}{k - 1} x^n.$$
-The coefficient $\binom{n+k-1}{k-1}$ is exactly the number of ways to write $n$ as an ordered sum of $k$ nonnegative integers — the "stars and bars" count.`,
-              },
-              { type: "section", title: "A Worked Example" },
-              {
-                type: "text",
-                content: R`*In how many ways can we make $10$ cents using pennies, nickels, and dimes?*
+                content: R`**Part 1.** If $F(x) = \displaystyle\int_a^x f(t)\,dt$ with $f$ continuous, then $F$ is differentiable and
+$$F'(x) = f(x).$$
 
-Each coin type contributes a factor that records the values it can supply:
-$$\underbrace{\frac{1}{1-x}}_{\text{pennies}} \cdot \underbrace{\frac{1}{1-x^5}}_{\text{nickels}} \cdot \underbrace{\frac{1}{1-x^{10}}}_{\text{dimes}}.$$
-We want $[x^{10}]$ of this product. Expanding just to degree $10$, the answer is $4$: namely $\{10\text{ p}\},\ \{5\text{ p}+1\text{ n}\},\ \{2\text{ n}\},\ \{1\text{ d}\}$.`,
+**Part 2 (Evaluation).** If $F$ is any antiderivative of $f$ on $[a,b]$, then
+$$\int_a^b f(x)\,dx = F(b) - F(a).$$
+
+Part 2 turns the hard problem of summing infinitely many slices into the easy problem of evaluating an antiderivative at two endpoints.`,
               },
               {
                 type: "resource",
-                source: "Art of Problem Solving",
+                source: "Paul's Online Notes",
                 stars: 4,
-                title: "Generating Functions",
+                title: "The Fundamental Theorem of Calculus",
                 description:
-                  "From first principles to partitions and recurrences, with AIME-level applications.",
-                url: "https://artofproblemsolving.com/wiki/index.php/Generating_functions",
+                  "A clear statement of both parts with fully worked examples.",
+                url: "https://tutorial.math.lamar.edu/classes/calci/proofintegrals.aspx",
               },
               { type: "section", title: "Practice Problems" },
               {
                 type: "problem",
-                title: "Counting with bounded parts",
-                source: "AIME (practice)",
-                difficulty: "Medium",
-                statement: R`How many solutions in nonnegative integers does
-$$x_1 + x_2 + x_3 = 12$$
-have, where each $x_i \le 6$?`,
-                hint: R`Each variable contributes $1 + x + \cdots + x^6 = \dfrac{1-x^7}{1-x}$. Find $[x^{12}]\left(\dfrac{1-x^7}{1-x}\right)^3$.`,
-                solution: R`Without the upper bound there are $\binom{12 + 2}{2} = \binom{14}{2} = 91$ solutions. By inclusion–exclusion on $(1 - x^7)^3$, subtract the cases where some $x_i \ge 7$: there are $\binom{3}{1}\binom{(12-7)+2}{2} = 3 \cdot \binom{7}{2} = 3 \cdot 21 = 63$. No two variables can both exceed $6$ (that would need $\ge 14$). So the count is
-$$91 - 63 = 28.$$`,
+                title: "A definite integral",
+                source: "AP Calculus BC (practice)",
+                difficulty: "Easy",
+                statement: R`Evaluate
+$$\int_1^3 \left(2x + 1\right)\,dx.$$`,
+                hint: R`Find an antiderivative, then apply Part 2: $F(3) - F(1)$.`,
+                solution: R`An antiderivative is $F(x) = x^2 + x$. Then
+$$F(3) - F(1) = (9 + 3) - (1 + 1) = 12 - 2 = 10.$$`,
               },
               {
                 type: "problem",
-                title: "A product of polynomials",
-                source: "AIME (practice)",
+                title: "Differentiating an integral",
+                source: "AP Calculus BC (practice)",
+                difficulty: "Medium",
+                statement: R`Let $\displaystyle G(x) = \int_0^{x^2} \cos(t)\,dt$. Find $G'(x)$.`,
+                hint: R`Combine FTC Part 1 with the chain rule, since the upper limit is $x^2$.`,
+                solution: R`By Part 1 with the chain rule,
+$$G'(x) = \cos\!\left(x^2\right)\cdot \frac{d}{dx}\!\left(x^2\right) = 2x\cos\!\left(x^2\right).$$`,
+              },
+              {
+                type: "problem",
+                title: "Area under a curve",
+                source: "AP Calculus BC (practice)",
                 difficulty: "Hard",
-                statement: R`What is the coefficient of $x^{4}$ in the product
-$$(1 + x + x^2 + x^3 + x^4)\,(1 + x)^4 ?$$`,
-                hint: R`Multiply term by term: pair each $x^j$ from the first factor with $\binom{4}{4-j}$ from $(1+x)^4$.`,
-                solution: R`The coefficient of $x^4$ collects $x^j \cdot x^{4-j}$ for $j = 0,1,2,3,4$:
-$$\sum_{j=0}^{4} \binom{4}{4-j} = \binom{4}{4} + \binom{4}{3} + \binom{4}{2} + \binom{4}{1} + \binom{4}{0} = 1 + 4 + 6 + 4 + 1 = 16.$$`,
+                statement: R`Find the area of the region bounded by $y = x^2$, the $x$-axis, and the lines $x = 0$ and $x = 2$.`,
+                hint: R`Area equals $\int_0^2 x^2\,dx$.`,
+                solution: R`The antiderivative of $x^2$ is $\tfrac{x^3}{3}$, so
+$$\int_0^2 x^2\,dx = \left[\frac{x^3}{3}\right]_0^2 = \frac{8}{3} - 0 = \frac{8}{3}.$$`,
               },
             ],
           },

@@ -1,10 +1,13 @@
 import { createClient } from "./supabase/server";
+import { isSuperAdmin } from "./admin";
 import type {
   Announcement,
   Block,
   Lesson,
+  LessonStatus,
   Module,
   Profile,
+  ProblemStatus,
   Track,
 } from "./types";
 
@@ -12,6 +15,7 @@ export interface SessionUser {
   id: string;
   email: string;
   profile: Profile | null;
+  isStaff: boolean;
 }
 
 export async function getSessionUser(): Promise<SessionUser | null> {
@@ -27,10 +31,25 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     .eq("id", user.id)
     .maybeSingle();
 
+  const email = user.email ?? profile?.email ?? "";
+  const superAdmin = isSuperAdmin(email);
+  const merged = profile
+    ? ({ ...profile, role: superAdmin ? "staff" : profile.role } as Profile)
+    : superAdmin
+      ? ({
+          id: user.id,
+          email,
+          full_name: null,
+          role: "staff",
+          created_at: new Date().toISOString(),
+        } as Profile)
+      : null;
+
   return {
     id: user.id,
-    email: user.email ?? profile?.email ?? "",
-    profile: (profile as Profile) ?? null,
+    email,
+    profile: merged,
+    isStaff: superAdmin || profile?.role === "staff",
   };
 }
 
@@ -81,16 +100,32 @@ export async function getNavTree(): Promise<TrackWithModules[]> {
   }));
 }
 
-export async function getCompletedLessonIds(
+/** Map of lesson_id -> status for a user (lessons with no row are not_started). */
+export async function getLessonStatuses(
   userId: string,
-): Promise<Set<string>> {
+): Promise<Record<string, LessonStatus>> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("progress")
-    .select("lesson_id, completed")
-    .eq("user_id", userId)
-    .eq("completed", true);
-  return new Set((data ?? []).map((r) => r.lesson_id as string));
+    .select("lesson_id, status, completed")
+    .eq("user_id", userId);
+  const out: Record<string, LessonStatus> = {};
+  for (const r of data ?? []) {
+    const status = (r.status as LessonStatus) ?? (r.completed ? "complete" : "not_started");
+    if (status && status !== "not_started") out[r.lesson_id as string] = status;
+  }
+  return out;
+}
+
+export async function getCompletedLessonIds(
+  userId: string,
+): Promise<Set<string>> {
+  const statuses = await getLessonStatuses(userId);
+  return new Set(
+    Object.entries(statuses)
+      .filter(([, s]) => s === "complete")
+      .map(([id]) => id),
+  );
 }
 
 export interface LessonContext {
@@ -158,32 +193,43 @@ export async function getLessonContext(
   };
 }
 
-export async function getLessonProgress(
+export async function getLessonStatus(
   userId: string,
   lessonId: string,
-): Promise<boolean> {
+): Promise<LessonStatus> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("progress")
-    .select("completed")
+    .select("status, completed")
     .eq("user_id", userId)
     .eq("lesson_id", lessonId)
     .maybeSingle();
-  return Boolean(data?.completed);
+  if (!data) return "not_started";
+  return (
+    (data.status as LessonStatus) ??
+    (data.completed ? "complete" : "not_started")
+  );
 }
 
-export async function getSolvedProblems(
+/** Map of problem_index -> status for a lesson. */
+export async function getProblemStatuses(
   userId: string,
   lessonId: string,
-): Promise<Set<number>> {
+): Promise<Record<number, ProblemStatus>> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("problem_completions")
-    .select("problem_index, completed")
+    .select("problem_index, status, completed")
     .eq("user_id", userId)
-    .eq("lesson_id", lessonId)
-    .eq("completed", true);
-  return new Set((data ?? []).map((r) => r.problem_index as number));
+    .eq("lesson_id", lessonId);
+  const out: Record<number, ProblemStatus> = {};
+  for (const r of data ?? []) {
+    const status =
+      (r.status as ProblemStatus) ?? (r.completed ? "solved" : "not_started");
+    if (status && status !== "not_started")
+      out[r.problem_index as number] = status;
+  }
+  return out;
 }
 
 export async function getAnnouncements(): Promise<

@@ -110,7 +110,7 @@ function ContentTab({
   );
 
   function onNewModule(trackId: string) {
-    const title = prompt("New module title:");
+    const title = prompt("New unit title:");
     if (!title?.trim()) return;
     startTransition(async () => {
       const res = await createModule(trackId, title.trim());
@@ -119,7 +119,7 @@ function ContentTab({
     });
   }
   function onNewLesson(moduleId: string) {
-    const title = prompt("New lesson title:");
+    const title = prompt("New chapter title:");
     if (!title?.trim()) return;
     startTransition(async () => {
       const res = await createLesson(moduleId, title.trim());
@@ -128,7 +128,7 @@ function ContentTab({
     });
   }
   function onDeleteModule(id: string, title: string) {
-    if (!confirm(`Delete module “${title}” and all its lessons?`)) return;
+    if (!confirm(`Delete unit “${title}” and all its chapters?`)) return;
     startTransition(async () => {
       const res = await deleteModule(id);
       if (res.ok) router.refresh();
@@ -136,7 +136,7 @@ function ContentTab({
     });
   }
   function onRenameModule(id: string, current: string) {
-    const title = prompt("Rename module:", current);
+    const title = prompt("Rename unit:", current);
     if (!title?.trim() || title === current) return;
     startTransition(async () => {
       const res = await updateModule(id, { title: title.trim() });
@@ -161,7 +161,7 @@ function ContentTab({
               onClick={() => onNewModule(track.id)}
               className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-[12.5px] font-medium text-tmuted transition-colors hover:border-gold/50 hover:text-gold"
             >
-              <PlusIcon className="h-3.5 w-3.5" /> New Module
+              <PlusIcon className="h-3.5 w-3.5" /> New Unit
             </button>
           </div>
 
@@ -180,7 +180,7 @@ function ContentTab({
                   <button
                     onClick={() => onRenameModule(m.id, m.title)}
                     className="text-left text-[15px] font-semibold text-tprimary hover:text-gold"
-                    title="Rename module"
+                    title="Rename unit"
                   >
                     {m.title}
                   </button>
@@ -189,12 +189,12 @@ function ContentTab({
                       onClick={() => onNewLesson(m.id)}
                       className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1 text-[12px] font-medium text-tmuted transition-colors hover:border-gold/50 hover:text-gold"
                     >
-                      <PlusIcon className="h-3 w-3" /> New Lesson
+                      <PlusIcon className="h-3 w-3" /> New Chapter
                     </button>
                     <button
                       onClick={() => onDeleteModule(m.id, m.title)}
                       className="rounded-md p-1.5 text-tmuted transition-colors hover:bg-danger/10 hover:text-danger"
-                      title="Delete module"
+                      title="Delete unit"
                     >
                       <TrashIcon className="h-3.5 w-3.5" />
                     </button>

@@ -103,7 +103,7 @@ export function BlockEditor({
   }
 
   function onDelete() {
-    if (!confirm(`Delete lesson “${lesson.title}”? This cannot be undone.`))
+    if (!confirm(`Delete chapter “${lesson.title}”? This cannot be undone.`))
       return;
     startTransition(async () => {
       const res = await deleteLesson(lesson.id);
@@ -119,7 +119,7 @@ export function BlockEditor({
   return (
     <div className="rounded-2xl border border-gold/40 bg-surface p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="font-serif text-xl text-tprimary">Edit Lesson</h3>
+        <h3 className="font-serif text-xl text-tprimary">Edit Chapter</h3>
         <div className="flex items-center gap-2">
           {msg && (
             <span

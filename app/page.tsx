@@ -13,10 +13,10 @@ const TRACK_BLURBS: Record<string, { tag: string; blurb: string }> = {
     blurb:
       "Master algebra, modular arithmetic, and contest tactics for the AMC 10 and 12.",
   },
-  aime: {
+  "ap-calculus-bc": {
     tag: "Advanced",
     blurb:
-      "Tackle olympiad-level techniques — LTE, generating functions, and more — for the AIME.",
+      "Limits, derivatives, integrals, and series — the complete AP Calculus BC curriculum.",
   },
 };
 

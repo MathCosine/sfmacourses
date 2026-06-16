@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { NavTrack } from "@/lib/nav";
 import { cn, initials } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { statusMeta } from "@/lib/status";
 import { ChevronRight, Check, LogOut } from "@/components/icons";
 
 export interface SidebarUser {
@@ -16,7 +17,7 @@ export interface SidebarUser {
 
 interface SidebarProps {
   tracks: NavTrack[];
-  completed: string[];
+  statuses: Record<string, string>;
   activeTrackSlug?: string;
   activeLessonId?: string;
   user: SidebarUser;
@@ -24,13 +25,12 @@ interface SidebarProps {
 
 export function Sidebar({
   tracks,
-  completed,
+  statuses,
   activeTrackSlug,
   activeLessonId,
   user,
 }: SidebarProps) {
   const router = useRouter();
-  const completedSet = useMemo(() => new Set(completed), [completed]);
 
   const initialTrack =
     activeTrackSlug && tracks.some((t) => t.slug === activeTrackSlug)
@@ -114,7 +114,9 @@ export function Sidebar({
                 <ul className="mb-1 ml-[18px] border-l border-border">
                   {m.lessons.map((l) => {
                     const isActive = l.id === activeLessonId;
-                    const isDone = completedSet.has(l.id);
+                    const status = statuses[l.id] ?? "not_started";
+                    const sm = statusMeta(status);
+                    const filled = status !== "not_started";
                     return (
                       <li key={l.id}>
                         <Link
@@ -122,19 +124,20 @@ export function Sidebar({
                           className={cn(
                             "group -ml-px flex items-center gap-2 border-l-2 py-1.5 pl-3 pr-2 text-[13.5px] transition-colors",
                             isActive
-                              ? "border-gold bg-gold/10 text-tprimary"
+                              ? "border-gold bg-gold/8 font-medium text-tprimary"
                               : "border-transparent text-tmuted hover:text-tprimary",
                           )}
                         >
                           <span
-                            className={cn(
-                              "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border",
-                              isDone
-                                ? "border-gold bg-gold text-bg"
-                                : "border-tfaint bg-transparent",
-                            )}
+                            className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2"
+                            style={{
+                              borderColor: filled ? sm.color : "#ccd0d8",
+                              background: filled ? sm.color : "transparent",
+                            }}
                           >
-                            {isDone && <Check className="h-2.5 w-2.5" />}
+                            {(status === "complete") && (
+                              <Check className="h-2 w-2 text-white" />
+                            )}
                           </span>
                           <span className="truncate">{l.title}</span>
                         </Link>

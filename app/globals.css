@@ -2,23 +2,25 @@
 @import "katex/dist/katex.min.css";
 
 @theme {
-  /* Premium light palette — warm paper, crisp white surfaces, deep amber. */
-  --color-bg: #f7f5f0;
-  --color-sidebar: #f1eee6;
+  /* Clean academic light palette — cool white, crisp surfaces, indigo accent.
+     The "gold" tokens are repurposed as the primary indigo so existing utility
+     classes (text-gold, bg-gold, …) pick up the new accent with no churn. */
+  --color-bg: #f7f8fa;
+  --color-sidebar: #ffffff;
   --color-surface: #ffffff;
-  --color-border: #e9e4d9;
-  --color-border-strong: #ddd6c7;
-  --color-gold: #a86a0a;
-  --color-gold-hover: #c0820f;
-  --color-gold-tint: #f6edda;
-  --color-tprimary: #211d16;
-  --color-tmuted: #6b6557;
-  --color-tfaint: #a59f8f;
-  --color-green: #1a7f47;
-  --color-green-tint: #e9f4ec;
-  --color-resource: #f3f7f1;
-  --color-resource-border: #d8e7d2;
-  --color-danger: #c0392b;
+  --color-border: #e7e9ee;
+  --color-border-strong: #d4d8e0;
+  --color-gold: #3b5bdb;
+  --color-gold-hover: #4263eb;
+  --color-gold-tint: #edf0fd;
+  --color-tprimary: #1a1d26;
+  --color-tmuted: #5e6470;
+  --color-tfaint: #99a0ad;
+  --color-green: #2f9e44;
+  --color-green-tint: #ebfbee;
+  --color-resource: #f2f6ff;
+  --color-resource-border: #d4e0fb;
+  --color-danger: #e03131;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
@@ -54,7 +56,7 @@ h1, h2, h3, h4 {
 }
 
 ::selection {
-  background: rgba(168, 106, 10, 0.18);
+  background: rgba(59,91,219,0.16);
   color: var(--color-tprimary);
 }
 
@@ -90,7 +92,7 @@ h1, h2, h3, h4 {
   background-clip: padding-box;
 }
 .scroll-area::-webkit-scrollbar-thumb:hover {
-  background: #c9c0ad;
+  background: #b9bfca;
   background-clip: padding-box;
 }
 
@@ -98,7 +100,7 @@ h1, h2, h3, h4 {
 .prose-sfma {
   font-size: 15.5px;
   line-height: 1.85;
-  color: #322d24;
+  color: #2b2f3a;
 }
 .prose-sfma p {
   margin: 0 0 1.15em;
@@ -117,14 +119,14 @@ h1, h2, h3, h4 {
 .prose-sfma a {
   color: var(--color-gold);
   text-decoration: none;
-  border-bottom: 1px solid rgba(168, 106, 10, 0.3);
+  border-bottom: 1px solid rgba(59,91,219,0.32);
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 .prose-sfma a:hover {
   color: var(--color-gold-hover);
   border-color: var(--color-gold-hover);
 }
-.prose-sfma strong { color: #16130d; font-weight: 650; }
+.prose-sfma strong { color: #0f1220; font-weight: 650; }
 .prose-sfma ul,
 .prose-sfma ol {
   margin: 0 0 1.15em;
@@ -143,14 +145,14 @@ h1, h2, h3, h4 {
 .prose-sfma code {
   font-family: var(--font-mono);
   font-size: 0.85em;
-  background: #f4f1ea;
+  background: #eef0f5;
   border: 1px solid var(--color-border);
   border-radius: 5px;
   padding: 0.12em 0.42em;
-  color: #8a5a08;
+  color: #3949c0;
 }
 .prose-sfma pre {
-  background: #fbfaf6;
+  background: #fafbfd;
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1.05em 1.2em;
@@ -162,7 +164,7 @@ h1, h2, h3, h4 {
   background: none;
   border: none;
   padding: 0;
-  color: #322d24;
+  color: #2b2f3a;
 }
 .prose-sfma hr {
   border: none;
@@ -182,7 +184,7 @@ h1, h2, h3, h4 {
   text-align: left;
 }
 .prose-sfma th {
-  background: #f4f1ea;
+  background: #f1f3f7;
   color: var(--color-tprimary);
   font-weight: 600;
 }
@@ -202,9 +204,9 @@ h1, h2, h3, h4 {
 .skeleton {
   background: linear-gradient(
     90deg,
-    #efece3 25%,
-    #f6f4ee 50%,
-    #efece3 75%
+    #eef0f4 25%,
+    #f6f7f9 50%,
+    #eef0f4 75%
   );
   background-size: 800px 100%;
   animation: shimmer 1.6s infinite linear;

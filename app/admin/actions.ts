@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils";
+import { isSuperAdmin } from "@/lib/admin";
 import type { Block, ContentBlock, MetaBlock, Frequency } from "@/lib/types";
 
 type Result = { ok: boolean; error?: string; id?: string };
@@ -13,6 +14,9 @@ async function requireStaff() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { supabase, error: "Not authenticated" as const };
+
+  if (isSuperAdmin(user.email)) return { supabase, user, error: null };
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")

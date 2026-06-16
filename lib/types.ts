@@ -4,6 +4,23 @@ export type Difficulty = "Easy" | "Medium" | "Hard" | "Very Hard";
 
 export type Frequency = "essential" | "important" | "supplemental";
 
+/** usaco.guide-style completion status for a lesson/chapter. */
+export type LessonStatus =
+  | "not_started"
+  | "reading"
+  | "practicing"
+  | "complete"
+  | "skipped"
+  | "ignored";
+
+/** Completion status for a single problem. */
+export type ProblemStatus =
+  | "not_started"
+  | "solving"
+  | "solved"
+  | "skipped"
+  | "ignored";
+
 export interface TextBlock {
   type: "text";
   content: string;

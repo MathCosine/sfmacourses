@@ -3,12 +3,13 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
 import { LessonView } from "@/components/LessonView";
+import { LessonStatusControl } from "@/components/LessonStatusControl";
 import { TableOfContents } from "@/components/TableOfContents";
 import {
   getLessonContext,
-  getLessonProgress,
+  getLessonStatus,
   getSessionUser,
-  getSolvedProblems,
+  getProblemStatuses,
 } from "@/lib/data";
 import { prepareBlocks } from "@/lib/prepare";
 import {
@@ -46,14 +47,14 @@ export default async function LessonPage({
 
   const user = await getSessionUser();
   const userId = user!.id;
-  const isStaff = user?.profile?.role === "staff";
+  const isStaff = user?.isStaff ?? false;
 
   const meta = extractMeta(ctx.lesson.content);
   const blocks = contentBlocks(ctx.lesson.content);
-  const [prepared, complete, solvedSet] = await Promise.all([
+  const [prepared, lessonStatus, problemStatuses] = await Promise.all([
     prepareBlocks(blocks),
-    getLessonProgress(userId, ctx.lesson.id),
-    getSolvedProblems(userId, ctx.lesson.id),
+    getLessonStatus(userId, ctx.lesson.id),
+    getProblemStatuses(userId, ctx.lesson.id),
   ]);
   const problemCount = countProblems(ctx.lesson.content);
   const dots = FREQUENCY_DOTS[meta.frequency];
@@ -113,21 +114,31 @@ export default async function LessonPage({
             )}
           </div>
 
-          {/* Title */}
-          <h1 className="mt-3 font-serif text-4xl leading-tight text-tprimary sm:text-[2.75rem]">
-            {ctx.lesson.title}
-          </h1>
-          <p className="mt-2 text-[13px] text-tmuted">
-            Written by {meta.author}
-          </p>
+          {/* Title + status */}
+          <div className="mt-3 flex items-start justify-between gap-4">
+            <div>
+              <h1 className="font-serif text-4xl leading-tight text-tprimary sm:text-[2.6rem]">
+                {ctx.lesson.title}
+              </h1>
+              <p className="mt-2 text-[13px] text-tmuted">
+                Written by {meta.author}
+              </p>
+            </div>
+            <div className="shrink-0 pt-1">
+              <LessonStatusControl
+                lessonId={ctx.lesson.id}
+                initial={lessonStatus}
+              />
+            </div>
+          </div>
 
           <div className="mt-7">
             <LessonView
               articleId="lesson-article"
               blocks={prepared}
               lessonId={ctx.lesson.id}
-              solved={[...solvedSet]}
-              initialComplete={complete}
+              lessonStatus={lessonStatus}
+              problemStatuses={problemStatuses}
             />
           </div>
 

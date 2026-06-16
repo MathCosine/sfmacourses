@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 interface ShellFrameProps {
   tracks: NavTrack[];
-  completed: string[];
+  statuses: Record<string, string>;
   activeTrackSlug?: string;
   activeLessonId?: string;
   user: SidebarUser;
@@ -17,7 +17,7 @@ interface ShellFrameProps {
 
 export function ShellFrame({
   tracks,
-  completed,
+  statuses,
   activeTrackSlug,
   activeLessonId,
   user,
@@ -31,7 +31,7 @@ export function ShellFrame({
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] border-r border-border lg:block">
         <Sidebar
           tracks={tracks}
-          completed={completed}
+          statuses={statuses}
           activeTrackSlug={activeTrackSlug}
           activeLessonId={activeLessonId}
           user={user}
@@ -73,7 +73,7 @@ export function ShellFrame({
         </button>
         <Sidebar
           tracks={tracks}
-          completed={completed}
+          statuses={statuses}
           activeTrackSlug={activeTrackSlug}
           activeLessonId={activeLessonId}
           user={user}

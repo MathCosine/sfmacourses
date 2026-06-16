@@ -19,14 +19,14 @@ export default async function AdminPage({
   const { lesson } = await searchParams;
   const user = await getSessionUser();
   if (!user) redirect("/auth");
-  if (user.profile?.role !== "staff") redirect("/dashboard");
+  if (!user.isStaff) redirect("/dashboard");
 
   const supabase = await createClient();
   const [tree, profiles, announcements, progressRes] = await Promise.all([
     getNavTree(),
     getAllProfiles(),
     getAnnouncements(),
-    supabase.from("progress").select("user_id, completed").eq("completed", true),
+    supabase.from("progress").select("user_id, status").eq("status", "complete"),
   ]);
 
   const progressByUser = new Map<string, number>();

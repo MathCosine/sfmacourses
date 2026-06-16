@@ -80,6 +80,21 @@ create unique index if not exists progress_user_lesson_key
 create unique index if not exists problem_completions_user_lesson_idx_key
   on public.problem_completions (user_id, lesson_id, problem_index);
 
+-- --------------------------------------------------- Status columns (usaco-style)
+-- Lessons: not_started | reading | practicing | complete | skipped | ignored
+-- Problems: not_started | solving | solved | skipped | ignored
+alter table public.progress
+  add column if not exists status text not null default 'not_started';
+update public.progress
+  set status = 'complete'
+  where completed = true and status = 'not_started';
+
+alter table public.problem_completions
+  add column if not exists status text not null default 'not_started';
+update public.problem_completions
+  set status = 'solved'
+  where completed = true and status = 'not_started';
+
 -- ------------------------------------------------ Staff helper (no recursion)
 create or replace function public.is_staff()
 returns boolean
@@ -173,3 +188,16 @@ create policy announcements_write on public.announcements
 -- ------------------------------------------------------------------- Notes
 -- Promote your first staff user after signing up:
 --   update public.profiles set role = 'staff' where email = 'you@example.com';
+--
+-- The email sfmathopen@gmail.com is hard-coded as a permanent super-admin in
+-- the app (lib/admin.ts), so it is always staff once that account signs up.
+-- To also reflect it in the DB:
+--   insert into public.profiles (id, email, full_name, role)
+--   select id, email, coalesce(raw_user_meta_data->>'full_name',''), 'staff'
+--   from auth.users where email = 'sfmathopen@gmail.com'
+--   on conflict (id) do update set role = 'staff';
+--
+-- Courses migration: this build's courses are AMC 8, AMC 10/12, AP Calculus BC.
+-- If your project still has the old AIME track, remove it before reseeding:
+--   delete from public.tracks where slug = 'aime';
+-- Then run supabase/seed.sql (idempotent upserts).
