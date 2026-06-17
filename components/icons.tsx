@@ -358,6 +358,13 @@ export const Heart = (props: SVGProps<SVGSVGElement>) => (
   </Base>
 );
 
+export const Hammer = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="m15 12-8.5 8.5a2.12 2.12 0 0 1-3-3L12 9" />
+    <path d="M17.64 15 22 10.64M20.91 11.7l-1.25-1.25a2.5 2.5 0 0 1 0-3.54l.7-.7-2.83-2.83-.7.7a2.5 2.5 0 0 1-3.54 0L12.04 2.88 8.5 6.42l9.08 9.08" />
+  </Base>
+);
+
 export const ExternalLink = (props: SVGProps<SVGSVGElement>) => (
   <Base {...props}>
     <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />

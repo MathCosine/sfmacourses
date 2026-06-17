@@ -10,6 +10,7 @@ import {
   Target,
   BookOpen,
   Users,
+  Hammer,
 } from "@/components/icons";
 
 export const metadata: Metadata = { title: "About" };
@@ -78,6 +79,21 @@ export default async function AboutPage() {
             chapters, pair every topic with curated practice, and let you track
             your progress on everything you touch.
           </p>
+        </div>
+
+        <div className="callout callout-warning mt-8">
+          <span className="callout-icon mt-0.5 text-yellow">
+            <Hammer className="h-5 w-5" />
+          </span>
+          <div className="text-[14px] leading-relaxed text-tprimary">
+            <strong className="font-bold">A work in progress.</strong> SFMA is
+            under active construction — we add and refine chapters regularly.
+            Every lesson, example, and problem is{" "}
+            <strong className="font-semibold">written and reviewed by humans</strong>{" "}
+            and checked for mathematical accuracy and teaching quality. None of
+            the material is auto-generated, and if you find an error we want to
+            know so we can fix it.
+          </div>
         </div>
       </section>
 

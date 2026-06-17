@@ -147,6 +147,25 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ---------- Under-construction / human-made note ---------- */}
+      <section className="border-b border-border bg-surface">
+        <div className="mx-auto flex max-w-5xl items-start gap-3.5 px-6 py-4 sm:px-8">
+          <span className="mt-0.5 inline-flex shrink-0 items-center gap-1.5 rounded-full bg-yellow/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-yellow">
+            <span className="h-1.5 w-1.5 rounded-full bg-yellow" />
+            Under construction
+          </span>
+          <p className="text-[13.5px] leading-relaxed text-tmuted">
+            SFMA is actively being built, and new chapters land regularly. Every
+            lesson and problem is{" "}
+            <span className="font-semibold text-tprimary">
+              written and reviewed by humans
+            </span>{" "}
+            and checked for mathematical accuracy and quality — nothing here is
+            auto-generated. Spot a mistake? We&apos;d love to hear about it.
+          </p>
+        </div>
+      </section>
+
       {/* ---------- How it works (editorial, numbered) ---------- */}
       <section className="mx-auto max-w-5xl px-6 py-20 sm:px-8">
         <Reveal>
