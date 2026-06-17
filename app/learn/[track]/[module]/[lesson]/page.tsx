@@ -14,18 +14,21 @@ import {
   getSectionStatuses,
 } from "@/lib/data";
 import { prepareBlocks } from "@/lib/prepare";
-import {
-  contentBlocks,
-  countProblems,
-  extractMeta,
-} from "@/lib/utils";
-import { ArrowLeft, ArrowRight } from "@/components/icons";
+import { contentBlocks, countProblems, extractMeta } from "@/lib/utils";
+import { FREQUENCY_LABELS } from "@/lib/types";
+import { ArrowLeft, ArrowRight, ListChecks } from "@/components/icons";
 
 interface Params {
   track: string;
   module: string;
   lesson: string;
 }
+
+const FREQUENCY_BLURB: Record<string, string> = {
+  essential: "Core material — make sure you master this.",
+  important: "Frequently useful; worth a solid look.",
+  supplemental: "Nice to know; revisit as needed.",
+};
 
 export async function generateMetadata({
   params,
@@ -73,15 +76,16 @@ export default async function LessonPage({
     <AppShell activeTrackSlug={ctx.track.slug} activeLessonId={ctx.lesson.id}>
       <div className="mx-auto flex max-w-[1180px] gap-10 px-6 py-8 sm:px-10">
         <article className="min-w-0 max-w-[760px] flex-1">
-          {/* Prev / Next + edit */}
-          <div className="mb-6 flex items-center justify-between gap-3">
-            <Link
-              href={`/learn/${ctx.track.slug}`}
-              className="text-[12.5px] text-tmuted transition-colors hover:text-gold"
-            >
-              {ctx.track.title}
-            </Link>
-            <div className="flex items-center gap-2">
+          {/* Breadcrumb + nav */}
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5 text-[12.5px] text-tmuted">
+              <Link href={`/learn/${ctx.track.slug}`} className="shrink-0 transition-colors hover:text-gold">
+                {ctx.track.title}
+              </Link>
+              <span className="text-tfaint">/</span>
+              <span className="truncate">{ctx.module.title}</span>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
               {isStaff && (
                 <Link
                   href={`/admin?lesson=${ctx.lesson.id}`}
@@ -95,44 +99,49 @@ export default async function LessonPage({
             </div>
           </div>
 
-          {/* Breadcrumb */}
-          <div className="flex flex-wrap items-center gap-1.5 text-[12.5px] text-tmuted">
-            <span>{ctx.track.title}</span>
-            <span className="text-tfaint">/</span>
-            <span>{ctx.module.title}</span>
-            <span className="text-tfaint">/</span>
-            <span className="text-tprimary">{ctx.lesson.title}</span>
-          </div>
-
-          {/* Frequency + count */}
-          <div className="mt-4 flex flex-wrap items-center gap-4">
-            <FrequencyDots frequency={meta.frequency} />
-            {problemCount > 0 && (
-              <span className="text-[12.5px] text-tmuted">
-                {problemCount} problem{problemCount === 1 ? "" : "s"}
-              </span>
-            )}
-          </div>
-
           {/* Title + status */}
-          <div className="mt-3 flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-[2.4rem] font-extrabold leading-tight tracking-tight text-tprimary">
-                {ctx.lesson.title}
-              </h1>
-              <p className="mt-2 text-[13px] text-tmuted">
-                Written by {meta.author}
-              </p>
-            </div>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-[2.4rem] font-extrabold leading-tight tracking-tight text-tprimary">
+              {ctx.lesson.title}
+            </h1>
             <div className="shrink-0 pt-1">
-              <LessonStatusControl
-                lessonId={ctx.lesson.id}
-                initial={lessonStatus}
-              />
+              <LessonStatusControl lessonId={ctx.lesson.id} initial={lessonStatus} />
             </div>
           </div>
 
-          <div className="mt-7">
+          {/* Meta box (usaco-style) */}
+          <div className="mt-5 rounded-2xl border border-border bg-surface-2 px-5 py-4">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Frequency</div>
+                <div className="mt-1">
+                  <FrequencyDots frequency={meta.frequency} />
+                </div>
+                <p className="mt-1 text-[11.5px] leading-snug text-tmuted">
+                  {FREQUENCY_BLURB[meta.frequency] ?? ""}
+                </p>
+              </div>
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Author</div>
+                <div className="mt-1 text-[13.5px] font-medium text-tprimary">{meta.author}</div>
+                <div className="mt-0.5 text-[11.5px] text-tmuted">{FREQUENCY_LABELS[meta.frequency]} topic</div>
+              </div>
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Practice</div>
+                <div className="mt-1 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-tprimary">
+                  <ListChecks className="h-4 w-4 text-gold" />
+                  {problemCount} problem{problemCount === 1 ? "" : "s"}
+                </div>
+                {isStaff && (
+                  <Link href={`/admin?lesson=${ctx.lesson.id}`} className="mt-1 block text-[11.5px] font-medium text-gold hover:underline">
+                    Edit this page →
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8">
             <LessonView
               articleId="lesson-article"
               blocks={prepared}
@@ -146,31 +155,17 @@ export default async function LessonPage({
           {/* Bottom prev/next */}
           <div className="mt-10 grid gap-3 border-t border-border pt-6 sm:grid-cols-2">
             {prevHref ? (
-              <Link
-                href={prevHref}
-                className="group card hover-lift rounded-2xl px-4.5 py-3.5 hover:border-gold/40"
-              >
-                <div className="text-[11px] uppercase tracking-wide text-tfaint">
-                  ← Previous
-                </div>
-                <div className="mt-0.5 text-[14px] font-medium text-tprimary">
-                  {ctx.prev!.title}
-                </div>
+              <Link href={prevHref} className="group card hover-lift rounded-2xl px-5 py-4 hover:border-gold/40">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-tfaint">← Previous</div>
+                <div className="mt-0.5 text-[14px] font-semibold text-tprimary group-hover:text-gold">{ctx.prev!.title}</div>
               </Link>
             ) : (
               <span />
             )}
             {nextHref && (
-              <Link
-                href={nextHref}
-                className="group card hover-lift rounded-2xl px-4.5 py-3.5 text-right hover:border-gold/40"
-              >
-                <div className="text-[11px] uppercase tracking-wide text-tfaint">
-                  Next →
-                </div>
-                <div className="mt-0.5 text-[14px] font-medium text-tprimary">
-                  {ctx.next!.title}
-                </div>
+              <Link href={nextHref} className="group card hover-lift rounded-2xl px-5 py-4 text-right hover:border-gold/40">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-tfaint">Next →</div>
+                <div className="mt-0.5 text-[14px] font-semibold text-tprimary group-hover:text-gold">{ctx.next!.title}</div>
               </Link>
             )}
           </div>
@@ -178,7 +173,7 @@ export default async function LessonPage({
 
         {/* Right TOC */}
         <aside className="hidden w-[220px] shrink-0 xl:block">
-          <div className="sticky top-8">
+          <div className="sticky top-24">
             <TableOfContents articleId="lesson-article" />
           </div>
         </aside>
@@ -187,13 +182,7 @@ export default async function LessonPage({
   );
 }
 
-function NavArrow({
-  href,
-  dir,
-}: {
-  href: string | null;
-  dir: "prev" | "next";
-}) {
+function NavArrow({ href, dir }: { href: string | null; dir: "prev" | "next" }) {
   const Icon = dir === "prev" ? ArrowLeft : ArrowRight;
   if (!href) {
     return (
@@ -203,10 +192,7 @@ function NavArrow({
     );
   }
   return (
-    <Link
-      href={href}
-      className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-tmuted transition-colors hover:border-gold/50 hover:text-gold"
-    >
+    <Link href={href} className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-tmuted transition-colors hover:border-gold/50 hover:text-gold">
       <Icon className="h-4 w-4" />
     </Link>
   );

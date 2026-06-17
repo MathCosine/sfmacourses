@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getLessonStatuses, getNavTree, getSessionUser } from "@/lib/data";
 import { toNavTracks } from "@/lib/nav";
 import { ShellFrame } from "@/components/ShellFrame";
+import type { NavUser } from "@/components/TopNav";
 
 interface AppShellProps {
   activeTrackSlug?: string;
@@ -10,9 +11,8 @@ interface AppShellProps {
 }
 
 /**
- * Server component that loads the nav tree + the signed-in user and renders the
- * three-column app frame (left sidebar + content). Redirects to /auth if the
- * visitor is not authenticated.
+ * Server component for lesson pages: global top nav + left module tree + content.
+ * Redirects to /auth if the visitor is not authenticated.
  */
 export async function AppShell({
   activeTrackSlug,
@@ -27,17 +27,19 @@ export async function AppShell({
     getLessonStatuses(user.id),
   ]);
 
+  const navUser: NavUser = {
+    name: user.profile?.full_name || user.email,
+    email: user.email,
+    isStaff: user.isStaff,
+  };
+
   return (
     <ShellFrame
       tracks={toNavTracks(tree)}
       statuses={statuses}
       activeTrackSlug={activeTrackSlug}
       activeLessonId={activeLessonId}
-      user={{
-        name: user.profile?.full_name || user.email,
-        email: user.email,
-        role: user.isStaff ? "staff" : "student",
-      }}
+      user={navUser}
     >
       {children}
     </ShellFrame>

@@ -259,6 +259,25 @@ export async function getSectionStatuses(
   return out;
 }
 
+/** Map of `${lesson_id}:${problem_index}` -> status across all lessons. */
+export async function getAllProblemStatuses(
+  userId: string,
+): Promise<Record<string, ProblemStatus>> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("problem_completions")
+    .select("lesson_id, problem_index, status, completed")
+    .eq("user_id", userId);
+  const out: Record<string, ProblemStatus> = {};
+  for (const r of data ?? []) {
+    const status =
+      (r.status as ProblemStatus) ?? (r.completed ? "solved" : "not_started");
+    if (status && status !== "not_started")
+      out[`${r.lesson_id}:${r.problem_index}`] = status;
+  }
+  return out;
+}
+
 export async function getAnnouncements(): Promise<
   (Announcement & { author_name?: string | null })[]
 > {

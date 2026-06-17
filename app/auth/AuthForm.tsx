@@ -93,7 +93,7 @@ export function AuthForm({ redirectTo }: { redirectTo?: string }) {
             className={cn(
               "rounded-md py-1.5 text-[13px] font-medium transition-colors",
               mode === m
-                ? "bg-gold text-bg"
+                ? "bg-gold text-white shadow-sm"
                 : "text-tmuted hover:text-tprimary",
             )}
           >
@@ -145,7 +145,7 @@ export function AuthForm({ redirectTo }: { redirectTo?: string }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-gold py-2.5 text-[14px] font-semibold text-bg transition-colors hover:bg-gold-hover disabled:opacity-60"
+          className="w-full rounded-lg bg-gold py-2.5 text-[14px] font-semibold text-white shadow-accent transition-colors hover:bg-gold-hover disabled:opacity-60"
         >
           {loading
             ? "Please wait…"

@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { AppShell } from "@/components/AppShell";
+import { SiteShell } from "@/components/SiteShell";
 import { FrequencyDots } from "@/components/FrequencyDots";
 import { getLessonStatuses, getNavTree, getSessionUser } from "@/lib/data";
-import { extractMeta } from "@/lib/utils";
+import { extractMeta, countProblems } from "@/lib/utils";
 import { trackTheme } from "@/lib/trackTheme";
 import type { LessonStatus } from "@/lib/types";
 import { statusMeta } from "@/lib/status";
-import { Check } from "@/components/icons";
+import { Check, ArrowRight } from "@/components/icons";
 
 export async function generateMetadata({
   params,
@@ -20,26 +20,16 @@ export async function generateMetadata({
   return { title: tree.find((x) => x.slug === track)?.title ?? "Course" };
 }
 
-function CountStat({
-  count,
-  label,
-  color,
-}: {
-  count: number;
-  label: string;
-  color: string;
-}) {
+function CountStat({ count, label, color }: { count: number; label: string; color: string }) {
   return (
     <div className="flex flex-col items-center gap-1.5">
       <div
         className="flex h-14 w-14 items-center justify-center rounded-full text-[20px] font-extrabold"
-        style={{ background: `${color}1a`, color }}
+        style={{ background: `color-mix(in srgb, ${color} 14%, transparent)`, color }}
       >
         {count}
       </div>
-      <div className="text-[10.5px] font-bold uppercase tracking-wide text-tmuted">
-        {label}
-      </div>
+      <div className="text-[10.5px] font-bold uppercase tracking-wide text-tmuted">{label}</div>
     </div>
   );
 }
@@ -71,113 +61,110 @@ export default async function TrackPage({
   const pct = total ? Math.round((counts.complete / total) * 100) : 0;
 
   return (
-    <AppShell activeTrackSlug={t.slug}>
-      {/* Colored banner */}
-      <div className="text-white" style={{ background: theme.banner }}>
-        <div className="mx-auto max-w-[820px] px-6 py-12 text-center sm:px-10">
-          <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/75">
-            {theme.tag}
-          </div>
-          <h1 className="mt-2 text-[2.75rem] font-extrabold leading-tight tracking-tight sm:text-[3.25rem]">
+    <SiteShell footer={false}>
+      {/* Banner */}
+      <div className="relative overflow-hidden text-white" style={{ background: theme.gradient }}>
+        <div className="dot-grid absolute inset-0 opacity-25" />
+        <div className="relative mx-auto max-w-4xl px-6 py-14 sm:px-10">
+          <Link href="/dashboard" className="text-[12.5px] font-medium text-white/75 transition-colors hover:text-white">
+            ← Dashboard
+          </Link>
+          <div className="mt-3 text-[11px] font-bold uppercase tracking-[0.16em] text-white/75">{theme.tag}</div>
+          <h1 className="mt-1.5 text-[2.6rem] font-extrabold leading-tight tracking-tight sm:text-[3.1rem]">
             {t.title}
           </h1>
           {t.description && (
-            <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-white/85">
-              {t.description}
-            </p>
+            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/85">{t.description}</p>
           )}
         </div>
       </div>
 
-      <div className="fade-up mx-auto max-w-[820px] px-6 py-8 sm:px-10">
-        {/* Progress summary card */}
-        <div className="card -mt-16 rounded-xl p-6 shadow-md">
+      <div className="mx-auto max-w-4xl px-6 pb-16 sm:px-10">
+        {/* Progress summary */}
+        <div className="card fade-up -mt-10 rounded-2xl p-6 shadow-md">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-[15px] font-bold text-tprimary">
-              Chapters Progress
-            </h2>
-            <span className="text-[12.5px] font-semibold text-tmuted">
-              {pct}% complete
-            </span>
+            <h2 className="text-[15px] font-bold text-tprimary">Course progress</h2>
+            <span className="text-[12.5px] font-semibold text-tmuted">{pct}% complete</span>
           </div>
-          <div className="mb-5 h-1.5 w-full overflow-hidden rounded-full bg-border">
-            <div
-              className="progress-fill h-full rounded-full"
-              style={{ width: `${pct}%`, background: theme.banner }}
-            />
+          <div className="mb-5 h-2 w-full overflow-hidden rounded-full bg-border">
+            <div className="progress-fill h-full rounded-full" style={{ width: `${pct}%`, background: theme.banner }} />
           </div>
           <div className="flex items-center justify-around">
             <CountStat count={counts.complete} label="Completed" color="#15a34a" />
             <CountStat count={counts.inProgress} label="In Progress" color="#d97706" />
-            <CountStat count={counts.skipped} label="Skipped" color="#2563eb" />
-            <CountStat count={counts.notStarted} label="Not Started" color="#9aa3b2" />
+            <CountStat count={counts.skipped} label="Skipped" color="#7c3aed" />
+            <CountStat count={counts.notStarted} label="Not Started" color="#94a0b3" />
           </div>
         </div>
 
-        {/* Timeline of units → chapters */}
-        <div className="mt-10">
-          {t.modules.map((m) => (
-            <section key={m.id} className="relative pl-8">
-              {/* vertical line */}
-              <span className="absolute left-[7px] top-2 bottom-0 w-px bg-border" />
-              {/* node */}
-              <span
-                className="absolute left-0 top-1.5 h-3.5 w-3.5 rounded-full border-2 bg-surface"
-                style={{ borderColor: theme.banner }}
-              />
-              <div className="pb-8">
-                <h2 className="text-[1.35rem] font-extrabold tracking-tight text-tprimary">
-                  {m.title}
-                </h2>
-                {m.description && (
-                  <p className="mt-0.5 text-[13.5px] text-tmuted">
-                    {m.description}
-                  </p>
-                )}
+        {/* Units → chapters */}
+        <div className="mt-10 space-y-9">
+          {t.modules.map((m, mi) => {
+            const unitDone = m.lessons.filter((l) => statusOf(l.id) === "complete").length;
+            return (
+              <section key={m.id}>
+                <div className="mb-3 flex items-end justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[12px] font-bold text-white"
+                      style={{ background: theme.banner }}
+                    >
+                      {mi + 1}
+                    </span>
+                    <div>
+                      <h2 className="text-[1.3rem] font-extrabold tracking-tight text-tprimary">{m.title}</h2>
+                      {m.description && <p className="text-[13px] text-tmuted">{m.description}</p>}
+                    </div>
+                  </div>
+                  <span className="shrink-0 text-[12px] font-semibold text-tmuted">
+                    {unitDone}/{m.lessons.length}
+                  </span>
+                </div>
 
-                <div className="mt-3 divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
+                <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
                   {m.lessons.map((l) => {
                     const s = statusOf(l.id);
                     const sm = statusMeta(s);
                     const filled = s !== "not_started";
                     const meta = extractMeta(l.content);
+                    const problems = countProblems(l.content);
                     return (
                       <Link
                         key={l.id}
                         href={`/learn/${t.slug}/${m.slug}/${l.slug}`}
-                        className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-bg"
+                        className="group flex items-center gap-3.5 px-4 py-3.5 transition-colors hover:bg-bg"
                       >
                         <span
-                          className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2"
+                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2"
                           style={{
-                            borderColor: filled ? sm.color : "#ccd0d8",
+                            borderColor: filled ? sm.color : "var(--color-border-strong)",
                             background: filled ? sm.color : "transparent",
                           }}
                         >
-                          {s === "complete" && (
-                            <Check className="h-2.5 w-2.5 text-white" />
-                          )}
+                          {s === "complete" && <Check className="h-3 w-3 text-white" />}
                         </span>
                         <div className="min-w-0 flex-1">
                           <div className="text-[14.5px] font-semibold text-tprimary group-hover:text-gold">
                             {l.title}
                           </div>
-                          <div className="mt-0.5">
+                          <div className="mt-0.5 flex items-center gap-3">
                             <FrequencyDots frequency={meta.frequency} />
+                            {problems > 0 && (
+                              <span className="text-[12px] text-tfaint">{problems} problem{problems === 1 ? "" : "s"}</span>
+                            )}
                           </div>
                         </div>
+                        <ArrowRight className="h-4 w-4 shrink-0 text-tfaint transition-all group-hover:translate-x-0.5 group-hover:text-gold" />
                       </Link>
                     );
                   })}
                   {m.lessons.length === 0 && (
-                    <div className="px-4 py-3 text-[13px] text-tfaint">
-                      No chapters yet.
-                    </div>
+                    <div className="px-4 py-3.5 text-[13px] text-tfaint">No chapters yet.</div>
                   )}
                 </div>
-              </div>
-            </section>
-          ))}
+              </section>
+            );
+          })}
           {t.modules.length === 0 && (
             <p className="text-[14px] text-tfaint">
               This course is under construction — chapters coming soon.
@@ -185,6 +172,6 @@ export default async function TrackPage({
           )}
         </div>
       </div>
-    </AppShell>
+    </SiteShell>
   );
 }

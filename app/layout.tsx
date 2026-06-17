@@ -17,20 +17,24 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: {
     default: "San Francisco Math Academy",
-    template: "%s | SFMA",
+    template: "%s · SFMA",
   },
   description:
-    "A free, structured guide to competition mathematics — AMC 8, AMC 10/12, and AIME.",
+    "A free collection of curated, high-quality lessons to take you from the AMC 8 to AP Calculus BC and beyond.",
 };
+
+// Applies the saved (or system) theme before paint to avoid a flash.
+const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();`;
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${jetbrains.variable}`}
-      >
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
+      <body className={`${inter.variable} ${jetbrains.variable}`}>
         {children}
       </body>
     </html>

@@ -476,7 +476,7 @@ function AnnouncementsTab({
         <button
           type="submit"
           disabled={pending}
-          className="mt-3 rounded-lg bg-gold px-5 py-2 text-[13.5px] font-semibold text-bg transition-colors hover:bg-gold-hover disabled:opacity-60"
+          className="mt-3 rounded-lg bg-gold px-5 py-2 text-[13.5px] font-semibold text-white transition-colors hover:bg-gold-hover disabled:opacity-60"
         >
           {pending ? "Posting…" : "Post"}
         </button>
