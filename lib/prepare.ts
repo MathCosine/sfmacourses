@@ -1,14 +1,17 @@
 import "server-only";
 import type { ContentBlock, ResourceBlock, VideoBlock } from "./types";
+import { CALLOUT_LABELS } from "./types";
 import { renderMarkdown } from "./markdown";
 import { headingId } from "./utils";
 import type { PreparedProblem } from "@/components/blocks/ProblemBlock";
+import type { PreparedCallout } from "@/components/blocks/CalloutBlock";
 
 export type PreparedBlock =
   | { kind: "text"; html: string }
   | { kind: "resource"; block: ResourceBlock }
   | { kind: "video"; block: VideoBlock }
   | { kind: "section"; id: string; title: string; sectionIndex: number }
+  | { kind: "callout"; prepared: PreparedCallout }
   | { kind: "problem"; problemIndex: number; prepared: PreparedProblem };
 
 /**
@@ -29,6 +32,15 @@ export async function prepareBlocks(
       out.push({ kind: "resource", block });
     } else if (block.type === "video") {
       out.push({ kind: "video", block });
+    } else if (block.type === "callout") {
+      out.push({
+        kind: "callout",
+        prepared: {
+          variant: block.variant,
+          label: block.title?.trim() || CALLOUT_LABELS[block.variant],
+          html: await renderMarkdown(block.body),
+        },
+      });
     } else if (block.type === "section") {
       out.push({
         kind: "section",

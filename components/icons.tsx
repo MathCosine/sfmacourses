@@ -370,3 +370,44 @@ export const ExternalLink = (props: SVGProps<SVGSVGElement>) => (
     <path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
   </Base>
 );
+
+export const Lightbulb = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M9 18h6M10 22h4" />
+    <path d="M15.1 14a5 5 0 1 0-6.2 0c.5.4.9 1 1 1.6l.1.9h4l.1-.9c.1-.6.5-1.2 1-1.6Z" />
+  </Base>
+);
+
+export const ScrollText = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M8 21h9a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v13" />
+    <path d="M5 18a2 2 0 0 0 2 2M9 7h6M9 11h6M9 15h4" />
+  </Base>
+);
+
+export const Beaker = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M9 3h6M10 3v6.2a2 2 0 0 1-.3 1L4.5 18a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3l-5.2-7.8a2 2 0 0 1-.3-1V3" />
+    <path d="M6.5 14h11" />
+  </Base>
+);
+
+export const Info = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 16v-4M12 8h.01" />
+  </Base>
+);
+
+export const AlertTriangle = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+    <path d="M12 9v4M12 17h.01" />
+  </Base>
+);
+
+export const Sigma = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8L12 12l-5.9 7.2a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2" />
+  </Base>
+);

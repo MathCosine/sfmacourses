@@ -15,6 +15,7 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
     title: "Initiative",
     links: [
       { label: "About SFMA", href: "/about" },
+      { label: "Our Team", href: "/team" },
       { label: "sfmathacademy.com", href: "https://sfmathacademy.com", external: true },
       { label: "sfmathopen.replit.app", href: "https://sfmathopen.replit.app", external: true },
       { label: "Group Lessons", href: "https://sfmathacademy.com", external: true },

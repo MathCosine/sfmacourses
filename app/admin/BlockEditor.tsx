@@ -3,12 +3,13 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type {
+  CalloutVariant,
   ContentBlock,
   Difficulty,
   Frequency,
   Lesson,
 } from "@/lib/types";
-import { DIFFICULTIES } from "@/lib/types";
+import { CALLOUT_LABELS, CALLOUT_VARIANTS, DIFFICULTIES } from "@/lib/types";
 import { contentBlocks, extractMeta } from "@/lib/utils";
 import { updateLesson, deleteLesson } from "./actions";
 import { MarkdownField } from "@/components/admin/MarkdownField";
@@ -20,6 +21,7 @@ const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
   problem: "Problem",
   section: "Section",
   video: "Video",
+  callout: "Environment",
 };
 
 const BLOCK_HINT: Record<ContentBlock["type"], string> = {
@@ -28,6 +30,7 @@ const BLOCK_HINT: Record<ContentBlock["type"], string> = {
   problem: "A practice problem with a status circle.",
   section: "A heading that appears in the contents and carries its own status.",
   video: "An embedded YouTube or Vimeo video.",
+  callout: "A styled box: theorem, big idea, recipe, example, note or warning.",
 };
 
 function emptyBlock(type: ContentBlock["type"]): ContentBlock {
@@ -50,6 +53,8 @@ function emptyBlock(type: ContentBlock["type"]): ContentBlock {
       return { type: "section", title: "" };
     case "video":
       return { type: "video", url: "", title: "", caption: "" };
+    case "callout":
+      return { type: "callout", variant: "theorem", title: "", body: "" };
   }
 }
 
@@ -269,7 +274,7 @@ export function BlockEditor({
           Add a block
         </div>
         <div className="flex flex-wrap gap-2">
-          {(["text", "section", "problem", "resource", "video"] as const).map(
+          {(["text", "section", "callout", "problem", "resource", "video"] as const).map(
             (t) => (
               <button
                 key={t}
@@ -343,6 +348,47 @@ function BlockFields({
           onChange={(e) => onChange({ title: e.target.value })}
           placeholder="Introduction"
         />
+      </div>
+    );
+  }
+
+  if (block.type === "callout") {
+    return (
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div>
+          <label className={labelCls}>Environment</label>
+          <select
+            className={inputCls}
+            value={block.variant}
+            onChange={(e) =>
+              onChange({ variant: e.target.value as CalloutVariant })
+            }
+          >
+            {CALLOUT_VARIANTS.map((v) => (
+              <option key={v} value={v}>
+                {CALLOUT_LABELS[v]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="sm:col-span-2">
+          <label className={labelCls}>Heading (optional)</label>
+          <input
+            className={inputCls}
+            value={block.title ?? ""}
+            onChange={(e) => onChange({ title: e.target.value })}
+            placeholder={CALLOUT_LABELS[block.variant]}
+          />
+        </div>
+        <div className="sm:col-span-3">
+          <label className={labelCls}>Body</label>
+          <MarkdownField
+            value={block.body}
+            onChange={(v) => onChange({ body: v })}
+            minHeight={90}
+            placeholder="The statement / idea / steps (supports LaTeX)."
+          />
+        </div>
       </div>
     );
   }

@@ -57,6 +57,42 @@ export interface VideoBlock {
   caption?: string;
 }
 
+/** Styled "environment" box: theorem, big idea, recipe, example, etc. */
+export type CalloutVariant =
+  | "theorem"
+  | "big-idea"
+  | "recipe"
+  | "example"
+  | "info"
+  | "warning";
+
+export interface CalloutBlock {
+  type: "callout";
+  variant: CalloutVariant;
+  /** Optional custom heading; falls back to the variant's default label. */
+  title?: string;
+  /** Markdown body (supports LaTeX). */
+  body: string;
+}
+
+export const CALLOUT_LABELS: Record<CalloutVariant, string> = {
+  theorem: "Theorem",
+  "big-idea": "Big Idea",
+  recipe: "Recipe",
+  example: "Example",
+  info: "Note",
+  warning: "Warning",
+};
+
+export const CALLOUT_VARIANTS: CalloutVariant[] = [
+  "theorem",
+  "big-idea",
+  "recipe",
+  "example",
+  "info",
+  "warning",
+];
+
 /**
  * Lesson-level metadata. Stored as an optional first element of the content
  * array (the `lessons` table has no dedicated columns for these), and filtered
@@ -73,7 +109,8 @@ export type ContentBlock =
   | ResourceBlock
   | ProblemBlock
   | SectionBlock
-  | VideoBlock;
+  | VideoBlock
+  | CalloutBlock;
 
 export type Block = ContentBlock | MetaBlock;
 

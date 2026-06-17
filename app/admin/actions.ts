@@ -54,7 +54,15 @@ async function nextOrder(
   return (data?.[0]?.order_index ?? -1) + 1;
 }
 
-/** Swap order_index with the neighbour in the given direction. */
+/**
+ * Move an item one slot in the given direction.
+ *
+ * Rather than swapping two `order_index` values (which silently no-ops when
+ * siblings share a duplicate index — a common result of seeding), this rebuilds
+ * a clean 0..n-1 ordering for the whole sibling group and writes back only the
+ * rows whose index actually changed. This is robust to duplicate/sparse indices
+ * and surfaces any DB error instead of pretending it succeeded.
+ */
 async function moveItem(
   table: "modules" | "lessons",
   id: string,
@@ -63,32 +71,47 @@ async function moveItem(
   const { supabase, error } = await requireStaff();
   if (error) return { ok: false, error };
 
-  const { data: row } = await supabase
+  const parentCol = table === "modules" ? "track_id" : "module_id";
+
+  const { data: row, error: rowErr } = await supabase
     .from(table)
-    .select("id, order_index, track_id, module_id")
+    .select(`id, ${parentCol}`)
     .eq("id", id)
     .maybeSingle();
-  if (!row) return { ok: false, error: "Not found" };
+  if (rowErr) return { ok: false, error: rowErr.message };
+  if (!row) return { ok: false, error: "Item not found" };
 
-  const parentCol = table === "modules" ? "track_id" : "module_id";
   const parentId = (row as Record<string, string>)[parentCol];
 
-  const { data: siblings } = await supabase
+  const { data: siblings, error: sibErr } = await supabase
     .from(table)
     .select("id, order_index")
     .eq(parentCol, parentId)
-    .order("order_index", { ascending: true });
+    .order("order_index", { ascending: true })
+    .order("id", { ascending: true }); // stable tiebreak for duplicate indices
+  if (sibErr) return { ok: false, error: sibErr.message };
 
-  const list = siblings ?? [];
+  const list = [...(siblings ?? [])];
   const idx = list.findIndex((s) => s.id === id);
   const swapIdx = idx + dir;
   if (idx === -1 || swapIdx < 0 || swapIdx >= list.length)
-    return { ok: true }; // already at the edge
+    return { ok: true }; // already at the edge — nothing to do
 
-  const a = list[idx];
-  const b = list[swapIdx];
-  await supabase.from(table).update({ order_index: b.order_index }).eq("id", a.id);
-  await supabase.from(table).update({ order_index: a.order_index }).eq("id", b.id);
+  // Reorder the in-memory list, then assign a clean contiguous index.
+  [list[idx], list[swapIdx]] = [list[swapIdx], list[idx]];
+
+  const updates = list
+    .map((item, position) => ({ id: item.id, order_index: position, was: item.order_index }))
+    .filter((u) => u.order_index !== u.was);
+
+  for (const u of updates) {
+    const { error: upErr } = await supabase
+      .from(table)
+      .update({ order_index: u.order_index })
+      .eq("id", u.id);
+    if (upErr) return { ok: false, error: upErr.message };
+  }
+
   refresh();
   return { ok: true };
 }

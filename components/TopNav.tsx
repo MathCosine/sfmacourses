@@ -107,7 +107,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
                 <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", learnOpen && "rotate-180")} />
               </button>
               {learnOpen && (
-                <div className="absolute left-0 top-full mt-1.5 w-[320px] overflow-hidden rounded-2xl border border-border bg-surface p-2 shadow-lift">
+                <div className="menu-pop absolute left-0 top-full mt-1.5 w-[320px] overflow-hidden rounded-2xl border border-border bg-surface p-2 shadow-lift">
                   <div className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-tfaint">
                     Courses
                   </div>
@@ -138,6 +138,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
             </div>
 
             <NavLink href="/problems" active={isActive("/problems")}>Problems</NavLink>
+            <NavLink href="/team" active={isActive("/team")}>Team</NavLink>
             <NavLink href="/about" active={isActive("/about")}>About</NavLink>
             <a
               href="https://sfmathacademy.com"
@@ -185,7 +186,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
                 {initials(user.name, user.email)}
               </button>
               {profileOpen && (
-                <div className="absolute right-0 top-full mt-1.5 w-60 overflow-hidden rounded-2xl border border-border bg-surface py-1.5 shadow-lift">
+                <div className="menu-pop absolute right-0 top-full mt-1.5 w-60 overflow-hidden rounded-2xl border border-border bg-surface py-1.5 shadow-lift">
                   <div className="border-b border-border px-4 py-2.5">
                     <div className="truncate text-[13.5px] font-semibold text-tprimary">{user.name}</div>
                     <div className="truncate text-[12px] text-tmuted">{user.email}</div>
@@ -247,6 +248,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
               ))}
               <div className="my-2 border-t border-border" />
               <MobileLink href="/problems">Problems</MobileLink>
+              <MobileLink href="/team">Team</MobileLink>
               <MobileLink href="/about">About</MobileLink>
               <a href="https://sfmathacademy.com" target="_blank" rel="noopener noreferrer" className="rounded-lg px-3 py-2.5 text-[14.5px] font-medium text-tmuted">Classes ↗</a>
               {user?.isStaff && <MobileLink href="/admin">Staff Admin</MobileLink>}

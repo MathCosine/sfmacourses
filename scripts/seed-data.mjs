@@ -123,6 +123,12 @@ and indeed $5868 = 36 \cdot 163$. The largest value is $\boxed{5868}$.`,
                 content: R`A positive integer $a$ is **divisible** by a positive integer $b$ when dividing $a$ by $b$ leaves no remainder. We write $b \mid a$, meaning $a = b \cdot k$ for some integer $k$. These shortcuts let you test divisibility at a glance — essential for fast AMC 8 arithmetic.`,
               },
               {
+                type: "callout",
+                variant: "big-idea",
+                title: "Big Idea",
+                body: R`Divisibility rules are not magic — each one is a statement about a number modulo its divisor. Master *why* $10^k$ behaves the way it does mod $9$ and mod $11$, and you can rebuild every rule from scratch under time pressure.`,
+              },
+              {
                 type: "text",
                 content: R`### The standard rules
 
@@ -201,11 +207,24 @@ Now $1001 = 7 \cdot 11 \cdot 13$, so $\overline{ABCABC}$ is divisible by each of
               },
               { type: "section", title: "Prime Factorization" },
               {
+                type: "callout",
+                variant: "theorem",
+                title: "Fundamental Theorem of Arithmetic",
+                body: R`Every integer $n > 1$ can be written **uniquely** as a product of primes, up to order:
+$$n = p_1^{e_1} p_2^{e_2} \cdots p_k^{e_k}, \qquad p_1 < p_2 < \cdots < p_k.$$`,
+              },
+              {
+                type: "callout",
+                variant: "recipe",
+                title: "Recipe — Factoring a number fast",
+                body: R`1. Pull out factors of $2$ until the number is odd.
+2. Test the small primes in order: $3, 5, 7, 11, 13, \ldots$
+3. Stop once your trial prime exceeds $\sqrt{n}$ — whatever remains is prime.
+4. Collect equal primes into powers to read off $n = p_1^{e_1}\cdots p_k^{e_k}$.`,
+              },
+              {
                 type: "text",
-                content: R`The **Fundamental Theorem of Arithmetic** says every integer $n > 1$ can be written **uniquely** as a product of primes (up to order):
-$$n = p_1^{e_1} p_2^{e_2} \cdots p_k^{e_k}, \qquad p_1 < p_2 < \cdots < p_k.$$
-
-This is the **prime factorization** of $n$, and almost every number-theory shortcut starts here.`,
+                content: R`This **prime factorization** of $n$ is where almost every number-theory shortcut starts.`,
               },
               {
                 type: "text",

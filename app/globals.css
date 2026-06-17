@@ -127,7 +127,10 @@
   --color-resource-border: var(--resource-border);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Editorial serif for headings / environment labels — reads like a printed
+     math text rather than a generic SaaS sans. System stack = zero load cost. */
+  --font-serif: "Charter", "Bitstream Charter", "Sitka Text", Cambria,
+    "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
   --shadow-xs: var(--shadow-1);
@@ -196,6 +199,67 @@ button:not(:disabled):active { transform: translateY(1px) scale(0.99); }
 .callout-tip { background: var(--color-green-tint); border-color: color-mix(in srgb, var(--green) 30%, transparent); }
 .callout-warning { background: var(--color-yellow-tint); border-color: color-mix(in srgb, var(--yellow) 35%, transparent); }
 
+/* ----- Content environments (theorem / big idea / recipe / example / …) -----
+   A distinctive "exam-book" treatment: a thick accent rail on the left, a small
+   icon badge + serif label, and a tinted surface. Each variant sets --env. */
+.env {
+  --env: var(--accent);
+  position: relative;
+  margin: 1.5em 0;
+  border: 1px solid color-mix(in srgb, var(--env) 32%, var(--color-border));
+  border-left: 4px solid var(--env);
+  border-radius: 12px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--env) 6%, var(--color-surface)),
+                    color-mix(in srgb, var(--env) 6%, var(--color-surface)));
+  padding: 0.95rem 1.15rem 1.05rem;
+  box-shadow: var(--shadow-2);
+}
+.env-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.55rem;
+}
+.env-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  width: 26px;
+  border-radius: 8px;
+  background: var(--env);
+  color: #fff;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--env) 40%, transparent);
+}
+.env-label {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: -0.01em;
+  color: color-mix(in srgb, var(--env) 72%, var(--color-tprimary));
+}
+.env-body { font-size: 15px; }
+.env-body > :first-child { margin-top: 0; }
+.env-body > :last-child { margin-bottom: 0; }
+/* A faint oversized glyph in the corner — a printed-textbook flourish. */
+.env::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 60% at 100% 0%,
+      color-mix(in srgb, var(--env) 7%, transparent), transparent 60%);
+}
+.env-theorem  { --env: var(--purple); }
+.env-big-idea { --env: var(--yellow); }
+.env-recipe   { --env: var(--green); }
+.env-example  { --env: var(--accent); }
+.env-info     { --env: var(--accent); }
+.env-warning  { --env: var(--danger); }
+
 /* ----- Rendered markdown / prose ----- */
 .prose-sfma { font-size: 15.5px; line-height: 1.8; color: var(--color-tprimary); }
 .prose-sfma p { margin: 0 0 1.1em; }
@@ -239,6 +303,8 @@ button:not(:disabled):active { transform: translateY(1px) scale(0.99); }
 .fade-up-3 { animation: fadeSlideIn 320ms var(--ease-out-soft) 180ms both; }
 @keyframes growWidth { from { width: 0; } }
 .progress-fill { animation: growWidth 800ms var(--ease-out-soft) both; }
+@keyframes menuPop { from { opacity: 0; transform: translateY(-6px) scale(0.97); } to { opacity: 1; transform: none; } }
+.status-menu, .menu-pop { animation: menuPop 140ms var(--ease-out-soft) both; transform-origin: top; }
 
 /* Subtle dotted grid used behind hero sections. */
 .dot-grid {

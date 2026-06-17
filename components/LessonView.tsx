@@ -7,6 +7,7 @@ import { ResourceBlock } from "@/components/blocks/ResourceBlock";
 import { ProblemBlock } from "@/components/blocks/ProblemBlock";
 import { VideoBlock } from "@/components/blocks/VideoBlock";
 import { SectionBlock } from "@/components/blocks/SectionBlock";
+import { CalloutBlock } from "@/components/blocks/CalloutBlock";
 import { LessonStatusControl } from "@/components/LessonStatusControl";
 
 interface LessonViewProps {
@@ -37,6 +38,8 @@ export function LessonView({
               return <ResourceBlock key={i} block={block.block} />;
             case "video":
               return <VideoBlock key={i} block={block.block} />;
+            case "callout":
+              return <CalloutBlock key={i} block={block.prepared} />;
             case "section":
               return (
                 <SectionBlock
