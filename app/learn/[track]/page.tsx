@@ -2,11 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
-import { ProgressRing } from "@/components/ProgressRing";
+import { FrequencyDots } from "@/components/FrequencyDots";
 import { getLessonStatuses, getNavTree, getSessionUser } from "@/lib/data";
 import { extractMeta } from "@/lib/utils";
-import { FREQUENCY_DOTS, type LessonStatus } from "@/lib/types";
-import { STATUS_META } from "@/lib/status";
+import { trackTheme } from "@/lib/trackTheme";
+import type { LessonStatus } from "@/lib/types";
+import { statusMeta } from "@/lib/status";
 import { Check } from "@/components/icons";
 
 export async function generateMetadata({
@@ -16,11 +17,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { track } = await params;
   const tree = await getNavTree();
-  const t = tree.find((x) => x.slug === track);
-  return { title: t?.title ?? "Course" };
+  return { title: tree.find((x) => x.slug === track)?.title ?? "Course" };
 }
 
-function StatPill({
+function CountStat({
   count,
   label,
   color,
@@ -30,14 +30,17 @@ function StatPill({
   color: string;
 }) {
   return (
-    <span className="inline-flex items-center gap-1.5">
-      <span
-        className="inline-block h-2 w-2 rounded-full"
-        style={{ background: color }}
-      />
-      <span className="font-semibold text-tprimary">{count}</span>
-      <span>{label}</span>
-    </span>
+    <div className="flex flex-col items-center gap-1.5">
+      <div
+        className="flex h-14 w-14 items-center justify-center rounded-full text-[20px] font-extrabold"
+        style={{ background: `${color}1a`, color }}
+      >
+        {count}
+      </div>
+      <div className="text-[10.5px] font-bold uppercase tracking-wide text-tmuted">
+        {label}
+      </div>
+    </div>
   );
 }
 
@@ -51,17 +54,13 @@ export default async function TrackPage({
   const t = tree.find((x) => x.slug === track);
   if (!t) notFound();
 
-  const statuses = await getLessonStatuses(user!.id);
+  const statuses = user ? await getLessonStatuses(user.id) : {};
   const statusOf = (id: string): LessonStatus => statuses[id] ?? "not_started";
+  const theme = trackTheme(t.slug);
 
   const allLessons = t.modules.flatMap((m) => m.lessons);
   const total = allLessons.length;
-  const counts = {
-    complete: 0,
-    inProgress: 0,
-    skipped: 0,
-    notStarted: 0,
-  };
+  const counts = { complete: 0, inProgress: 0, skipped: 0, notStarted: 0 };
   for (const l of allLessons) {
     const s = statusOf(l.id);
     if (s === "complete") counts.complete++;
@@ -69,114 +68,121 @@ export default async function TrackPage({
     else if (s === "skipped" || s === "ignored") counts.skipped++;
     else counts.notStarted++;
   }
+  const pct = total ? Math.round((counts.complete / total) * 100) : 0;
 
   return (
     <AppShell activeTrackSlug={t.slug}>
-      <div className="fade-up mx-auto max-w-[840px] px-6 py-10 sm:px-10">
-        <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-gold">
-          Course
-        </div>
-        <div className="mt-1.5 flex items-start justify-between gap-6">
-          <div>
-            <h1 className="font-serif text-[2.5rem] leading-tight text-tprimary">
-              {t.title}
-            </h1>
-            {t.description && (
-              <p className="mt-2 max-w-xl text-[14.5px] leading-relaxed text-tmuted">
-                {t.description}
-              </p>
-            )}
+      {/* Colored banner */}
+      <div className="text-white" style={{ background: theme.banner }}>
+        <div className="mx-auto max-w-[820px] px-6 py-12 text-center sm:px-10">
+          <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/75">
+            {theme.tag}
           </div>
-          <ProgressRing value={counts.complete} total={total} size={68} />
+          <h1 className="mt-2 text-[2.75rem] font-extrabold leading-tight tracking-tight sm:text-[3.25rem]">
+            {t.title}
+          </h1>
+          {t.description && (
+            <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-white/85">
+              {t.description}
+            </p>
+          )}
         </div>
+      </div>
 
-        {/* Slim gradient progress bar */}
-        <div className="mt-6">
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-border/70">
+      <div className="fade-up mx-auto max-w-[820px] px-6 py-8 sm:px-10">
+        {/* Progress summary card */}
+        <div className="card -mt-16 rounded-xl p-6 shadow-md">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-[15px] font-bold text-tprimary">
+              Chapters Progress
+            </h2>
+            <span className="text-[12.5px] font-semibold text-tmuted">
+              {pct}% complete
+            </span>
+          </div>
+          <div className="mb-5 h-1.5 w-full overflow-hidden rounded-full bg-border">
             <div
               className="progress-fill h-full rounded-full"
-              style={{
-                width: `${total ? (counts.complete / total) * 100 : 0}%`,
-                background: "linear-gradient(90deg, #2563eb, #16a34a)",
-              }}
+              style={{ width: `${pct}%`, background: theme.banner }}
             />
           </div>
-          <div className="mt-2.5 flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-tmuted">
-            <StatPill count={counts.complete} label="Completed" color="#16a34a" />
-            <StatPill count={counts.inProgress} label="In Progress" color="#ca8a04" />
-            <StatPill count={counts.skipped} label="Skipped" color="#2563eb" />
-            <StatPill count={counts.notStarted} label="Not Started" color="#718096" />
+          <div className="flex items-center justify-around">
+            <CountStat count={counts.complete} label="Completed" color="#15a34a" />
+            <CountStat count={counts.inProgress} label="In Progress" color="#d97706" />
+            <CountStat count={counts.skipped} label="Skipped" color="#2563eb" />
+            <CountStat count={counts.notStarted} label="Not Started" color="#9aa3b2" />
           </div>
         </div>
 
-        <div className="mt-8 space-y-3">
-          {t.modules.map((m) => {
-            const mDone = m.lessons.filter(
-              (l) => statusOf(l.id) === "complete",
-            ).length;
-            return (
-              <section
-                key={m.id}
-                className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm"
-              >
-                <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
-                  <div>
-                    <h2 className="font-serif text-xl text-tprimary">
-                      {m.title}
-                    </h2>
-                    {m.description && (
-                      <p className="mt-0.5 text-[13px] text-tmuted">
-                        {m.description}
-                      </p>
-                    )}
-                  </div>
-                  <span className="shrink-0 text-[12.5px] font-medium text-tmuted">
-                    {mDone}/{m.lessons.length}
-                  </span>
-                </div>
+        {/* Timeline of units → chapters */}
+        <div className="mt-10">
+          {t.modules.map((m) => (
+            <section key={m.id} className="relative pl-8">
+              {/* vertical line */}
+              <span className="absolute left-[7px] top-2 bottom-0 w-px bg-border" />
+              {/* node */}
+              <span
+                className="absolute left-0 top-1.5 h-3.5 w-3.5 rounded-full border-2 bg-surface"
+                style={{ borderColor: theme.banner }}
+              />
+              <div className="pb-8">
+                <h2 className="text-[1.35rem] font-extrabold tracking-tight text-tprimary">
+                  {m.title}
+                </h2>
+                {m.description && (
+                  <p className="mt-0.5 text-[13.5px] text-tmuted">
+                    {m.description}
+                  </p>
+                )}
 
-                <ul className="divide-y divide-border border-t border-border px-5">
+                <div className="mt-3 divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
                   {m.lessons.map((l) => {
                     const s = statusOf(l.id);
-                    const sm = STATUS_META[s];
+                    const sm = statusMeta(s);
                     const filled = s !== "not_started";
                     const meta = extractMeta(l.content);
                     return (
-                      <li key={l.id}>
-                        <Link
-                          href={`/learn/${t.slug}/${m.slug}/${l.slug}`}
-                          className="group flex items-center gap-3 py-2.5"
+                      <Link
+                        key={l.id}
+                        href={`/learn/${t.slug}/${m.slug}/${l.slug}`}
+                        className="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-bg"
+                      >
+                        <span
+                          className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2"
+                          style={{
+                            borderColor: filled ? sm.color : "#ccd0d8",
+                            background: filled ? sm.color : "transparent",
+                          }}
                         >
-                          <span
-                            className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2"
-                            style={{
-                              borderColor: filled ? sm.color : "#ccd0d8",
-                              background: filled ? sm.color : "transparent",
-                            }}
-                          >
-                            {s === "complete" && (
-                              <Check className="h-2.5 w-2.5 text-white" />
-                            )}
-                          </span>
-                          <span className="flex-1 text-[14px] text-tprimary transition-colors group-hover:text-gold">
+                          {s === "complete" && (
+                            <Check className="h-2.5 w-2.5 text-white" />
+                          )}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[14.5px] font-semibold text-tprimary group-hover:text-gold">
                             {l.title}
-                          </span>
-                          <span className="text-[11px] tracking-tight text-gold">
-                            {"●".repeat(FREQUENCY_DOTS[meta.frequency])}
-                          </span>
-                        </Link>
-                      </li>
+                          </div>
+                          <div className="mt-0.5">
+                            <FrequencyDots frequency={meta.frequency} />
+                          </div>
+                        </div>
+                      </Link>
                     );
                   })}
                   {m.lessons.length === 0 && (
-                    <li className="py-3 text-[13px] text-tfaint">
+                    <div className="px-4 py-3 text-[13px] text-tfaint">
                       No chapters yet.
-                    </li>
+                    </div>
                   )}
-                </ul>
-              </section>
-            );
-          })}
+                </div>
+              </div>
+            </section>
+          ))}
+          {t.modules.length === 0 && (
+            <p className="text-[14px] text-tfaint">
+              This course is under construction — chapters coming soon.
+            </p>
+          )}
         </div>
       </div>
     </AppShell>

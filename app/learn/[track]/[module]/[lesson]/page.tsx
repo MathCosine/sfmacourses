@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { LessonView } from "@/components/LessonView";
 import { LessonStatusControl } from "@/components/LessonStatusControl";
 import { TableOfContents } from "@/components/TableOfContents";
+import { FrequencyDots } from "@/components/FrequencyDots";
 import {
   getLessonContext,
   getLessonStatus,
@@ -18,7 +19,6 @@ import {
   countProblems,
   extractMeta,
 } from "@/lib/utils";
-import { FREQUENCY_LABELS, FREQUENCY_DOTS } from "@/lib/types";
 import { ArrowLeft, ArrowRight } from "@/components/icons";
 
 interface Params {
@@ -61,7 +61,6 @@ export default async function LessonPage({
       getSectionStatuses(userId, ctx.lesson.id),
     ]);
   const problemCount = countProblems(ctx.lesson.content);
-  const dots = FREQUENCY_DOTS[meta.frequency];
 
   const prevHref = ctx.prev
     ? `/learn/${ctx.prev.track}/${ctx.prev.module}/${ctx.prev.lesson}`
@@ -107,10 +106,7 @@ export default async function LessonPage({
 
           {/* Frequency + count */}
           <div className="mt-4 flex flex-wrap items-center gap-4">
-            <span className="flex items-center gap-1.5 text-[12.5px] font-semibold text-gold">
-              <span className="tracking-tight">{"●".repeat(dots)}</span>
-              {FREQUENCY_LABELS[meta.frequency]}
-            </span>
+            <FrequencyDots frequency={meta.frequency} />
             {problemCount > 0 && (
               <span className="text-[12.5px] text-tmuted">
                 {problemCount} problem{problemCount === 1 ? "" : "s"}
@@ -121,7 +117,7 @@ export default async function LessonPage({
           {/* Title + status */}
           <div className="mt-3 flex items-start justify-between gap-4">
             <div>
-              <h1 className="font-serif text-4xl leading-tight text-tprimary sm:text-[2.6rem]">
+              <h1 className="text-[2.4rem] font-extrabold leading-tight tracking-tight text-tprimary">
                 {ctx.lesson.title}
               </h1>
               <p className="mt-2 text-[13px] text-tmuted">
