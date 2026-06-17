@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import type { LessonStatus } from "@/lib/types";
 import { LESSON_STATUS_OPTIONS } from "@/lib/status";
 import { setLessonStatus } from "@/app/learn/actions";
@@ -16,7 +15,6 @@ export function LessonStatusControl({
   initial: LessonStatus;
   align?: "left" | "right";
 }) {
-  const router = useRouter();
   const [status, setStatus] = useState<LessonStatus>(initial);
   const [, startTransition] = useTransition();
 
@@ -26,7 +24,6 @@ export function LessonStatusControl({
     startTransition(async () => {
       const res = await setLessonStatus(lessonId, next as LessonStatus);
       if (!res.ok) setStatus(prev);
-      else router.refresh();
     });
   }
 

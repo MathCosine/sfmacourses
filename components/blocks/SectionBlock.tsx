@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import type { LessonStatus } from "@/lib/types";
 import { LESSON_STATUS_OPTIONS } from "@/lib/status";
 import { setSectionStatus } from "@/app/learn/actions";
@@ -20,7 +19,6 @@ export function SectionBlock({
   sectionIndex: number;
   initialStatus: LessonStatus;
 }) {
-  const router = useRouter();
   const [status, setStatus] = useState<LessonStatus>(initialStatus);
   const [, startTransition] = useTransition();
 
@@ -34,7 +32,6 @@ export function SectionBlock({
         next as LessonStatus,
       );
       if (!res.ok) setStatus(prev);
-      else router.refresh();
     });
   }
 

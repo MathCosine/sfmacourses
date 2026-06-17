@@ -18,7 +18,7 @@ export default async function AuthPage({
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center px-6 py-10">
-      <div className="dot-grid absolute inset-0 opacity-50" />
+      <div className="graph-paper-lg absolute inset-0 opacity-70" />
       <div className="absolute right-5 top-5">
         <ThemeToggle />
       </div>

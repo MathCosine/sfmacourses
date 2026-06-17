@@ -39,7 +39,7 @@ export default async function AboutPage() {
     <SiteShell>
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border bg-surface">
-        <div className="dot-grid absolute inset-0 opacity-50" />
+        <div className="graph-paper-lg absolute inset-0 opacity-70" />
         <div className="relative mx-auto max-w-3xl px-6 py-20 text-center sm:px-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-border bg-bg px-3.5 py-1.5 text-[12.5px] font-medium text-tmuted">
             <Users className="h-3.5 w-3.5 text-gold" />
@@ -47,9 +47,7 @@ export default async function AboutPage() {
           </div>
           <h1 className="mt-5 text-[2.8rem] font-extrabold leading-tight tracking-tight text-tprimary">
             Great math instruction,{" "}
-            <span className="bg-gradient-to-r from-gold to-purple bg-clip-text text-transparent">
-              free for everyone
-            </span>
+            <span className="marker">free for everyone</span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-[16.5px] leading-relaxed text-tmuted">
             San Francisco Math Academy is the free, structured guide of the San

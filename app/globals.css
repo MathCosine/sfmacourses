@@ -245,3 +245,62 @@ button:not(:disabled):active { transform: translateY(1px) scale(0.99); }
   background-image: radial-gradient(color-mix(in srgb, var(--accent) 16%, transparent) 1px, transparent 1px);
   background-size: 22px 22px;
 }
+
+/* Graph-paper texture — reads as a math notebook, not a generic gradient. */
+.graph-paper {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--tprimary) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--tprimary) 6%, transparent) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.graph-paper-lg {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--tprimary) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--tprimary) 7%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Highlighter-pen emphasis — hand-marked, not a clip-text gradient. */
+.marker {
+  background-image: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--yellow) 38%, transparent),
+    color-mix(in srgb, var(--yellow) 38%, transparent)
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 40%;
+  background-position: 0 82%;
+  padding: 0 0.06em;
+}
+.marker-blue {
+  background-image: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--accent) 26%, transparent),
+    color-mix(in srgb, var(--accent) 26%, transparent)
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 38%;
+  background-position: 0 84%;
+  padding: 0 0.06em;
+}
+
+/* Scroll-reveal (paired with components/Reveal.tsx). */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s var(--ease-out-soft), transform 0.6s var(--ease-out-soft);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .fade-up, .fade-up-1, .fade-up-2, .fade-up-3,
+  .progress-fill, .hover-lift { animation: none !important; }
+  .hover-lift:hover { transform: none !important; }
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
