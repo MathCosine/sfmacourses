@@ -55,6 +55,35 @@ async function nextOrder(
 }
 
 /**
+ * Build a slug that is unique among its siblings (same track/module). Slugs are
+ * only unique *within* a parent in the schema, but two chapters can legitimately
+ * share a title (e.g. "Introduction") — so on a collision we append -2, -3, …
+ * rather than letting the unique index throw. `excludeId` skips the row being
+ * edited so re-saving an unchanged title keeps its slug.
+ */
+async function uniqueSlug(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  table: "modules" | "lessons",
+  column: "track_id" | "module_id",
+  parentId: string,
+  title: string,
+  excludeId?: string,
+): Promise<string> {
+  const base = slugify(title) || `${table.slice(0, -1)}-${Date.now()}`;
+  const { data } = await supabase
+    .from(table)
+    .select("id, slug")
+    .eq(column, parentId);
+  const taken = new Set(
+    (data ?? []).filter((r) => r.id !== excludeId).map((r) => r.slug),
+  );
+  if (!taken.has(base)) return base;
+  let n = 2;
+  while (taken.has(`${base}-${n}`)) n += 1;
+  return `${base}-${n}`;
+}
+
+/**
  * Move an item one slot in the given direction.
  *
  * Rather than swapping two `order_index` values (which silently no-ops when
@@ -133,12 +162,13 @@ export async function createModule(
   const { supabase, error } = await requireStaff();
   if (error) return { ok: false, error };
   const order_index = await nextOrder(supabase, "modules", "track_id", trackId);
+  const slug = await uniqueSlug(supabase, "modules", "track_id", trackId, title);
   const { data, error: e } = await supabase
     .from("modules")
     .insert({
       track_id: trackId,
       title,
-      slug: slugify(title) || `module-${Date.now()}`,
+      slug,
       order_index,
     })
     .select("id")
@@ -155,7 +185,23 @@ export async function updateModule(
   const { supabase, error } = await requireStaff();
   if (error) return { ok: false, error };
   const patch: Record<string, unknown> = { ...fields };
-  if (fields.title) patch.slug = slugify(fields.title);
+  if (fields.title) {
+    const { data: row } = await supabase
+      .from("modules")
+      .select("track_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (row?.track_id) {
+      patch.slug = await uniqueSlug(
+        supabase,
+        "modules",
+        "track_id",
+        row.track_id,
+        fields.title,
+        id,
+      );
+    }
+  }
   const { error: e } = await supabase.from("modules").update(patch).eq("id", id);
   if (e) return { ok: false, error: e.message };
   refresh();
@@ -190,12 +236,13 @@ export async function createLesson(
     author: "SFMA Staff",
     frequency: "important",
   };
+  const slug = await uniqueSlug(supabase, "lessons", "module_id", moduleId, title);
   const { data, error: e } = await supabase
     .from("lessons")
     .insert({
       module_id: moduleId,
       title,
-      slug: slugify(title) || `lesson-${Date.now()}`,
+      slug,
       content: [meta] as Block[],
       order_index,
     })
@@ -221,7 +268,21 @@ export async function updateLesson(
   const patch: Record<string, unknown> = {};
   if (fields.title) {
     patch.title = fields.title;
-    patch.slug = slugify(fields.title);
+    const { data: row } = await supabase
+      .from("lessons")
+      .select("module_id")
+      .eq("id", id)
+      .maybeSingle();
+    if (row?.module_id) {
+      patch.slug = await uniqueSlug(
+        supabase,
+        "lessons",
+        "module_id",
+        row.module_id,
+        fields.title,
+        id,
+      );
+    }
   }
   if (fields.content) {
     const meta: MetaBlock = {
