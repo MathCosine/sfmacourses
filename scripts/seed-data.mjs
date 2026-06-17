@@ -110,6 +110,314 @@ and indeed $5868 = 36 \cdot 163$. The largest value is $\boxed{5868}$.`,
               },
             ],
           },
+          {
+            title: "Divisibility, Prime Factorization & GCD/LCM",
+            slug: "divisibility-factorization-gcd-lcm",
+            order_index: 1,
+            author: "SFMA",
+            frequency: "essential",
+            blocks: [
+              { type: "section", title: "Divisibility Rules" },
+              {
+                type: "text",
+                content: R`A positive integer $a$ is **divisible** by a positive integer $b$ when dividing $a$ by $b$ leaves no remainder. We write $b \mid a$, meaning $a = b \cdot k$ for some integer $k$. These shortcuts let you test divisibility at a glance — essential for fast AMC 8 arithmetic.`,
+              },
+              {
+                type: "text",
+                content: R`### The standard rules
+
+For a positive integer $n$ written in base ten:
+
+- **By 2** — the last digit is even ($0,2,4,6,8$).
+- **By 3** — the digit sum is divisible by $3$.
+- **By 4** — the last **two** digits form a multiple of $4$.
+- **By 5** — the last digit is $0$ or $5$.
+- **By 6** — divisible by both $2$ **and** $3$.
+- **By 8** — the last **three** digits form a multiple of $8$.
+- **By 9** — the digit sum is divisible by $9$.
+- **By 10** — the last digit is $0$.
+- **By 11** — the **alternating** digit sum $d_1 - d_2 + d_3 - \cdots$ (from the right) is divisible by $11$.`,
+              },
+              {
+                type: "text",
+                content: R`### Why they work
+
+Each rule comes from how powers of ten behave modulo the divisor. Since $10 \equiv 1 \pmod 9$, we have $10^k \equiv 1 \pmod 9$, so a number is congruent to its digit sum modulo $9$ (and modulo $3$). Since $10 \equiv -1 \pmod{11}$, the powers of ten alternate $+1, -1, +1, \ldots$, which produces the alternating-sum rule. Understanding **why** a rule holds beats memorizing it.`,
+              },
+              { type: "section", title: "Examples — Divisibility" },
+              {
+                type: "problem",
+                title: "Apply the rules",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`For each number, decide whether it is divisible by $3$, by $9$, and by $11$, justifying with a rule:
+$$(a)\ 4752 \qquad (b)\ 30294 \qquad (c)\ 6413.$$`,
+                hint: R`Use the digit sum for $3$ and $9$, and the alternating digit sum for $11$.`,
+                solution: R`**(a) $4752$:** digit sum $4+7+5+2 = 18$, divisible by both $3$ and $9$. Alternating sum (from the right) $2-5+7-4 = 0$, divisible by $11$. Divisible by all three.
+
+**(b) $30294$:** digit sum $3+0+2+9+4 = 18$ — divisible by $3$ and $9$. Alternating sum $4-9+2-0+3 = 0$ — divisible by $11$. All three.
+
+**(c) $6413$:** digit sum $6+4+1+3 = 14$ — not divisible by $3$ or $9$. Alternating sum $3-1+4-6 = 0$ — divisible by $11$. Only by $11$.`,
+              },
+              {
+                type: "problem",
+                title: "A number divisible by 9",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`The five-digit number $\overline{A3B5C}$ is divisible by $9$, where $A \neq 0$.
+
+(a) What condition does the rule for $9$ place on $A + B + C$?
+(b) What is the minimum possible value of $A + B + C$?
+(c) How many digit triples $(A, B, C)$ give a valid number?`,
+                hint: R`The digit sum is $A + 3 + B + 5 + C = A + B + C + 8$, which must be a multiple of $9$.`,
+                solution: R`The digit sum is $A + B + C + 8$, so we need $A + B + C \equiv 1 \pmod 9$.
+
+**(a)** $A + B + C \equiv 1 \pmod 9$.
+
+**(b)** With $A \ge 1$ and $B, C \ge 0$, the smallest attainable sum that is $\equiv 1 \pmod 9$ is $1$ (e.g. $A=1, B=C=0$). Minimum $A+B+C = 1$.
+
+**(c)** Since $A + B + C \le 27$, the allowed sums are $1, 10, 19$. Counting digit triples with $A \in [1,9]$, $B, C \in [0,9]$ gives $1 + 54 + 45 = \boxed{100}$ valid triples.`,
+              },
+              {
+                type: "problem",
+                title: "Multiples of 5 but not 10",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`How many integers from $1$ to $1000$ inclusive are divisible by $5$ but **not** by $10$?`,
+                hint: R`These are exactly the **odd** multiples of $5$ — the numbers ending in $5$.`,
+                solution: R`There are $\lfloor 1000/5 \rfloor = 200$ multiples of $5$ and $\lfloor 1000/10 \rfloor = 100$ multiples of $10$. The ones divisible by $5$ but not $10$ number
+$$200 - 100 = 100.$$`,
+              },
+              {
+                type: "problem",
+                title: "The pattern ABCABC",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`Let $\overline{ABCABC}$ be a six-digit number with $A \neq 0$. Show it is always divisible by $7$, $11$, and $13$.`,
+                hint: R`Write $\overline{ABCABC}$ in terms of $\overline{ABC}$ and a power of ten, then factor.`,
+                solution: R`We can split the number as
+$$\overline{ABCABC} = \overline{ABC} \cdot 1000 + \overline{ABC} = \overline{ABC} \cdot 1001.$$
+Now $1001 = 7 \cdot 11 \cdot 13$, so $\overline{ABCABC}$ is divisible by each of $7$, $11$, and $13$. For example, $123123 = 123 \cdot 1001$.`,
+              },
+              { type: "section", title: "Prime Factorization" },
+              {
+                type: "text",
+                content: R`The **Fundamental Theorem of Arithmetic** says every integer $n > 1$ can be written **uniquely** as a product of primes (up to order):
+$$n = p_1^{e_1} p_2^{e_2} \cdots p_k^{e_k}, \qquad p_1 < p_2 < \cdots < p_k.$$
+
+This is the **prime factorization** of $n$, and almost every number-theory shortcut starts here.`,
+              },
+              {
+                type: "text",
+                content: R`### Counting divisors
+
+If $n = p_1^{e_1} \cdots p_k^{e_k}$, then the number of positive divisors of $n$ is
+$$\tau(n) = (e_1 + 1)(e_2 + 1) \cdots (e_k + 1),$$
+since each divisor independently chooses an exponent from $0$ to $e_i$ for each prime.
+
+**A useful fact:** $\tau(n)$ is **odd** exactly when $n$ is a perfect square. Divisors normally pair up as $(d,\ n/d)$; the only one that pairs with itself is $\sqrt{n}$, which is an integer only for perfect squares.`,
+              },
+              { type: "section", title: "Examples — Factorization" },
+              {
+                type: "problem",
+                title: "Factor and count divisors",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`Find the prime factorization of each number, then count its positive divisors:
+$$(a)\ 360 \qquad (b)\ 1764 \qquad (c)\ 2310.$$`,
+                hint: R`Use a factor tree, then apply $\tau(n) = (e_1+1)(e_2+1)\cdots$.`,
+                solution: R`**(a)** $360 = 2^3 \cdot 3^2 \cdot 5$, so $\tau = 4 \cdot 3 \cdot 2 = 24$.
+
+**(b)** $1764 = 2^2 \cdot 3^2 \cdot 7^2$, so $\tau = 3 \cdot 3 \cdot 3 = 27$.
+
+**(c)** $2310 = 2 \cdot 3 \cdot 5 \cdot 7 \cdot 11$, so $\tau = 2^5 = 32$.`,
+              },
+              {
+                type: "problem",
+                title: "Exactly 12 divisors",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`A positive integer $n$ has exactly $12$ positive divisors. List all possible "shapes" of its prime factorization, and find the smallest possible $n$.`,
+                hint: R`Write $12$ as an ordered product of integers each $\ge 2$; these are the values of $(e_1+1)(e_2+1)\cdots$.`,
+                solution: R`Writing $12 = (e_1+1)(e_2+1)\cdots$ gives the shapes
+$$p^{11},\quad p^5 q,\quad p^3 q^2,\quad p^2 q r.$$
+Using the smallest primes for each: $2^{11}=2048$, $2^5\cdot 3 = 96$, $2^3 \cdot 3^2 = 72$, and $2^2 \cdot 3 \cdot 5 = 60$. The smallest is $\boxed{60}$.`,
+              },
+              {
+                type: "problem",
+                title: "Squares, cubes, and sixth powers",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`Among the integers from $1$ to $500$, how many are perfect squares? How many are perfect cubes? How many are both (perfect sixth powers)?`,
+                hint: R`A number is both a square and a cube exactly when it is a perfect sixth power.`,
+                solution: R`Squares: $\lfloor \sqrt{500} \rfloor = 22$ (since $22^2 = 484$). Cubes: $\lfloor 500^{1/3} \rfloor = 7$ (since $7^3 = 343$, $8^3 = 512$). Sixth powers: $\lfloor 500^{1/6} \rfloor = 2$ (since $2^6 = 64$, $3^6 = 729$). So $22$, $7$, and $2$.`,
+              },
+              {
+                type: "problem",
+                title: "Fifteen divisors of the form 2^a·3^b",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`The prime factorization of $n$ is $2^a \cdot 3^b$ with $a, b \geq 1$, and $n$ has exactly $15$ positive divisors. Find all pairs $(a,b)$, compute each $n$, and say which are perfect squares.`,
+                hint: R`Need $(a+1)(b+1) = 15$ with $a, b \ge 1$.`,
+                solution: R`Since $(a+1)(b+1) = 15 = 3 \cdot 5$ and $a, b \ge 1$, the factor pairs give $(a+1, b+1) = (3,5)$ or $(5,3)$, so
+$$(a,b) = (2,4) \ \Rightarrow\ n = 2^2 \cdot 3^4 = 324, \qquad (a,b) = (4,2) \ \Rightarrow\ n = 2^4 \cdot 3^2 = 144.$$
+Both exponents are even in each case, so **both** $324 = 18^2$ and $144 = 12^2$ are perfect squares.`,
+              },
+              { type: "section", title: "Greatest Common Divisor" },
+              {
+                type: "text",
+                content: R`The **greatest common divisor** $\gcd(a,b)$ is the largest integer dividing both $a$ and $b$. Two ways to compute it:
+
+**Prime factorization.** With $a = \prod p_i^{e_i}$ and $b = \prod p_i^{f_i}$,
+$$\gcd(a,b) = \prod p_i^{\min(e_i,\,f_i)}.$$
+
+**Euclidean algorithm.** Repeatedly replace $(a,b)$ with $(b,\ a \bmod b)$ until the remainder is $0$; the last nonzero remainder is the gcd. It works because $\gcd(a,b) = \gcd(b,\ a - kb)$ for any integer $k$, and the remainders strictly decrease.`,
+              },
+              { type: "section", title: "Examples — GCD" },
+              {
+                type: "problem",
+                title: "Two methods agree",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`Compute $\gcd(180, 252)$ using prime factorization and the Euclidean algorithm, and check the answers match.`,
+                hint: R`$180 = 2^2 \cdot 3^2 \cdot 5$ and $252 = 2^2 \cdot 3^2 \cdot 7$.`,
+                solution: R`**Factorization:** $\gcd = 2^2 \cdot 3^2 = 36$ (the shared primes to their smaller powers).
+
+**Euclid:** $252 = 180 \cdot 1 + 72$, then $180 = 72 \cdot 2 + 36$, then $72 = 36 \cdot 2 + 0$. Last nonzero remainder $= 36$. Both give $36$.`,
+              },
+              {
+                type: "problem",
+                title: "Tiling a floor",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`A rectangular floor measures $84$ cm by $126$ cm. It is to be tiled exactly with identical square tiles, no cutting and no gaps. What is the largest possible tile side length, and how many tiles are needed?`,
+                hint: R`The side length must divide both $84$ and $126$ — take the **largest** such number.`,
+                solution: R`The largest square side is $\gcd(84, 126) = 42$ cm. The floor is then $\tfrac{84}{42} = 2$ tiles by $\tfrac{126}{42} = 3$ tiles, for $2 \cdot 3 = 6$ tiles.`,
+              },
+              {
+                type: "problem",
+                title: "Given gcd and sum",
+                source: "AMC 8 Course",
+                difficulty: "Hard",
+                statement: R`Two positive integers $a$ and $b$ satisfy $\gcd(a,b) = 18$ and $a + b = 162$. Find all pairs $(a,b)$ with $a \le b$.`,
+                hint: R`Write $a = 18m$, $b = 18n$ with $\gcd(m,n) = 1$. What must $m + n$ equal?`,
+                solution: R`Write $a = 18m$, $b = 18n$ with $\gcd(m,n) = 1$. Then $18(m+n) = 162$, so $m + n = 9$. The coprime pairs with $m \le n$ are $(1,8), (2,7), (4,5)$ — note $(3,6)$ is **not** coprime. Multiplying by $18$:
+$$(a,b) = (18, 144),\ (36, 126),\ (72, 90).$$`,
+              },
+              {
+                type: "problem",
+                title: "A Euclidean shortcut",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`Use the Euclidean algorithm to find $\gcd(2025, 675)$. Then find $\gcd(2025, 2700)$ — can you reuse the first result?`,
+                hint: R`Notice that $2700 = 2025 + 675$.`,
+                solution: R`Since $2025 = 675 \cdot 3$, we get $\gcd(2025, 675) = 675$. For the second, $2700 = 2025 + 675$, so $\gcd(2025, 2700) = \gcd(2025, 2700 - 2025) = \gcd(2025, 675) = 675$.`,
+              },
+              { type: "section", title: "Least Common Multiple" },
+              {
+                type: "text",
+                content: R`The **least common multiple** $\operatorname{lcm}(a,b)$ is the smallest positive integer divisible by both. By prime factorization,
+$$\operatorname{lcm}(a,b) = \prod p_i^{\max(e_i,\,f_i)}.$$
+
+**Key identity (two numbers only):**
+$$\gcd(a,b) \cdot \operatorname{lcm}(a,b) = a \cdot b.$$
+Since $\min(e,f) + \max(e,f) = e + f$, the gcd (minimums, the "intersection") and lcm (maximums, the "union") together account for every prime exactly. This identity does **not** extend cleanly to three or more numbers.`,
+              },
+              { type: "section", title: "Examples — LCM" },
+              {
+                type: "problem",
+                title: "LCM of three numbers",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`Find $\operatorname{lcm}(12, 18, 30)$ using prime factorizations, then verify it is divisible by all three.`,
+                hint: R`Take the highest power of each prime that appears.`,
+                solution: R`$12 = 2^2 \cdot 3$, $18 = 2 \cdot 3^2$, $30 = 2 \cdot 3 \cdot 5$. Taking maximum exponents,
+$$\operatorname{lcm} = 2^2 \cdot 3^2 \cdot 5 = 180.$$
+Indeed $180 = 12 \cdot 15 = 18 \cdot 10 = 30 \cdot 6$.`,
+              },
+              {
+                type: "problem",
+                title: "Recover the other number",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`Two positive integers have $\operatorname{lcm} = 240$ and $\gcd = 4$. One of them is $48$. Find the other.`,
+                hint: R`Use $\gcd \cdot \operatorname{lcm} = a \cdot b$.`,
+                solution: R`From $\gcd \cdot \operatorname{lcm} = a \cdot b$ we get $a \cdot b = 4 \cdot 240 = 960$. With one number $48$, the other is $\tfrac{960}{48} = 20$. Check: $20$ and $48$ both divide $240$, and $\gcd(20,48) = 4$.`,
+              },
+              {
+                type: "problem",
+                title: "Divisible by 1 through 10",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`What is the smallest positive integer divisible by every integer from $1$ to $10$?`,
+                hint: R`You want $\operatorname{lcm}(1,2,\ldots,10)$. Which prime powers up to $10$ are needed?`,
+                solution: R`Take the largest power of each prime that is at most $10$: $2^3$ (from $8$), $3^2$ (from $9$), $5$, and $7$. So
+$$\operatorname{lcm}(1,\ldots,10) = 2^3 \cdot 3^2 \cdot 5 \cdot 7 = 2520.$$`,
+              },
+              {
+                type: "problem",
+                title: "Three buses",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`Three buses leave a stop together at 7:00 AM. Bus A returns every $12$ minutes, Bus B every $20$, and Bus C every $45$. When do all three next meet, and how many times do they all meet between 7:00 AM and 7:00 PM?`,
+                hint: R`They meet again after $\operatorname{lcm}(12,20,45)$ minutes.`,
+                solution: R`$12 = 2^2 \cdot 3$, $20 = 2^2 \cdot 5$, $45 = 3^2 \cdot 5$, so $\operatorname{lcm} = 2^2 \cdot 3^2 \cdot 5 = 180$ minutes. They next meet at **10:00 AM**. From 7:00 AM to 7:00 PM is $720$ minutes, and $\lfloor 720/180 \rfloor = 4$, so they meet together $4$ times (10:00 AM, 1:00 PM, 4:00 PM, 7:00 PM).`,
+              },
+              { type: "section", title: "Challenge Problems" },
+              {
+                type: "problem",
+                title: "Highly composite numbers",
+                source: "AMC 8 Course",
+                difficulty: "Hard",
+                statement: R`A positive integer is **highly composite** if it has more divisors than every smaller positive integer. Verify $12$ is highly composite, and find the next three highly composite numbers.`,
+                hint: R`Track the record number of divisors as you scan upward: $\tau(12) = 6$.`,
+                solution: R`No integer below $12$ has more than $\tau(12) = 6$ divisors (for instance $\tau(6) = \tau(8) = \tau(10) = 4$), so $12$ is highly composite. Continuing, $\tau(24) = 8$, $\tau(36) = 9$, $\tau(48) = 10$ each set a new record, so the next three are $24$, $36$, and $48$.`,
+              },
+              {
+                type: "problem",
+                title: "Counting LCM pairs",
+                source: "AMC 8 Course",
+                difficulty: "Very Hard",
+                statement: R`How many ordered pairs $(a,b)$ of positive integers satisfy $\operatorname{lcm}(a,b) = 360$?`,
+                hint: R`$360 = 2^3 \cdot 3^2 \cdot 5$. For a prime power $p^k$, count pairs of exponents with $\max = k$, then multiply across primes.`,
+                solution: R`For each prime $p^k \,\|\, 360$, the exponents $(e, f)$ of $a, b$ must satisfy $\max(e,f) = k$, and the number of such pairs is $2k + 1$. So
+$$(2 \cdot 3 + 1)(2 \cdot 2 + 1)(2 \cdot 1 + 1) = 7 \cdot 5 \cdot 3 = 105.$$`,
+              },
+              {
+                type: "problem",
+                title: "Perfect numbers",
+                source: "AMC 8 Course",
+                difficulty: "Hard",
+                statement: R`A **perfect number** equals the sum of its proper divisors. Verify $28$ is perfect, factor the next perfect number $496$ and verify it, and check Euler's form $2^{p-1}(2^p - 1)$ for $6, 28, 496$.`,
+                hint: R`Sum every divisor except the number itself.`,
+                solution: R`$28$: $1+2+4+7+14 = 28$. ✓
+
+$496 = 2^4 \cdot 31$; its proper divisors $1+2+4+8+16+31+62+124+248 = 496$. ✓
+
+Euler form: $6 = 2^1(2^2-1)$, $28 = 2^2(2^3-1)$, $496 = 2^4(2^5-1)$, where $3, 7, 31$ are prime. ✓`,
+              },
+              {
+                type: "problem",
+                title: "Trailing zeros of a factorial",
+                source: "AMC 8 Course",
+                difficulty: "Very Hard",
+                statement: R`Find the smallest positive integer $n$ such that $n!$ is divisible by $10^{10}$.`,
+                hint: R`$10^{10} = 2^{10} \cdot 5^{10}$. Powers of $5$ are scarcer than powers of $2$, so $5$ is the bottleneck. Use $v_5(n!) = \lfloor n/5 \rfloor + \lfloor n/25 \rfloor + \cdots$.`,
+                solution: R`We need $v_5(n!) \ge 10$. At $n = 45$, $v_5(45!) = \lfloor 45/5 \rfloor + \lfloor 45/25 \rfloor = 9 + 1 = 10$, while $n = 44$ gives only $9$. The power of $2$ is far larger than $10$, so $n = 45$.`,
+              },
+              {
+                type: "problem",
+                title: "Same divisor count",
+                source: "AMC 8 Course",
+                difficulty: "Hard",
+                statement: R`Show that $\tau(p^k) = k + 1$ for any prime $p$. Then find two distinct integers below $50$ that have the same number of divisors but share no prime factors.`,
+                hint: R`The divisors of $p^k$ are exactly $1, p, p^2, \ldots, p^k$.`,
+                solution: R`The divisors of $p^k$ are $1, p, \ldots, p^k$ — that is $k+1$ of them, so $\tau(p^k) = k+1$.
+
+For the second part, $8 = 2^3$ and $15 = 3 \cdot 5$ each have $4$ divisors, are unequal, and share no prime factors. So $\tau(8) = \tau(15) = 4$ does not force $8 = 15$.`,
+              },
+            ],
+          },
         ],
       },
       {
@@ -190,6 +498,280 @@ $$\binom{6}{3} = \frac{6!}{3!\,3!} = 20.$$`,
                 hint: R`Complementary counting: total minus the codes with **no** even digit.`,
                 solution: R`There are $6^3 = 216$ codes in all. Codes using only the odd digits $\{1,3,5\}$ number $3^3 = 27$. So the codes with at least one even digit total
 $$216 - 27 = 189.$$`,
+              },
+            ],
+          },
+          {
+            title: "Counting Methods",
+            slug: "counting-methods",
+            order_index: 1,
+            author: "SFMA",
+            frequency: "essential",
+            blocks: [
+              { type: "section", title: "The Fundamental Counting Principle" },
+              {
+                type: "text",
+                content: R`Most counting problems reduce to two ideas: **multiply** when choices are made together ("and"), and **add** when choices are alternatives ("or").
+
+- **Multiplication Principle.** If task $A$ can be done in $m$ ways and task $B$ in $n$ ways independently, then doing $A$ **and then** $B$ can be done in $m \times n$ ways.
+- **Addition Principle.** If $A$ can be done in $m$ ways and $B$ in $n$ ways, and the two are **mutually exclusive**, then doing $A$ **or** $B$ can be done in $m + n$ ways.`,
+              },
+              {
+                type: "text",
+                content: R`### The slot-filling strategy
+
+Imagine filling a sequence of labeled slots one at a time. For each slot ask: *how many choices remain, given what's already chosen?* Then multiply across the slots. If the problem breaks into separate scenarios, count each and add.
+
+Before every calculation, say it out loud: **"AND or OR?"** Multiplying when you should add (and vice versa) is the most common counting mistake.`,
+              },
+              { type: "section", title: "Examples — Counting Principle" },
+              {
+                type: "problem",
+                title: "Combo meals",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`A café offers $4$ sandwiches, $3$ soups, and $2$ drinks. A combo is one of each. How many different combos are possible?`,
+                hint: R`One choice "and" another "and" another — multiply.`,
+                solution: R`$$4 \times 3 \times 2 = 24.$$`,
+              },
+              {
+                type: "problem",
+                title: "License plates",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`A plate is $3$ letters (A–Z) followed by $3$ digits (0–9), repeats allowed. How many plates are possible?`,
+                hint: R`Each position is an independent slot.`,
+                solution: R`$$26^3 \times 10^3 = 17576 \times 1000 = 17{,}576{,}000.$$`,
+              },
+              {
+                type: "problem",
+                title: "All digits different",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`How many three-digit numbers (from $100$ to $999$) have all three digits different?`,
+                hint: R`Fill the hundreds digit first, then tens, then units, tracking remaining choices.`,
+                solution: R`Hundreds: $9$ choices ($1$–$9$). Tens: $9$ (any digit except the hundreds digit, including $0$). Units: $8$. So
+$$9 \times 9 \times 8 = 648.$$`,
+              },
+              {
+                type: "problem",
+                title: "Competition entries",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`A student picks one problem to present from Topic A ($3$ problems) **or** Topic B ($5$ problems), and separately picks one of $4$ worksheets. How many entries (one problem, one worksheet) are possible?`,
+                hint: R`Add within the problem choice (A or B), then multiply by the worksheet choice.`,
+                solution: R`There are $3 + 5 = 8$ problem choices and $4$ worksheets, so
+$$(3 + 5) \times 4 = 32.$$`,
+              },
+              { type: "section", title: "Permutations and Combinations" },
+              {
+                type: "text",
+                content: R`Both count selections from a set — they differ in one question: **does order matter?**
+
+- **Permutations** count **ordered** arrangements:
+$$P(n, r) = \frac{n!}{(n-r)!} = n(n-1)\cdots(n-r+1).$$
+Arranging all $n$ objects gives $n!$.
+- **Combinations** count **unordered** selections:
+$$\binom{n}{r} = \frac{n!}{r!\,(n-r)!} = \frac{P(n,r)}{r!}.$$`,
+              },
+              {
+                type: "text",
+                content: R`### The central question
+
+> Does the order of the chosen items matter?
+
+"How many ways can $3$ students **line up**?" — order matters — **permutation**.
+"How many ways can $3$ students be **chosen** for a team?" — order doesn't — **combination**.
+
+A combination is a permutation with the $r!$ internal arrangements of the chosen group divided out.
+
+**Repeated letters.** Arranging $n$ objects where item $i$ repeats $k_i$ times gives $\dfrac{n!}{k_1!\,k_2!\cdots}$ distinct arrangements — we divide to undo the overcount from swapping identical copies.`,
+              },
+              { type: "section", title: "Examples — Permutations" },
+              {
+                type: "problem",
+                title: "Medals",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`Eight runners race with no ties. In how many ways can gold, silver, and bronze be awarded?`,
+                hint: R`Order matters — this is $P(8,3)$.`,
+                solution: R`$$8 \times 7 \times 6 = 336.$$`,
+              },
+              {
+                type: "problem",
+                title: "Club offices",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`A club of $10$ members elects a President, Vice President, and Treasurer (all different). How many ways?`,
+                hint: R`Three distinct ordered roles: $P(10,3)$.`,
+                solution: R`$$10 \times 9 \times 8 = 720.$$`,
+              },
+              {
+                type: "problem",
+                title: "Four-letter strings",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`How many four-letter strings can be formed from the letters of $\textsf{PROBLEM}$ with no letter repeated?`,
+                hint: R`$\textsf{PROBLEM}$ has $7$ distinct letters; arrange $4$ of them in order.`,
+                solution: R`$$P(7,4) = 7 \times 6 \times 5 \times 4 = 840.$$`,
+              },
+              {
+                type: "problem",
+                title: "Arrangements of LEVEL",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`In how many distinct ways can the letters of $\textsf{LEVEL}$ be arranged?`,
+                hint: R`There are repeated letters — divide by the factorials of their counts.`,
+                solution: R`$\textsf{LEVEL}$ has $5$ letters with $\textsf{L}$ twice and $\textsf{E}$ twice, so
+$$\frac{5!}{2!\,2!} = \frac{120}{4} = 30.$$`,
+              },
+              { type: "section", title: "Examples — Combinations" },
+              {
+                type: "problem",
+                title: "A committee",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`How many ways can a committee of $3$ be chosen from $12$ students?`,
+                hint: R`Order doesn't matter — this is $\binom{12}{3}$.`,
+                solution: R`$$\binom{12}{3} = \frac{12 \cdot 11 \cdot 10}{3 \cdot 2 \cdot 1} = 220.$$`,
+              },
+              {
+                type: "problem",
+                title: "Pizza toppings",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`A shop lets you choose exactly $2$ toppings from $8$. How many different pizzas are possible?`,
+                hint: R`Choosing toppings is unordered: $\binom{8}{2}$.`,
+                solution: R`$$\binom{8}{2} = \frac{8 \cdot 7}{2} = 28.$$`,
+              },
+              {
+                type: "problem",
+                title: "Boys and girls",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`A team of $5$ is chosen from $7$ boys and $5$ girls. How many teams have exactly $3$ boys and $2$ girls?`,
+                hint: R`Choose the boys and the girls separately, then multiply.`,
+                solution: R`$$\binom{7}{3}\binom{5}{2} = 35 \times 10 = 350.$$`,
+              },
+              {
+                type: "problem",
+                title: "Handshakes",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`At a party of $10$ people, everyone shakes hands with everyone else exactly once. How many handshakes occur?`,
+                hint: R`Each handshake is a choice of $2$ people from $10$ — and it's an edge of $K_{10}$.`,
+                solution: R`$$\binom{10}{2} = \frac{10 \cdot 9}{2} = 45,$$
+which is also the number of edges in the complete graph $K_{10}$.`,
+              },
+              { type: "section", title: "Casework" },
+              {
+                type: "text",
+                content: R`**Casework** breaks a problem into smaller non-overlapping sub-problems (cases), solves each, and adds. It is a strategy, not a formula. A casework argument is valid only when the cases are:
+
+1. **Mutually exclusive** — no outcome is counted twice.
+2. **Exhaustive** — every outcome lands in some case.
+
+Good things to case on: the value of a single digit, the number of items of a type, parity, or the size of the largest item. And when a condition says "at least one," it is often faster to count the **complement**:
+$$|\text{desired}| = |\text{total}| - |\text{undesired}|.$$`,
+              },
+              { type: "section", title: "Examples — Casework" },
+              {
+                type: "problem",
+                title: "Digit sum equals 9",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`How many two-digit numbers have digit sum equal to $9$?`,
+                hint: R`Case on the tens digit; the units digit is forced.`,
+                solution: R`For tens digit $t \in \{1, \ldots, 9\}$, the units digit must be $9 - t \in \{0, \ldots, 8\}$, always a valid digit. That's one number per $t$:
+$$18, 27, 36, 45, 54, 63, 72, 81, 90 \ \Rightarrow\ 9 \text{ numbers}.$$`,
+              },
+              {
+                type: "problem",
+                title: "Dice sums",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`Two standard dice are rolled. In how many outcomes is the sum $7$? In how many is the sum $8$?`,
+                hint: R`List ordered pairs $(a,b)$ for each target sum.`,
+                solution: R`Sum $7$: $(1,6),(2,5),(3,4),(4,3),(5,2),(6,1)$ — $6$ outcomes. Sum $8$: $(2,6),(3,5),(4,4),(5,3),(6,2)$ — $5$ outcomes.`,
+              },
+              {
+                type: "problem",
+                title: "Divisible by 4 or 5, not both",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`How many integers from $1$ to $100$ are divisible by $4$ or $5$ but **not** both?`,
+                hint: R`Count multiples of $4$, of $5$, and of $20$; then take "exactly one."`,
+                solution: R`Multiples of $4$: $25$. Of $5$: $20$. Of both (i.e. $20$): $5$. "Only $4$" $= 25 - 5 = 20$; "only $5$" $= 20 - 5 = 15$. Total $= 20 + 15 = 35$.`,
+              },
+              {
+                type: "problem",
+                title: "Exactly two equal digits",
+                source: "AMC 8 Course",
+                difficulty: "Hard",
+                statement: R`How many integers from $100$ to $199$ have **exactly two** equal digits?`,
+                hint: R`Every such number is $\overline{1XY}$. Case on whether the repeated digit is $1$ or not.`,
+                solution: R`Write the number as $\overline{1XY}$.
+
+**Case 1 — the two equal digits are both $1$:** exactly one of $X, Y$ equals $1$ and the other differs. If $X = 1$, then $Y \neq 1$ gives $9$ values; if $Y = 1$, then $X \neq 1$ gives $9$. That's $18$ (and $111$ is excluded since its third digit also equals $1$).
+
+**Case 2 — $X = Y \neq 1$:** the pair $X = Y$ can be any of $\{0,2,3,\ldots,9\}$, i.e. $9$ values, with the leading $1$ different.
+
+Total $= 18 + 9 = 27$.`,
+              },
+              { type: "section", title: "Practice Problems" },
+              {
+                type: "problem",
+                title: "Constrained codes",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`How many four-digit codes use digits $1$–$9$ (no zeros), repeats allowed, with the first digit odd and the last digit even?`,
+                hint: R`Count each slot's choices and multiply.`,
+                solution: R`First digit odd: $\{1,3,5,7,9\}$, $5$ choices. Last digit even: $\{2,4,6,8\}$, $4$ choices. Middle two: $9$ each. So $5 \cdot 9 \cdot 9 \cdot 4 = 1620$.`,
+              },
+              {
+                type: "problem",
+                title: "Choosing books",
+                source: "AMC 8 Course",
+                difficulty: "Easy",
+                statement: R`From $5$ math books and $4$ science books (all different), how many ways are there to choose $2$ math books and $1$ science book?`,
+                hint: R`Combinations, multiplied.`,
+                solution: R`$$\binom{5}{2}\binom{4}{1} = 10 \times 4 = 40.$$`,
+              },
+              {
+                type: "problem",
+                title: "Tallest friends together",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`Eight friends stand in a line for a photo. In how many arrangements are the two tallest **next to each other**?`,
+                hint: R`Glue the two tall friends into a single block, then account for their internal order.`,
+                solution: R`Treat the pair as one block: $7$ items arrange in $7! = 5040$ ways, and the block's two friends can swap in $2! = 2$ ways. Total $7! \cdot 2! = 10080$.`,
+              },
+              {
+                type: "problem",
+                title: "Three-digit even numbers",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`How many three-digit even numbers can be formed from $\{1,2,3,4,5,6\}$ with no repeated digit?`,
+                hint: R`Decide the units digit first.`,
+                solution: R`Units digit even: $\{2,4,6\}$, $3$ choices. Then hundreds: $5$ remaining, tens: $4$ remaining. So $3 \cdot 5 \cdot 4 = 60$.`,
+              },
+              {
+                type: "problem",
+                title: "At least two girls",
+                source: "AMC 8 Course",
+                difficulty: "Hard",
+                statement: R`A committee of $4$ is chosen from $6$ boys and $5$ girls. How many committees contain **at least** $2$ girls?`,
+                hint: R`Use the complement: total minus (0 girls) minus (1 girl).`,
+                solution: R`Total committees: $\binom{11}{4} = 330$. With $0$ girls: $\binom{6}{4} = 15$. With $1$ girl: $\binom{5}{1}\binom{6}{3} = 5 \cdot 20 = 100$. At least $2$ girls $= 330 - 15 - 100 = 215$.`,
+              },
+              {
+                type: "problem",
+                title: "No square digits",
+                source: "AMC 8 Course",
+                difficulty: "Medium",
+                statement: R`How many two-digit numbers ($10$–$99$) have **neither** digit a perfect square? (The single-digit perfect squares are $1$, $4$, $9$.)`,
+                hint: R`The allowed digits are $\{0,2,3,5,6,7,8\}$; the tens digit can't be $0$.`,
+                solution: R`Allowed digits: $\{0,2,3,5,6,7,8\}$ ($7$ of them). Tens digit must be nonzero: $6$ choices. Units digit: $7$ choices. Total $6 \times 7 = 42$.`,
               },
             ],
           },

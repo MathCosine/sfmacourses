@@ -33,12 +33,26 @@ const DEFAULT_META: MetaBlock = {
   frequency: "important",
 };
 
+/** Coerce a possibly-malformed content value into a Block[] (never throws). */
+export function asBlocks(content: unknown): Block[] {
+  if (Array.isArray(content)) return content as Block[];
+  if (typeof content === "string") {
+    try {
+      const parsed = JSON.parse(content);
+      if (Array.isArray(parsed)) return parsed as Block[];
+    } catch {
+      /* ignore */
+    }
+  }
+  return [];
+}
+
 /** Pull the lesson-level meta block out of a content array. */
 export function extractMeta(content: Block[] | null | undefined): {
   author: string;
   frequency: Frequency;
 } {
-  const meta = (content ?? []).find((b): b is MetaBlock => b.type === "meta");
+  const meta = asBlocks(content).find((b): b is MetaBlock => b.type === "meta");
   return {
     author: meta?.author || DEFAULT_META.author,
     frequency: meta?.frequency || DEFAULT_META.frequency,
@@ -49,13 +63,13 @@ export function extractMeta(content: Block[] | null | undefined): {
 export function contentBlocks(
   content: Block[] | null | undefined,
 ): ContentBlock[] {
-  return (content ?? []).filter(
+  return asBlocks(content).filter(
     (b): b is ContentBlock => b.type !== "meta",
   );
 }
 
 export function countProblems(content: Block[] | null | undefined): number {
-  return (content ?? []).filter((b) => b.type === "problem").length;
+  return asBlocks(content).filter((b) => b.type === "problem").length;
 }
 
 /** Parse a YouTube/Vimeo watch URL into an embeddable iframe URL. */

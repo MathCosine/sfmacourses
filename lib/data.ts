@@ -111,15 +111,19 @@ export async function getNavTree(): Promise<TrackWithModules[]> {
 export async function getLessonStatuses(
   userId: string,
 ): Promise<Record<string, LessonStatus>> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("progress")
-    .select("lesson_id, status, completed")
-    .eq("user_id", userId);
   const out: Record<string, LessonStatus> = {};
-  for (const r of data ?? []) {
-    const status = (r.status as LessonStatus) ?? (r.completed ? "complete" : "not_started");
-    if (status && status !== "not_started") out[r.lesson_id as string] = status;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("progress")
+      .select("lesson_id, status, completed")
+      .eq("user_id", userId);
+    for (const r of data ?? []) {
+      const status = (r.status as LessonStatus) ?? (r.completed ? "complete" : "not_started");
+      if (status && status !== "not_started") out[r.lesson_id as string] = status;
+    }
+  } catch (e) {
+    console.error("getLessonStatuses failed", e);
   }
   return out;
 }
@@ -204,18 +208,23 @@ export async function getLessonStatus(
   userId: string,
   lessonId: string,
 ): Promise<LessonStatus> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("progress")
-    .select("status, completed")
-    .eq("user_id", userId)
-    .eq("lesson_id", lessonId)
-    .maybeSingle();
-  if (!data) return "not_started";
-  return (
-    (data.status as LessonStatus) ??
-    (data.completed ? "complete" : "not_started")
-  );
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("progress")
+      .select("status, completed")
+      .eq("user_id", userId)
+      .eq("lesson_id", lessonId)
+      .maybeSingle();
+    if (!data) return "not_started";
+    return (
+      (data.status as LessonStatus) ??
+      (data.completed ? "complete" : "not_started")
+    );
+  } catch (e) {
+    console.error("getLessonStatus failed", e);
+    return "not_started";
+  }
 }
 
 /** Map of problem_index -> status for a lesson. */
@@ -223,18 +232,22 @@ export async function getProblemStatuses(
   userId: string,
   lessonId: string,
 ): Promise<Record<number, ProblemStatus>> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("problem_completions")
-    .select("problem_index, status, completed")
-    .eq("user_id", userId)
-    .eq("lesson_id", lessonId);
   const out: Record<number, ProblemStatus> = {};
-  for (const r of data ?? []) {
-    const status =
-      (r.status as ProblemStatus) ?? (r.completed ? "solved" : "not_started");
-    if (status && status !== "not_started")
-      out[r.problem_index as number] = status;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("problem_completions")
+      .select("problem_index, status, completed")
+      .eq("user_id", userId)
+      .eq("lesson_id", lessonId);
+    for (const r of data ?? []) {
+      const status =
+        (r.status as ProblemStatus) ?? (r.completed ? "solved" : "not_started");
+      if (status && status !== "not_started")
+        out[r.problem_index as number] = status;
+    }
+  } catch (e) {
+    console.error("getProblemStatuses failed", e);
   }
   return out;
 }
@@ -244,17 +257,21 @@ export async function getSectionStatuses(
   userId: string,
   lessonId: string,
 ): Promise<Record<number, LessonStatus>> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("section_completions")
-    .select("section_index, status")
-    .eq("user_id", userId)
-    .eq("lesson_id", lessonId);
   const out: Record<number, LessonStatus> = {};
-  for (const r of data ?? []) {
-    const status = r.status as LessonStatus;
-    if (status && status !== "not_started")
-      out[r.section_index as number] = status;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("section_completions")
+      .select("section_index, status")
+      .eq("user_id", userId)
+      .eq("lesson_id", lessonId);
+    for (const r of data ?? []) {
+      const status = r.status as LessonStatus;
+      if (status && status !== "not_started")
+        out[r.section_index as number] = status;
+    }
+  } catch (e) {
+    console.error("getSectionStatuses failed", e);
   }
   return out;
 }
@@ -263,17 +280,21 @@ export async function getSectionStatuses(
 export async function getAllProblemStatuses(
   userId: string,
 ): Promise<Record<string, ProblemStatus>> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("problem_completions")
-    .select("lesson_id, problem_index, status, completed")
-    .eq("user_id", userId);
   const out: Record<string, ProblemStatus> = {};
-  for (const r of data ?? []) {
-    const status =
-      (r.status as ProblemStatus) ?? (r.completed ? "solved" : "not_started");
-    if (status && status !== "not_started")
-      out[`${r.lesson_id}:${r.problem_index}`] = status;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("problem_completions")
+      .select("lesson_id, problem_index, status, completed")
+      .eq("user_id", userId);
+    for (const r of data ?? []) {
+      const status =
+        (r.status as ProblemStatus) ?? (r.completed ? "solved" : "not_started");
+      if (status && status !== "not_started")
+        out[`${r.lesson_id}:${r.problem_index}`] = status;
+    }
+  } catch (e) {
+    console.error("getAllProblemStatuses failed", e);
   }
   return out;
 }
@@ -281,19 +302,29 @@ export async function getAllProblemStatuses(
 export async function getAnnouncements(): Promise<
   (Announcement & { author_name?: string | null })[]
 > {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("announcements")
-    .select("*")
-    .order("created_at", { ascending: false });
-  return (data ?? []) as Announcement[];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("announcements")
+      .select("*")
+      .order("created_at", { ascending: false });
+    return (data ?? []) as Announcement[];
+  } catch (e) {
+    console.error("getAnnouncements failed", e);
+    return [];
+  }
 }
 
 export async function getAllProfiles(): Promise<Profile[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("profiles")
-    .select("*")
-    .order("created_at", { ascending: true });
-  return (data ?? []) as Profile[];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("created_at", { ascending: true });
+    return (data ?? []) as Profile[];
+  } catch (e) {
+    console.error("getAllProfiles failed", e);
+    return [];
+  }
 }
