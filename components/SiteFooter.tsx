@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BrandMark } from "@/components/Brand";
 import { Github, Heart } from "@/components/icons";
 
 const COLUMNS: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [
@@ -38,9 +39,7 @@ export function SiteFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold text-[18px] font-bold text-white shadow-accent">
-                ∑
-              </span>
+              <BrandMark className="h-10 w-10 shrink-0 shadow-sm" />
               <span className="text-[16px] font-extrabold tracking-tight text-tprimary">
                 SFMA <span className="font-medium text-tmuted">Math Academy</span>
               </span>

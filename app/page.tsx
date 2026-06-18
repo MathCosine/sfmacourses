@@ -4,6 +4,7 @@ import { renderMarkdown } from "@/lib/markdown";
 import { trackTheme } from "@/lib/trackTheme";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { BrandMark } from "@/components/Brand";
 import { Faq } from "@/components/Faq";
 import { Reveal } from "@/components/Reveal";
 import { ArrowRight, ArrowUpRight, Check } from "@/components/icons";
@@ -100,10 +101,41 @@ export default async function HomePage() {
 
       {/* ---------- Hero ---------- */}
       <section className="relative overflow-hidden border-b border-border bg-bg">
-        <div className="graph-paper-lg absolute inset-0 opacity-70" />
-        <div className="absolute -right-32 -top-24 h-80 w-80 rounded-full bg-gold/8 blur-3xl" />
+        {/* Animated backdrop: graph paper, drifting dot grid, and floating blobs. */}
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="graph-paper-lg absolute inset-0 opacity-60" />
+          <div
+            className="dot-grid animate-drift-dots absolute inset-0 opacity-50"
+            style={{
+              maskImage: "linear-gradient(to bottom, black, transparent 80%)",
+              WebkitMaskImage: "linear-gradient(to bottom, black, transparent 80%)",
+            }}
+          />
+          <div className="animate-float-blob absolute -right-32 -top-24 h-96 w-96 rounded-full bg-gold/10 blur-3xl" />
+          <div
+            className="animate-float-blob absolute -left-24 top-44 h-72 w-72 rounded-full bg-green/10 blur-3xl"
+            style={{ animationDelay: "-5s" }}
+          />
+        </div>
+
         <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-6 py-16 sm:px-8 lg:grid-cols-[1.04fr_0.96fr] lg:py-24">
           <div className="fade-up">
+            {/* Logo lockup */}
+            <div className="mb-7 flex items-center gap-3.5">
+              <div className="relative">
+                <div className="animate-logo-glow absolute -inset-2.5 rounded-[1.1rem] bg-gold/30 blur-xl" />
+                <BrandMark className="brand-sheen animate-logo-float relative h-16 w-16 rounded-2xl shadow-lift ring-1 ring-border" />
+              </div>
+              <div className="leading-tight">
+                <div className="text-[20px] font-extrabold tracking-tight text-tprimary">
+                  SFMA <span className="font-medium text-tmuted">courses</span>
+                </div>
+                <div className="text-[12.5px] text-tfaint">
+                  San Francisco Math Academy
+                </div>
+              </div>
+            </div>
+
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-[12.5px] font-medium text-tmuted shadow-xs">
               <span className="h-1.5 w-1.5 rounded-full bg-green" />
               Free &amp; open · hosted by the San Francisco Math Initiative
@@ -140,8 +172,14 @@ export default async function HomePage() {
             </p>
           </div>
 
-          {/* Notebook-style excerpt with real rendered math */}
-          <div className="fade-up-1">
+          {/* Notebook-style excerpt with real rendered math + floating logo medallion */}
+          <div className="fade-up-1 relative">
+            <div className="absolute -left-4 -top-7 z-10 hidden sm:block">
+              <div className="animate-logo-float relative" style={{ animationDelay: "-2.5s" }}>
+                <div className="animate-logo-glow absolute -inset-2 rounded-2xl bg-gold/30 blur-lg" />
+                <BrandMark className="brand-sheen relative h-14 w-14 rounded-2xl shadow-lift ring-1 ring-border" />
+              </div>
+            </div>
             <HeroExcerpt qHtml={qHtml} aHtml={aHtml} formulaHtml={formulaHtml} />
           </div>
         </div>
