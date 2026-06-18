@@ -1106,6 +1106,20 @@ function BlockFields({
           minHeight={70}
         />
       </div>
+      <div className="sm:col-span-2">
+        <label className={labelCls}>Solution link (optional)</label>
+        <input
+          className={inputCls}
+          type="url"
+          value={block.solutionUrl ?? ""}
+          onChange={(e) => onChange({ solutionUrl: e.target.value })}
+          placeholder="https://artofproblemsolving.com/… or a video link"
+        />
+        <p className="mt-1 text-[11.5px] text-tfaint">
+          Link to a solution elsewhere (AoPS thread, video, article). Shown as a
+          button — use instead of, or alongside, a written solution.
+        </p>
+      </div>
     </div>
   );
 }

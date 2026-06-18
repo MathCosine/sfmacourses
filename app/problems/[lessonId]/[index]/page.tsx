@@ -60,6 +60,7 @@ export default async function ProblemPage({
         statementHtml={statementHtml}
         hintHtml={hintHtml}
         solutionHtml={solutionHtml}
+        solutionUrl={view.problem.solutionUrl}
         initialStatus={statuses[idx] ?? "not_started"}
         location={view.location}
         author={view.lessonAuthor}

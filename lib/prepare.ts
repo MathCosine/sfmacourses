@@ -59,6 +59,7 @@ export async function prepareBlocks(
         solutionHtml: block.solution
           ? await renderMarkdown(block.solution)
           : undefined,
+        solutionUrl: block.solutionUrl?.trim() || undefined,
       };
       out.push({ kind: "problem", problemIndex, prepared });
       problemIndex += 1;

@@ -6,7 +6,8 @@ import type { Difficulty, ProblemStatus } from "@/lib/types";
 import { setProblemStatus } from "@/app/learn/actions";
 import { PROBLEM_STATUS_OPTIONS } from "@/lib/status";
 import { StatusControl } from "@/components/StatusControl";
-import { ArrowLeft, ArrowRight, BookOpen, Lightbulb, CheckCircle } from "@/components/icons";
+import { solutionLinkLabel } from "@/lib/utils";
+import { ArrowLeft, ArrowRight, BookOpen, Lightbulb, CheckCircle, ExternalLink } from "@/components/icons";
 
 const DIFFICULTY_STYLE: Record<Difficulty, { color: string; bg: string }> = {
   Easy: { color: "#2f9e44", bg: "rgba(47,158,68,0.12)" },
@@ -24,6 +25,7 @@ interface Props {
   statementHtml: string;
   hintHtml: string;
   solutionHtml: string;
+  solutionUrl?: string;
   initialStatus: ProblemStatus;
   location: {
     trackTitle: string;
@@ -48,6 +50,7 @@ export function ProblemWorkspace(props: Props) {
     statementHtml,
     hintHtml,
     solutionHtml,
+    solutionUrl,
     initialStatus,
     location,
     author,
@@ -197,6 +200,17 @@ export function ProblemWorkspace(props: Props) {
             <CheckCircle className="h-4 w-4" />
             {showSolution ? "Hide solution" : "Show solution"}
           </button>
+        )}
+        {solutionUrl && (
+          <a
+            href={solutionUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl border border-green/40 bg-green/10 px-4 py-2 text-[13px] font-semibold text-green transition-colors hover:bg-green/15"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Solution on {solutionLinkLabel(solutionUrl)}
+          </a>
         )}
         {location && (
           <Link

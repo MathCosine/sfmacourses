@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { BrandMark } from "@/components/Brand";
 import { Faq } from "@/components/Faq";
 import { Reveal } from "@/components/Reveal";
-import { ArrowRight, ArrowUpRight, Check } from "@/components/icons";
+import { ArrowRight, ArrowUpRight, Check, Compass } from "@/components/icons";
 
 const TRACK_INFO: Record<string, { blurb: string; topics: string[] }> = {
   "amc-8": {
@@ -30,18 +30,27 @@ const TRACK_INFO: Record<string, { blurb: string; topics: string[] }> = {
 const STEPS = [
   {
     n: "01",
-    title: "Follow a real sequence",
-    body: "Units and chapters that build on each other, so you always know the next thing to learn — not a pile of disconnected handouts.",
+    title: "Pick a course and follow the path",
+    body: "Each course is a sequence of units and chapters that build on each other, so you always know the next thing to learn — not a pile of disconnected handouts.",
+    legend: false,
   },
   {
     n: "02",
-    title: "Mark what you've done",
-    body: "Set every chapter, section, and problem to Reading, Practicing, Complete, or Skipped with one click. It syncs to your account and follows you everywhere.",
+    title: "Read — with worked examples and resources",
+    body: "Every chapter explains the idea, walks through worked examples, and points you to hand-picked resources — videos, articles, and AoPS threads — when you want another angle.",
+    legend: false,
   },
   {
     n: "03",
-    title: "Practice, then check yourself",
-    body: "Each topic comes with real contest problems, hints, and full solutions you reveal only when you're ready to compare.",
+    title: "Track everything you do",
+    body: "Set every chapter, section, and problem to Reading, Practicing, Complete, or Skipped with one click. It syncs to your account and follows you everywhere.",
+    legend: true,
+  },
+  {
+    n: "04",
+    title: "Practice, then check the solution",
+    body: "Each topic comes with real contest problems and hints. Solutions are sometimes written out in full, and sometimes a link to a trusted source — an AoPS thread, a video, or an article — so you always have a way to check your work.",
+    legend: false,
   },
 ];
 
@@ -204,14 +213,22 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ---------- How it works (editorial, numbered) ---------- */}
-      <section className="mx-auto max-w-5xl px-6 py-20 sm:px-8">
+      {/* ---------- How to use this guide (editorial, numbered) ---------- */}
+      <section id="how-to-use" className="mx-auto max-w-5xl px-6 py-20 sm:px-8">
         <Reveal>
-          <h2 className="max-w-2xl text-[2.05rem] font-extrabold leading-tight tracking-tight text-tprimary">
-            It works the way a good teacher would lay it out.
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-[12.5px] font-medium text-tmuted shadow-xs">
+            <Compass className="h-3.5 w-3.5 text-gold" />
+            Getting started
+          </div>
+          <h2 className="mt-5 max-w-2xl text-[2.05rem] font-extrabold leading-tight tracking-tight text-tprimary">
+            How to use this guide
           </h2>
+          <p className="mt-3 max-w-xl text-[15.5px] leading-relaxed text-tmuted">
+            It&apos;s laid out the way a good teacher would: learn in order,
+            keep track of where you are, and practice with solutions on hand.
+          </p>
         </Reveal>
-        <div className="mt-12 space-y-px overflow-hidden rounded-2xl border border-border">
+        <div className="mt-10 space-y-px overflow-hidden rounded-2xl border border-border">
           {STEPS.map((s, i) => (
             <Reveal key={s.n} delay={i * 70}>
               <div className="grid items-start gap-5 bg-surface px-6 py-7 sm:grid-cols-[auto_1fr] sm:px-9 sm:py-9">
@@ -223,7 +240,7 @@ export default async function HomePage() {
                   <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-tmuted">
                     {s.body}
                   </p>
-                  {s.n === "02" && (
+                  {s.legend && (
                     <div className="mt-4 flex flex-wrap gap-2">
                       {STATUS_LEGEND.map((st) => (
                         <span

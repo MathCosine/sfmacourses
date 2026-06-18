@@ -43,6 +43,9 @@ export interface ProblemBlock {
   statement: string;
   hint?: string;
   solution?: string;
+  /** Optional external solution (e.g. an AoPS thread, video, or article).
+   *  May be used alone or alongside a written `solution`. */
+  solutionUrl?: string;
 }
 
 export interface SectionBlock {

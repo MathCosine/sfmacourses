@@ -78,8 +78,8 @@ export function TopNav({ tracks, user }: TopNavProps) {
     <>
       <header className="bar sticky top-0 z-40">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-1 px-4 sm:px-6">
-          {/* Logo */}
-          <Link href={user ? "/dashboard" : "/"} className="group flex items-center gap-2.5 pr-2">
+          {/* Logo — always returns to the landing page. */}
+          <Link href="/" className="group flex items-center gap-2.5 pr-2">
             <BrandMark className="h-9 w-9 shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-105" />
             <span className="hidden text-[15.5px] font-extrabold tracking-tight text-tprimary sm:block">
               SFMA

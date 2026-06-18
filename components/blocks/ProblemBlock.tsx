@@ -4,8 +4,8 @@ import { useState, useTransition } from "react";
 import type { Difficulty, ProblemStatus } from "@/lib/types";
 import { setProblemStatus } from "@/app/learn/actions";
 import { PROBLEM_STATUS_OPTIONS } from "@/lib/status";
-import { cn } from "@/lib/utils";
-import { ChevronRight } from "@/components/icons";
+import { cn, solutionLinkLabel } from "@/lib/utils";
+import { ChevronRight, ExternalLink } from "@/components/icons";
 import { StatusControl } from "@/components/StatusControl";
 
 export interface PreparedProblem {
@@ -15,6 +15,7 @@ export interface PreparedProblem {
   statementHtml: string;
   hintHtml?: string;
   solutionHtml?: string;
+  solutionUrl?: string;
 }
 
 const DIFFICULTY_STYLE: Record<Difficulty, { color: string; bg: string }> = {
@@ -126,6 +127,17 @@ export function ProblemBlock({
               >
                 {showSolution ? "Hide Solution" : "Show Solution"}
               </button>
+            )}
+            {block.solutionUrl && (
+              <a
+                href={block.solutionUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-green/40 bg-green/5 px-3 py-1.5 text-[12.5px] font-medium text-green transition-colors hover:bg-green/10"
+              >
+                Solution on {solutionLinkLabel(block.solutionUrl)}
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
             )}
           </div>
 

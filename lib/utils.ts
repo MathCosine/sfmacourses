@@ -27,6 +27,24 @@ export function headingId(text: string): string {
   return slugify(text) || "section";
 }
 
+/** Friendly label for an external solution link, inferred from its host
+ *  (e.g. an AoPS thread or YouTube video). Falls back to the bare hostname. */
+export function solutionLinkLabel(url: string | null | undefined): string {
+  if (!url) return "source";
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    if (host.includes("artofproblemsolving") || host.includes("aops"))
+      return "AoPS";
+    if (host.includes("youtube") || host.includes("youtu.be")) return "YouTube";
+    if (host.includes("khanacademy")) return "Khan Academy";
+    if (host.includes("brilliant")) return "Brilliant";
+    if (host.includes("desmos")) return "Desmos";
+    return host;
+  } catch {
+    return "source";
+  }
+}
+
 const DEFAULT_META: MetaBlock = {
   type: "meta",
   author: "SFMA Staff",
