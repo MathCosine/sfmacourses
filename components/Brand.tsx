@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -61,6 +61,15 @@ export function LogoMark({ className }: { className?: string }) {
  */
 export function BrandMark({ className }: { className?: string }) {
   const [failed, setFailed] = useState(false);
+  const ref = useRef<HTMLImageElement>(null);
+
+  // The image can 404 before React attaches the onError handler during
+  // hydration, so that event is missed. Re-check on mount: a finished load
+  // with zero natural width means it failed — fall back to the SVG mark.
+  useEffect(() => {
+    const img = ref.current;
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
 
   if (failed) {
     return <LogoMark className={cn("rounded-[0.5em]", className)} />;
@@ -69,6 +78,7 @@ export function BrandMark({ className }: { className?: string }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      ref={ref}
       src="/brand/sfma-logo.png"
       alt="SFMA courses logo"
       onError={() => setFailed(true)}

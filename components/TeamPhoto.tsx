@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { initials } from "@/lib/utils";
 
 /**
@@ -17,6 +17,13 @@ export function TeamPhoto({
   color: string;
 }) {
   const [failed, setFailed] = useState(false);
+  const ref = useRef<HTMLImageElement>(null);
+
+  // Catch a 404 that happened before React attached onError during hydration.
+  useEffect(() => {
+    const img = ref.current;
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
 
   if (!src || failed) {
     return (
@@ -34,6 +41,7 @@ export function TeamPhoto({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      ref={ref}
       src={src}
       alt={name}
       loading="lazy"
