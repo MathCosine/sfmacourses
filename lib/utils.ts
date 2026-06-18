@@ -51,11 +51,17 @@ export function asBlocks(content: unknown): Block[] {
 export function extractMeta(content: Block[] | null | undefined): {
   author: string;
   frequency: Frequency;
+  prereqNote: string;
+  prereqLessonIds: string[];
 } {
   const meta = asBlocks(content).find((b): b is MetaBlock => b.type === "meta");
   return {
     author: meta?.author || DEFAULT_META.author,
     frequency: meta?.frequency || DEFAULT_META.frequency,
+    prereqNote: meta?.prereqNote || "",
+    prereqLessonIds: Array.isArray(meta?.prereqLessonIds)
+      ? meta!.prereqLessonIds
+      : [],
   };
 }
 

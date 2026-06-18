@@ -102,6 +102,10 @@ export interface MetaBlock {
   type: "meta";
   author: string;
   frequency: Frequency;
+  /** Optional free-text recommended prerequisites (markdown, supports lists). */
+  prereqNote?: string;
+  /** Optional ids of other lessons recommended as prerequisites. */
+  prereqLessonIds?: string[];
 }
 
 export type ContentBlock =

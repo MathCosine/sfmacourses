@@ -302,6 +302,8 @@ export async function updateLesson(
     content?: ContentBlock[];
     author?: string;
     frequency?: Frequency;
+    prereqNote?: string;
+    prereqLessonIds?: string[];
   },
 ): Promise<Result> {
   const { supabase, error } = await requireStaff();
@@ -317,6 +319,10 @@ export async function updateLesson(
       type: "meta",
       author: fields.author ?? "SFMA Staff",
       frequency: fields.frequency ?? "important",
+      prereqNote: fields.prereqNote?.trim() || undefined,
+      prereqLessonIds: fields.prereqLessonIds?.length
+        ? fields.prereqLessonIds
+        : undefined,
     };
     patch.content = [meta, ...fields.content] as Block[];
   }

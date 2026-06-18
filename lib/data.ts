@@ -119,6 +119,42 @@ export async function getCourseTree(): Promise<TrackWithModules[]> {
   return tree.filter((t) => t.slug !== PROBLEM_BANK_SLUG);
 }
 
+export interface LessonLink {
+  id: string;
+  title: string;
+  trackTitle: string;
+  trackSlug: string;
+  moduleTitle: string;
+  href: string;
+}
+
+/** Flatten a nav tree into a searchable catalog of every lesson (for linking). */
+export function flattenLessons(tree: TrackWithModules[]): LessonLink[] {
+  const out: LessonLink[] = [];
+  for (const t of tree)
+    for (const m of t.modules)
+      for (const l of m.lessons)
+        out.push({
+          id: l.id,
+          title: l.title,
+          trackTitle: t.title,
+          trackSlug: t.slug,
+          moduleTitle: m.title,
+          href: `/learn/${t.slug}/${m.slug}/${l.slug}`,
+        });
+  return out;
+}
+
+/** Resolve a set of lesson ids to links, preserving the requested order. */
+export async function getLessonLinksByIds(
+  ids: string[],
+): Promise<LessonLink[]> {
+  if (!ids?.length) return [];
+  const all = flattenLessons(await getNavTree());
+  const byId = new Map(all.map((l) => [l.id, l]));
+  return ids.map((id) => byId.get(id)).filter((l): l is LessonLink => !!l);
+}
+
 export interface ProblemView {
   problem: ProblemBlock;
   problemIndex: number;

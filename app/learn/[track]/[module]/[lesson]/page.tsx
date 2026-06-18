@@ -6,14 +6,17 @@ import { LessonView } from "@/components/LessonView";
 import { LessonStatusControl } from "@/components/LessonStatusControl";
 import { TableOfContents } from "@/components/TableOfContents";
 import { FrequencyDots } from "@/components/FrequencyDots";
+import { Prerequisites } from "@/components/Prerequisites";
 import {
   getLessonContext,
   getLessonStatus,
   getSessionUser,
   getProblemStatuses,
   getSectionStatuses,
+  getLessonLinksByIds,
 } from "@/lib/data";
 import { prepareBlocks } from "@/lib/prepare";
+import { renderMarkdown } from "@/lib/markdown";
 import { contentBlocks, countProblems, extractMeta } from "@/lib/utils";
 import { FREQUENCY_LABELS } from "@/lib/types";
 import { ArrowLeft, ArrowRight, ListChecks } from "@/components/icons";
@@ -56,13 +59,21 @@ export default async function LessonPage({
 
   const meta = extractMeta(ctx.lesson.content);
   const blocks = contentBlocks(ctx.lesson.content);
-  const [prepared, lessonStatus, problemStatuses, sectionStatuses] =
-    await Promise.all([
-      prepareBlocks(blocks),
-      getLessonStatus(userId, ctx.lesson.id),
-      getProblemStatuses(userId, ctx.lesson.id),
-      getSectionStatuses(userId, ctx.lesson.id),
-    ]);
+  const [
+    prepared,
+    lessonStatus,
+    problemStatuses,
+    sectionStatuses,
+    prereqNoteHtml,
+    prereqLinks,
+  ] = await Promise.all([
+    prepareBlocks(blocks),
+    getLessonStatus(userId, ctx.lesson.id),
+    getProblemStatuses(userId, ctx.lesson.id),
+    getSectionStatuses(userId, ctx.lesson.id),
+    meta.prereqNote ? renderMarkdown(meta.prereqNote) : Promise.resolve(""),
+    getLessonLinksByIds(meta.prereqLessonIds),
+  ]);
   const problemCount = countProblems(ctx.lesson.content);
 
   const prevHref = ctx.prev
@@ -140,6 +151,8 @@ export default async function LessonPage({
               </div>
             </div>
           </div>
+
+          <Prerequisites noteHtml={prereqNoteHtml} links={prereqLinks} />
 
           <div className="mt-8">
             <LessonView

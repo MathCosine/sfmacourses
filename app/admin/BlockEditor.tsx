@@ -11,6 +11,7 @@ import type {
 } from "@/lib/types";
 import { CALLOUT_LABELS, CALLOUT_VARIANTS, DIFFICULTIES } from "@/lib/types";
 import type { PreparedBlock } from "@/lib/prepare";
+import type { LessonLink } from "@/lib/data";
 import { contentBlocks, extractMeta } from "@/lib/utils";
 import { updateLesson, deleteLesson, renderLessonPreview } from "./actions";
 import { MarkdownField } from "@/components/admin/MarkdownField";
@@ -23,6 +24,9 @@ import {
   Check,
   Pencil,
   Close,
+  Link2,
+  Search,
+  Milestone,
 } from "@/components/icons";
 
 const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
@@ -83,9 +87,11 @@ const labelCls = "mb-1 block text-[11.5px] font-medium text-tmuted";
 
 export function BlockEditor({
   lesson,
+  catalog,
   onClose,
 }: {
   lesson: Lesson;
+  catalog: LessonLink[];
   onClose: () => void;
 }) {
   const router = useRouter();
@@ -93,6 +99,10 @@ export function BlockEditor({
   const [title, setTitle] = useState(lesson.title);
   const [author, setAuthor] = useState(meta.author);
   const [frequency, setFrequency] = useState<Frequency>(meta.frequency);
+  const [prereqNote, setPrereqNote] = useState(meta.prereqNote);
+  const [prereqLessonIds, setPrereqLessonIds] = useState<string[]>(
+    meta.prereqLessonIds,
+  );
   const [blocks, setBlocks] = useState<ContentBlock[]>(
     contentBlocks(lesson.content),
   );
@@ -167,6 +177,8 @@ export function BlockEditor({
         content: blocks,
         author,
         frequency,
+        prereqNote,
+        prereqLessonIds,
       });
       if (res.ok) {
         setMsg("Saved ✓");
@@ -276,6 +288,43 @@ export function BlockEditor({
             <option value="supplemental">●●● Supplemental</option>
           </select>
         </div>
+      </div>
+
+      {/* Prerequisites */}
+      <div className="mb-2 rounded-xl border border-border bg-surface p-4">
+        <div className="mb-1 flex items-center gap-2">
+          <Milestone className="h-4 w-4 text-gold" />
+          <span className="text-[13px] font-semibold text-tprimary">
+            Recommended prerequisites
+          </span>
+          <span className="text-[11.5px] text-tfaint">optional</span>
+        </div>
+        <p className="mb-3 text-[12px] text-tmuted">
+          Shown to readers at the top of the chapter. Write any topics they
+          should know (bullet lists work), and/or link chapters from anywhere on
+          the site.
+        </p>
+        <div className="mb-3">
+          <label className={labelCls}>Topics / notes</label>
+          <MarkdownField
+            value={prereqNote}
+            onChange={(v) => {
+              setPrereqNote(v);
+              setDirty(true);
+            }}
+            minHeight={70}
+            placeholder={"e.g.\n- Comfort with fractions and percents\n- Basic factoring"}
+          />
+        </div>
+        <LessonLinker
+          catalog={catalog}
+          selectedIds={prereqLessonIds}
+          currentLessonId={lesson.id}
+          onChange={(ids) => {
+            setPrereqLessonIds(ids);
+            setDirty(true);
+          }}
+        />
       </div>
 
       <p className="mb-3 px-1 text-[12px] text-tfaint">
@@ -525,6 +574,118 @@ function EditCard({
           <BlockPreview block={prepared} />
         </div>
       )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------- Lesson linker */
+
+function LessonLinker({
+  catalog,
+  selectedIds,
+  currentLessonId,
+  onChange,
+}: {
+  catalog: LessonLink[];
+  selectedIds: string[];
+  currentLessonId: string;
+  onChange: (ids: string[]) => void;
+}) {
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const byId = new Map(catalog.map((l) => [l.id, l]));
+  const selected = selectedIds
+    .map((id) => byId.get(id))
+    .filter((l): l is LessonLink => !!l);
+
+  const needle = q.trim().toLowerCase();
+  const results = catalog
+    .filter(
+      (l) =>
+        l.id !== currentLessonId &&
+        !selectedIds.includes(l.id) &&
+        (!needle ||
+          l.title.toLowerCase().includes(needle) ||
+          l.trackTitle.toLowerCase().includes(needle) ||
+          l.moduleTitle.toLowerCase().includes(needle)),
+    )
+    .slice(0, 8);
+
+  function addId(id: string) {
+    onChange([...selectedIds, id]);
+    setQ("");
+  }
+  function removeId(id: string) {
+    onChange(selectedIds.filter((x) => x !== id));
+  }
+
+  return (
+    <div>
+      <label className={labelCls}>Linked chapters</label>
+
+      {selected.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          {selected.map((l) => (
+            <span
+              key={l.id}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 py-1 pl-2 pr-1 text-[12px] text-tprimary"
+            >
+              <Link2 className="h-3.5 w-3.5 text-gold" />
+              <span className="font-medium">{l.title}</span>
+              <span className="text-tfaint">· {l.trackTitle}</span>
+              <button
+                onClick={() => removeId(l.id)}
+                title="Remove"
+                className="rounded p-0.5 text-tfaint transition-colors hover:bg-danger/10 hover:text-danger"
+              >
+                <Close className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="relative">
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2">
+          <Search className="h-4 w-4 text-tfaint" />
+          <input
+            value={q}
+            onFocus={() => setOpen(true)}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setOpen(true);
+            }}
+            onBlur={() => setTimeout(() => setOpen(false), 150)}
+            placeholder="Search any chapter to link as a prerequisite…"
+            className="flex-1 bg-transparent text-[13px] text-tprimary outline-none placeholder:text-tfaint"
+          />
+        </div>
+        {open && results.length > 0 && (
+          <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-64 overflow-y-auto rounded-xl border border-border bg-surface py-1 shadow-lift">
+            {results.map((l) => (
+              <button
+                key={l.id}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  addId(l.id);
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-bg"
+              >
+                <PlusIcon className="h-3.5 w-3.5 shrink-0 text-gold" />
+                <span className="min-w-0">
+                  <span className="block truncate text-[13px] font-medium text-tprimary">
+                    {l.title}
+                  </span>
+                  <span className="block truncate text-[11.5px] text-tmuted">
+                    {l.trackTitle} · {l.moduleTitle}
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

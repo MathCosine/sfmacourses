@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { TrackWithModules } from "@/lib/data";
+import type { LessonLink, TrackWithModules } from "@/lib/data";
 import type { Announcement, Lesson, Profile } from "@/lib/types";
 import { cn, formatDate, countProblems } from "@/lib/utils";
 import { BlockEditor } from "./BlockEditor";
@@ -35,6 +35,7 @@ type Tab = "content" | "students" | "announcements";
 
 interface AdminClientProps {
   tree: TrackWithModules[];
+  catalog: LessonLink[];
   profiles: (Profile & { completedCount: number })[];
   announcements: Announcement[];
   totalLessons: number;
@@ -43,6 +44,7 @@ interface AdminClientProps {
 
 export function AdminClient({
   tree,
+  catalog,
   profiles,
   announcements,
   totalLessons,
@@ -89,7 +91,7 @@ export function AdminClient({
         </div>
 
         {tab === "content" && (
-          <ContentTab tree={tree} openLessonId={openLessonId} />
+          <ContentTab tree={tree} catalog={catalog} openLessonId={openLessonId} />
         )}
         {tab === "students" && (
           <StudentsTab profiles={profiles} totalLessons={totalLessons} />
@@ -106,9 +108,11 @@ export function AdminClient({
 
 function ContentTab({
   tree,
+  catalog,
   openLessonId,
 }: {
   tree: TrackWithModules[];
+  catalog: LessonLink[];
   openLessonId: string | null;
 }) {
   const router = useRouter();
@@ -129,7 +133,13 @@ function ContentTab({
   }
 
   if (editing) {
-    return <BlockEditor lesson={editing} onClose={() => setEditing(null)} />;
+    return (
+      <BlockEditor
+        lesson={editing}
+        catalog={catalog}
+        onClose={() => setEditing(null)}
+      />
+    );
   }
 
   return (

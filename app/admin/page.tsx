@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import {
+  flattenLessons,
   getAllProfiles,
   getAnnouncements,
   getNavTree,
@@ -45,6 +46,7 @@ export default async function AdminPage({
   return (
     <AdminClient
       tree={tree}
+      catalog={flattenLessons(tree)}
       profiles={profiles.map((p) => ({
         ...p,
         completedCount: progressByUser.get(p.id) ?? 0,
