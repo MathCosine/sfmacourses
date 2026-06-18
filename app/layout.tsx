@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "@/components/Toast";
+import { ScrollProgress } from "@/components/ScrollProgress";
+import { FloatingDock } from "@/components/FloatingDock";
+import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,7 +39,12 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body className={`${inter.variable} ${jetbrains.variable}`}>
-        {children}
+        <ToastProvider>
+          <ScrollProgress />
+          {children}
+          <FloatingDock />
+          <KeyboardShortcuts />
+        </ToastProvider>
       </body>
     </html>
   );

@@ -438,3 +438,36 @@ export const Milestone = (props: SVGProps<SVGSVGElement>) => (
     <path d="M4 6h13l3 3.5L17 13H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z" />
   </Base>
 );
+
+export const Bug = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M8 2l1.5 1.5M16 2l-1.5 1.5" />
+    <path d="M9 7.5h6a3 3 0 0 1 3 3V14a6 6 0 0 1-12 0v-3.5a3 3 0 0 1 3-3Z" />
+    <path d="M12 12v6M3 9h3M18 9h3M3 14h3.2M17.8 14H21M4 19l2.5-2M20 19l-2.5-2" />
+  </Base>
+);
+
+export const Send = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M22 2 11 13M22 2l-7 20-4-9-9-4Z" />
+  </Base>
+);
+
+export const MessageCircle = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 21l1.9-5.2A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5Z" />
+  </Base>
+);
+
+export const Keyboard = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <rect x="2" y="5" width="20" height="14" rx="2" />
+    <path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M18 13h.01M9 13h6" />
+  </Base>
+);
+
+export const Command = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3Z" />
+  </Base>
+);
