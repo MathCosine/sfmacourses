@@ -28,23 +28,26 @@ export function LogoMark({ className }: { className?: string }) {
       <rect x="6.5" y="6.5" width="51" height="51" rx="11.5" fill="#2b2f37" />
       <text
         x="32"
-        y="31"
+        y="32"
         textAnchor="middle"
+        textLength="40"
+        lengthAdjust="spacingAndGlyphs"
         fontFamily="Georgia, 'Times New Roman', serif"
         fontStyle="italic"
         fontWeight="700"
-        fontSize="25"
+        fontSize="22"
         fill="url(#sfma-silver)"
       >
         SFMA
       </text>
       <text
         x="32"
-        y="46.5"
+        y="46"
         textAnchor="middle"
+        textLength="34"
+        lengthAdjust="spacingAndGlyphs"
         fontFamily="Georgia, 'Times New Roman', serif"
-        fontSize="12"
-        letterSpacing="0.5"
+        fontSize="10.5"
         fill="url(#sfma-silver)"
       >
         courses
