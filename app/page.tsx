@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSessionUser, getNavTree } from "@/lib/data";
+import { getSessionUser, getCourseTree } from "@/lib/data";
 import { renderMarkdown } from "@/lib/markdown";
 import { trackTheme } from "@/lib/trackTheme";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -76,7 +76,7 @@ const FAQ_ITEMS = [
 ];
 
 export default async function HomePage() {
-  const [user, tree] = await Promise.all([getSessionUser(), getNavTree()]);
+  const [user, tree] = await Promise.all([getSessionUser(), getCourseTree()]);
   const cta = user ? "/dashboard" : "/auth";
   const totalChapters = tree.reduce(
     (a, t) => a + t.modules.reduce((b, m) => b + m.lessons.length, 0),

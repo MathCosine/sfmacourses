@@ -189,7 +189,10 @@ export function ProblemsExplorer({
                   size={22}
                 />
                 <div className="min-w-0">
-                  <Link href={r.href} className="block truncate text-[14px] font-semibold text-tprimary hover:text-gold">
+                  <Link
+                    href={`/problems/${r.lessonId}/${r.problemIndex}`}
+                    className="block truncate text-[14px] font-semibold text-tprimary hover:text-gold"
+                  >
                     {r.title}
                   </Link>
                   <div className="truncate text-[12px] text-tmuted sm:hidden">

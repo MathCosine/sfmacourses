@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/SiteShell";
-import { getNavTree, getSessionUser } from "@/lib/data";
+import { getCourseTree, getSessionUser } from "@/lib/data";
 import { trackTheme } from "@/lib/trackTheme";
 import {
   ArrowRight,
@@ -34,7 +34,7 @@ const VALUES = [
 ];
 
 export default async function AboutPage() {
-  const [tree, user] = await Promise.all([getNavTree(), getSessionUser()]);
+  const [tree, user] = await Promise.all([getCourseTree(), getSessionUser()]);
 
   return (
     <SiteShell>

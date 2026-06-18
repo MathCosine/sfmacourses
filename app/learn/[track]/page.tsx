@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/SiteShell";
 import { FrequencyDots } from "@/components/FrequencyDots";
-import { getLessonStatuses, getNavTree, getSessionUser } from "@/lib/data";
+import { getLessonStatuses, getCourseTree, getSessionUser } from "@/lib/data";
 import { extractMeta, countProblems } from "@/lib/utils";
 import { trackTheme } from "@/lib/trackTheme";
 import type { LessonStatus } from "@/lib/types";
@@ -16,7 +16,7 @@ export async function generateMetadata({
   params: Promise<{ track: string }>;
 }): Promise<Metadata> {
   const { track } = await params;
-  const tree = await getNavTree();
+  const tree = await getCourseTree();
   return { title: tree.find((x) => x.slug === track)?.title ?? "Course" };
 }
 
@@ -40,7 +40,7 @@ export default async function TrackPage({
   params: Promise<{ track: string }>;
 }) {
   const { track } = await params;
-  const [tree, user] = await Promise.all([getNavTree(), getSessionUser()]);
+  const [tree, user] = await Promise.all([getCourseTree(), getSessionUser()]);
   const t = tree.find((x) => x.slug === track);
   if (!t) notFound();
 

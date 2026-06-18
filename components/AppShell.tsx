@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getLessonStatuses, getNavTree, getSessionUser } from "@/lib/data";
+import { getLessonStatuses, getCourseTree, getSessionUser } from "@/lib/data";
 import { toNavTracks } from "@/lib/nav";
 import { ShellFrame } from "@/components/ShellFrame";
 import type { NavUser } from "@/components/TopNav";
@@ -23,7 +23,7 @@ export async function AppShell({
   if (!user) redirect("/auth");
 
   const [tree, statuses] = await Promise.all([
-    getNavTree(),
+    getCourseTree(),
     getLessonStatuses(user.id),
   ]);
 

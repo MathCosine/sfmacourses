@@ -1,5 +1,6 @@
 import { createClient } from "./supabase/server";
 import { isSuperAdmin } from "./admin";
+import { contentBlocks } from "./utils";
 import type {
   Announcement,
   Block,
@@ -7,9 +8,14 @@ import type {
   LessonStatus,
   Module,
   Profile,
+  ProblemBlock,
   ProblemStatus,
   Track,
 } from "./types";
+
+/** Slug of the special "Problem Bank" track — standalone problems not tied to a
+ *  teaching chapter. Hidden from the learner course nav, shown in /problems. */
+export const PROBLEM_BANK_SLUG = "problem-bank";
 
 export interface SessionUser {
   id: string;
@@ -105,6 +111,79 @@ export async function getNavTree(): Promise<TrackWithModules[]> {
     console.error("getNavTree failed", e);
     return [];
   }
+}
+
+/** Learner-facing courses: the nav tree without the hidden Problem Bank track. */
+export async function getCourseTree(): Promise<TrackWithModules[]> {
+  const tree = await getNavTree();
+  return tree.filter((t) => t.slug !== PROBLEM_BANK_SLUG);
+}
+
+export interface ProblemView {
+  problem: ProblemBlock;
+  problemIndex: number;
+  lessonId: string;
+  lessonTitle: string;
+  lessonAuthor: string;
+  /** Location for breadcrumbs / "open the lesson" link. Null for bank problems. */
+  location: {
+    trackTitle: string;
+    trackSlug: string;
+    moduleTitle: string;
+    lessonHref: string;
+  } | null;
+  isBank: boolean;
+  /** Sibling problems in the same lesson, for prev/next. */
+  prev: { index: number; title: string } | null;
+  next: { index: number; title: string } | null;
+  total: number;
+}
+
+/** Resolve a single problem (by lesson id + its problem index) for the
+ *  standalone problem workspace. */
+export async function getProblemView(
+  lessonId: string,
+  index: number,
+): Promise<ProblemView | null> {
+  const tree = await getNavTree();
+  for (const t of tree) {
+    for (const m of t.modules) {
+      for (const l of m.lessons) {
+        if (l.id !== lessonId) continue;
+        const problems = contentBlocks(l.content).filter(
+          (b): b is ProblemBlock => b.type === "problem",
+        );
+        const problem = problems[index];
+        if (!problem) return null;
+        const isBank = t.slug === PROBLEM_BANK_SLUG;
+        const prevP = problems[index - 1];
+        const nextP = problems[index + 1];
+        return {
+          problem,
+          problemIndex: index,
+          lessonId,
+          lessonTitle: l.title,
+          lessonAuthor:
+            (l.content?.find?.((b) => (b as { type?: string }).type === "meta") as
+              | { author?: string }
+              | undefined)?.author ?? "SFMA Staff",
+          location: isBank
+            ? null
+            : {
+                trackTitle: t.title,
+                trackSlug: t.slug,
+                moduleTitle: m.title,
+                lessonHref: `/learn/${t.slug}/${m.slug}/${l.slug}`,
+              },
+          isBank,
+          prev: prevP ? { index: index - 1, title: prevP.title } : null,
+          next: nextP ? { index: index + 1, title: nextP.title } : null,
+          total: problems.length,
+        };
+      }
+    }
+  }
+  return null;
 }
 
 /** Map of lesson_id -> status for a user (lessons with no row are not_started). */

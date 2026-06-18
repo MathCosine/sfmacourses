@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils";
 import { renderMarkdown } from "@/lib/markdown";
+import { prepareBlocks, type PreparedBlock } from "@/lib/prepare";
 import { isSuperAdmin } from "@/lib/admin";
 import type { Block, ContentBlock, MetaBlock, Frequency } from "@/lib/types";
 
@@ -12,6 +13,13 @@ type Result = { ok: boolean; error?: string; id?: string };
 /** Render markdown + LaTeX to HTML for the live editor preview. */
 export async function previewMarkdown(md: string): Promise<string> {
   return renderMarkdown(md ?? "");
+}
+
+/** Render a full block list to its wiki appearance for the inline editor. */
+export async function renderLessonPreview(
+  blocks: ContentBlock[],
+): Promise<PreparedBlock[]> {
+  return prepareBlocks(blocks ?? []);
 }
 
 async function requireStaff() {

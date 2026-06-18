@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { Fragment, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type {
   CalloutVariant,
@@ -10,10 +10,20 @@ import type {
   Lesson,
 } from "@/lib/types";
 import { CALLOUT_LABELS, CALLOUT_VARIANTS, DIFFICULTIES } from "@/lib/types";
+import type { PreparedBlock } from "@/lib/prepare";
 import { contentBlocks, extractMeta } from "@/lib/utils";
-import { updateLesson, deleteLesson } from "./actions";
+import { updateLesson, deleteLesson, renderLessonPreview } from "./actions";
 import { MarkdownField } from "@/components/admin/MarkdownField";
-import { ArrowUp, ArrowDown, TrashIcon, PlusIcon } from "@/components/icons";
+import { BlockPreview } from "@/components/admin/BlockPreview";
+import {
+  ArrowUp,
+  ArrowDown,
+  TrashIcon,
+  PlusIcon,
+  Check,
+  Pencil,
+  Close,
+} from "@/components/icons";
 
 const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
   text: "Text",
@@ -32,6 +42,15 @@ const BLOCK_HINT: Record<ContentBlock["type"], string> = {
   video: "An embedded YouTube or Vimeo video.",
   callout: "A styled box: theorem, big idea, recipe, example, note or warning.",
 };
+
+const ADD_ORDER: ContentBlock["type"][] = [
+  "text",
+  "section",
+  "callout",
+  "problem",
+  "resource",
+  "video",
+];
 
 function emptyBlock(type: ContentBlock["type"]): ContentBlock {
   switch (type) {
@@ -77,9 +96,31 @@ export function BlockEditor({
   const [blocks, setBlocks] = useState<ContentBlock[]>(
     contentBlocks(lesson.content),
   );
+  const [editing, setEditing] = useState<number | null>(null);
+  const [insertAt, setInsertAt] = useState<number | null>(null);
+  const [prepared, setPrepared] = useState<PreparedBlock[]>([]);
+  const [rendering, setRendering] = useState(true);
   const [pending, startTransition] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
+
+  // Live "wiki" preview — re-rendered (debounced) whenever the blocks change.
+  useEffect(() => {
+    let active = true;
+    setRendering(true);
+    const t = setTimeout(async () => {
+      try {
+        const out = await renderLessonPreview(blocks);
+        if (active) setPrepared(out);
+      } finally {
+        if (active) setRendering(false);
+      }
+    }, 250);
+    return () => {
+      active = false;
+      clearTimeout(t);
+    };
+  }, [blocks]);
 
   function update(updater: (prev: ContentBlock[]) => ContentBlock[]) {
     setBlocks(updater);
@@ -91,19 +132,31 @@ export function BlockEditor({
     );
   }
   function move(i: number, dir: -1 | 1) {
+    const j = i + dir;
+    if (j < 0 || j >= blocks.length) return;
     update((prev) => {
-      const j = i + dir;
-      if (j < 0 || j >= prev.length) return prev;
       const next = [...prev];
       [next[i], next[j]] = [next[j], next[i]];
       return next;
     });
+    setEditing((cur) =>
+      cur === i ? j : cur === j ? i : cur,
+    );
   }
   function remove(i: number) {
     update((prev) => prev.filter((_, idx) => idx !== i));
+    setEditing((cur) =>
+      cur === null ? null : cur === i ? null : cur > i ? cur - 1 : cur,
+    );
   }
-  function add(type: ContentBlock["type"]) {
-    update((prev) => [...prev, emptyBlock(type)]);
+  function add(type: ContentBlock["type"], at: number) {
+    update((prev) => {
+      const next = [...prev];
+      next.splice(at, 0, emptyBlock(type));
+      return next;
+    });
+    setInsertAt(null);
+    setEditing(at);
   }
 
   function save() {
@@ -142,7 +195,7 @@ export function BlockEditor({
   return (
     <div>
       {/* Sticky toolbar */}
-      <div className="sticky top-0 z-20 -mx-2 mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border bg-bg/90 px-2 py-3 backdrop-blur">
+      <div className="sticky top-0 z-20 -mx-2 mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border bg-bg/95 px-2 py-3 backdrop-blur">
         <div className="flex items-center gap-2">
           <button
             onClick={onClose}
@@ -151,9 +204,11 @@ export function BlockEditor({
             ← Back
           </button>
           <h3 className="font-serif text-lg text-tprimary">Edit Chapter</h3>
-          {dirty && (
+          {rendering ? (
+            <span className="text-[11.5px] text-tfaint">rendering…</span>
+          ) : dirty ? (
             <span className="text-[11.5px] text-tfaint">unsaved changes</span>
-          )}
+          ) : null}
         </div>
         <div className="flex items-center gap-2">
           {msg && (
@@ -183,7 +238,7 @@ export function BlockEditor({
       </div>
 
       {/* Chapter meta */}
-      <div className="mb-6 grid gap-3 rounded-xl border border-border bg-surface p-4 sm:grid-cols-3">
+      <div className="mb-2 grid gap-3 rounded-xl border border-border bg-surface p-4 sm:grid-cols-3">
         <div className="sm:col-span-3">
           <label className={labelCls}>Chapter title</label>
           <input
@@ -223,71 +278,253 @@ export function BlockEditor({
         </div>
       </div>
 
-      {/* Blocks */}
-      <div className="space-y-3">
+      <p className="mb-3 px-1 text-[12px] text-tfaint">
+        This is how the page looks on the site. Hover a block to edit, move or
+        delete it; use the <span className="font-semibold text-tmuted">+</span>{" "}
+        buttons to insert.
+      </p>
+
+      {/* The page (wiki preview + inline editing) */}
+      <div>
         {blocks.length === 0 && (
-          <p className="rounded-xl border border-dashed border-border px-4 py-8 text-center text-[13px] text-tfaint">
-            This chapter is empty. Add a block below to start building.
-          </p>
-        )}
-        {blocks.map((block, i) => (
-          <div
-            key={i}
-            className="rounded-xl border border-border bg-surface p-4 shadow-card"
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="rounded-md bg-gold/12 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-gold">
-                  {BLOCK_LABEL[block.type]}
-                </span>
-                <span className="hidden text-[11.5px] text-tfaint sm:inline">
-                  {BLOCK_HINT[block.type]}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <IconBtn onClick={() => move(i, -1)} disabled={i === 0} title="Move up">
-                  <ArrowUp className="h-3.5 w-3.5" />
-                </IconBtn>
-                <IconBtn
-                  onClick={() => move(i, 1)}
-                  disabled={i === blocks.length - 1}
-                  title="Move down"
-                >
-                  <ArrowDown className="h-3.5 w-3.5" />
-                </IconBtn>
-                <IconBtn onClick={() => remove(i)} danger title="Delete block">
-                  <TrashIcon className="h-3.5 w-3.5" />
-                </IconBtn>
-              </div>
-            </div>
-            <BlockFields
-              block={block}
-              onChange={(patch) => patchBlock(i, patch)}
-            />
+          <div className="rounded-xl border border-dashed border-border px-4 py-10 text-center text-[13px] text-tfaint">
+            This chapter is empty — insert a block below to start building.
           </div>
+        )}
+
+        {blocks.map((block, i) => (
+          <Fragment key={i}>
+            <InsertBar
+              open={insertAt === i}
+              onToggle={() => setInsertAt((c) => (c === i ? null : i))}
+              onPick={(t) => add(t, i)}
+            />
+            {editing === i ? (
+              <EditCard
+                block={block}
+                prepared={prepared[i]}
+                onPatch={(patch) => patchBlock(i, patch)}
+                onDone={() => setEditing(null)}
+                onMoveUp={() => move(i, -1)}
+                onMoveDown={() => move(i, 1)}
+                onDelete={() => remove(i)}
+                canUp={i > 0}
+                canDown={i < blocks.length - 1}
+              />
+            ) : (
+              <PreviewRow
+                label={BLOCK_LABEL[block.type]}
+                prepared={prepared[i]}
+                onEdit={() => setEditing(i)}
+                onMoveUp={() => move(i, -1)}
+                onMoveDown={() => move(i, 1)}
+                onDelete={() => remove(i)}
+                canUp={i > 0}
+                canDown={i < blocks.length - 1}
+              />
+            )}
+          </Fragment>
         ))}
+
+        <InsertBar
+          open={insertAt === blocks.length}
+          onToggle={() =>
+            setInsertAt((c) => (c === blocks.length ? null : blocks.length))
+          }
+          onPick={(t) => add(t, blocks.length)}
+          alwaysVisible
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ Insert */
+
+function InsertBar({
+  open,
+  onToggle,
+  onPick,
+  alwaysVisible,
+}: {
+  open: boolean;
+  onToggle: () => void;
+  onPick: (type: ContentBlock["type"]) => void;
+  alwaysVisible?: boolean;
+}) {
+  return (
+    <div className={`group/insert relative my-1 ${alwaysVisible ? "" : ""}`}>
+      {!open ? (
+        <div className="flex items-center">
+          <div
+            className={`h-px flex-1 bg-border transition-opacity ${
+              alwaysVisible ? "opacity-60" : "opacity-0 group-hover/insert:opacity-60"
+            }`}
+          />
+          <button
+            onClick={onToggle}
+            title="Insert a block here"
+            className={`mx-2 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-surface text-tmuted shadow-card transition-all hover:border-gold/50 hover:text-gold ${
+              alwaysVisible
+                ? "opacity-100"
+                : "opacity-0 group-hover/insert:opacity-100"
+            }`}
+          >
+            <PlusIcon className="h-3.5 w-3.5" />
+          </button>
+          <div
+            className={`h-px flex-1 bg-border transition-opacity ${
+              alwaysVisible ? "opacity-60" : "opacity-0 group-hover/insert:opacity-60"
+            }`}
+          />
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface p-2.5 shadow-card">
+          <span className="px-1 text-[11.5px] font-medium text-tmuted">Insert:</span>
+          {ADD_ORDER.map((t) => (
+            <button
+              key={t}
+              onClick={() => onPick(t)}
+              className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-2.5 py-1.5 text-[12px] font-medium text-tprimary transition-colors hover:border-gold/50 hover:text-gold"
+            >
+              <PlusIcon className="h-3 w-3 text-gold" />
+              {BLOCK_LABEL[t]}
+            </button>
+          ))}
+          <button
+            onClick={onToggle}
+            title="Cancel"
+            className="ml-auto rounded-md p-1.5 text-tfaint transition-colors hover:bg-bg hover:text-tprimary"
+          >
+            <Close className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------- Preview row */
+
+function PreviewRow({
+  label,
+  prepared,
+  onEdit,
+  onMoveUp,
+  onMoveDown,
+  onDelete,
+  canUp,
+  canDown,
+}: {
+  label: string;
+  prepared: PreparedBlock | undefined;
+  onEdit: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onDelete: () => void;
+  canUp: boolean;
+  canDown: boolean;
+}) {
+  return (
+    <div className="group relative rounded-xl border border-transparent px-3 py-1 transition-colors hover:border-border hover:bg-surface-2/40">
+      {/* Hover toolbar */}
+      <div className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded-lg border border-border bg-surface p-0.5 opacity-0 shadow-card transition-opacity group-hover:opacity-100">
+        <span className="px-1.5 text-[10px] font-bold uppercase tracking-wide text-tfaint">
+          {label}
+        </span>
+        <IconBtn onClick={onMoveUp} disabled={!canUp} title="Move up">
+          <ArrowUp className="h-3.5 w-3.5" />
+        </IconBtn>
+        <IconBtn onClick={onMoveDown} disabled={!canDown} title="Move down">
+          <ArrowDown className="h-3.5 w-3.5" />
+        </IconBtn>
+        <IconBtn onClick={onEdit} title="Edit">
+          <Pencil className="h-3.5 w-3.5" />
+        </IconBtn>
+        <IconBtn onClick={onDelete} danger title="Delete">
+          <TrashIcon className="h-3.5 w-3.5" />
+        </IconBtn>
       </div>
 
-      {/* Add block */}
-      <div className="mt-5 rounded-xl border border-dashed border-border-strong bg-surface/60 p-4">
-        <div className="mb-2.5 text-[12px] font-medium text-tmuted">
-          Add a block
+      <button
+        onClick={onEdit}
+        className="block w-full cursor-text text-left"
+        title="Click to edit"
+      >
+        {prepared ? (
+          <BlockPreview block={prepared} />
+        ) : (
+          <div className="py-3 text-[13px] text-tfaint">Rendering…</div>
+        )}
+      </button>
+    </div>
+  );
+}
+
+/* --------------------------------------------------------------- Edit card */
+
+function EditCard({
+  block,
+  prepared,
+  onPatch,
+  onDone,
+  onMoveUp,
+  onMoveDown,
+  onDelete,
+  canUp,
+  canDown,
+}: {
+  block: ContentBlock;
+  prepared: PreparedBlock | undefined;
+  onPatch: (patch: Partial<ContentBlock>) => void;
+  onDone: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onDelete: () => void;
+  canUp: boolean;
+  canDown: boolean;
+}) {
+  return (
+    <div className="rounded-xl border border-gold/40 bg-surface p-4 shadow-lift ring-1 ring-gold/15">
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="rounded-md bg-gold/12 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-gold">
+            {BLOCK_LABEL[block.type]}
+          </span>
+          <span className="hidden text-[11.5px] text-tfaint sm:inline">
+            {BLOCK_HINT[block.type]}
+          </span>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {(["text", "section", "callout", "problem", "resource", "video"] as const).map(
-            (t) => (
-              <button
-                key={t}
-                onClick={() => add(t)}
-                className="flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 text-[12.5px] font-medium text-tprimary transition-colors hover:border-gold/50 hover:text-gold"
-              >
-                <PlusIcon className="h-3.5 w-3.5 text-gold" />
-                {BLOCK_LABEL[t]}
-              </button>
-            ),
-          )}
+        <div className="flex items-center gap-1">
+          <IconBtn onClick={onMoveUp} disabled={!canUp} title="Move up">
+            <ArrowUp className="h-3.5 w-3.5" />
+          </IconBtn>
+          <IconBtn onClick={onMoveDown} disabled={!canDown} title="Move down">
+            <ArrowDown className="h-3.5 w-3.5" />
+          </IconBtn>
+          <IconBtn onClick={onDelete} danger title="Delete block">
+            <TrashIcon className="h-3.5 w-3.5" />
+          </IconBtn>
+          <button
+            onClick={onDone}
+            className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-gold px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-gold-hover"
+          >
+            <Check className="h-3.5 w-3.5" /> Done
+          </button>
         </div>
       </div>
+
+      <BlockFields block={block} onChange={onPatch} />
+
+      {/* Live block preview */}
+      {prepared && (
+        <div className="mt-4 border-t border-dashed border-border pt-3">
+          <div className="mb-2 text-[10.5px] font-bold uppercase tracking-wide text-tfaint">
+            Preview
+          </div>
+          <BlockPreview block={prepared} />
+        </div>
+      )}
     </div>
   );
 }

@@ -411,3 +411,17 @@ export const Sigma = (props: SVGProps<SVGSVGElement>) => (
     <path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8L12 12l-5.9 7.2a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2" />
   </Base>
 );
+
+export const Pencil = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+  </Base>
+);
+
+export const Eye = (props: SVGProps<SVGSVGElement>) => (
+  <Base {...props}>
+    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+    <circle cx="12" cy="12" r="3" />
+  </Base>
+);

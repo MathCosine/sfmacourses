@@ -5,7 +5,7 @@ import { ProgressRing } from "@/components/ProgressRing";
 import {
   getAnnouncements,
   getLessonStatuses,
-  getNavTree,
+  getCourseTree,
   getSessionUser,
 } from "@/lib/data";
 import { trackTheme } from "@/lib/trackTheme";
@@ -24,7 +24,7 @@ export const metadata: Metadata = { title: "Dashboard" };
 export default async function DashboardPage() {
   const user = await getSessionUser();
   const [tree, statuses, announcements] = await Promise.all([
-    getNavTree(),
+    getCourseTree(),
     getLessonStatuses(user!.id),
     getAnnouncements(),
   ]);

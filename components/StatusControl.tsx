@@ -94,7 +94,7 @@ export function StatusControl({
           <div
             ref={menuRef}
             role="menu"
-            className="status-menu glass fixed z-[80] overflow-hidden rounded-xl py-1"
+            className="status-menu panel fixed z-[80] overflow-hidden rounded-xl py-1"
             style={{ top: coords.top, left: coords.left, width: MENU_W }}
             onClick={(e) => e.stopPropagation()}
           >
