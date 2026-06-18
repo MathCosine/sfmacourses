@@ -3,7 +3,12 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { LessonLink, TrackWithModules } from "@/lib/data";
+import type {
+  CrossListing,
+  LessonLink,
+  ModuleLink,
+  TrackWithModules,
+} from "@/lib/data";
 import type { Announcement, Lesson, Profile } from "@/lib/types";
 import { cn, formatDate, countProblems } from "@/lib/utils";
 import { BlockEditor } from "./BlockEditor";
@@ -36,6 +41,8 @@ type Tab = "content" | "students" | "announcements";
 interface AdminClientProps {
   tree: TrackWithModules[];
   catalog: LessonLink[];
+  moduleCatalog: ModuleLink[];
+  crossListings: CrossListing[];
   profiles: (Profile & { completedCount: number })[];
   announcements: Announcement[];
   totalLessons: number;
@@ -45,6 +52,8 @@ interface AdminClientProps {
 export function AdminClient({
   tree,
   catalog,
+  moduleCatalog,
+  crossListings,
   profiles,
   announcements,
   totalLessons,
@@ -91,7 +100,13 @@ export function AdminClient({
         </div>
 
         {tab === "content" && (
-          <ContentTab tree={tree} catalog={catalog} openLessonId={openLessonId} />
+          <ContentTab
+            tree={tree}
+            catalog={catalog}
+            moduleCatalog={moduleCatalog}
+            crossListings={crossListings}
+            openLessonId={openLessonId}
+          />
         )}
         {tab === "students" && (
           <StudentsTab profiles={profiles} totalLessons={totalLessons} />
@@ -109,10 +124,14 @@ export function AdminClient({
 function ContentTab({
   tree,
   catalog,
+  moduleCatalog,
+  crossListings,
   openLessonId,
 }: {
   tree: TrackWithModules[];
   catalog: LessonLink[];
+  moduleCatalog: ModuleLink[];
+  crossListings: CrossListing[];
   openLessonId: string | null;
 }) {
   const router = useRouter();
@@ -137,6 +156,10 @@ function ContentTab({
       <BlockEditor
         lesson={editing}
         catalog={catalog}
+        moduleCatalog={moduleCatalog}
+        initialCrossModuleIds={crossListings
+          .filter((c) => c.lesson_id === editing.id)
+          .map((c) => c.module_id)}
         onClose={() => setEditing(null)}
       />
     );

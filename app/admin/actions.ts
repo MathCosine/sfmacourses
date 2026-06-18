@@ -341,6 +341,60 @@ export async function deleteLesson(id: string): Promise<Result> {
   return { ok: true };
 }
 
+/* ------------- Cross-listings (a lesson placed in multiple courses) ------- */
+
+export async function addCrossListing(
+  lessonId: string,
+  moduleId: string,
+): Promise<Result> {
+  const { supabase, error } = await requireStaff();
+  if (error) return { ok: false, error };
+
+  // Place it after the module's existing lessons + cross-listings.
+  const [{ data: prim }, { data: cross }] = await Promise.all([
+    supabase
+      .from("lessons")
+      .select("order_index")
+      .eq("module_id", moduleId)
+      .order("order_index", { ascending: false })
+      .limit(1),
+    supabase
+      .from("lesson_cross_listings")
+      .select("order_index")
+      .eq("module_id", moduleId)
+      .order("order_index", { ascending: false })
+      .limit(1),
+  ]);
+  const order_index =
+    Math.max(prim?.[0]?.order_index ?? -1, cross?.[0]?.order_index ?? -1) + 1;
+
+  const { error: e } = await supabase
+    .from("lesson_cross_listings")
+    .upsert(
+      { lesson_id: lessonId, module_id: moduleId, order_index },
+      { onConflict: "lesson_id,module_id" },
+    );
+  if (e) return { ok: false, error: e.message };
+  refresh();
+  return { ok: true };
+}
+
+export async function removeCrossListing(
+  lessonId: string,
+  moduleId: string,
+): Promise<Result> {
+  const { supabase, error } = await requireStaff();
+  if (error) return { ok: false, error };
+  const { error: e } = await supabase
+    .from("lesson_cross_listings")
+    .delete()
+    .eq("lesson_id", lessonId)
+    .eq("module_id", moduleId);
+  if (e) return { ok: false, error: e.message };
+  refresh();
+  return { ok: true };
+}
+
 /* ---------------- Students ---------------- */
 
 export async function toggleRole(

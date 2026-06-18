@@ -11,9 +11,15 @@ import type {
 } from "@/lib/types";
 import { CALLOUT_LABELS, CALLOUT_VARIANTS, DIFFICULTIES } from "@/lib/types";
 import type { PreparedBlock } from "@/lib/prepare";
-import type { LessonLink } from "@/lib/data";
+import type { LessonLink, ModuleLink } from "@/lib/data";
 import { contentBlocks, extractMeta } from "@/lib/utils";
-import { updateLesson, deleteLesson, renderLessonPreview } from "./actions";
+import {
+  updateLesson,
+  deleteLesson,
+  renderLessonPreview,
+  addCrossListing,
+  removeCrossListing,
+} from "./actions";
 import { MarkdownField } from "@/components/admin/MarkdownField";
 import { BlockPreview } from "@/components/admin/BlockPreview";
 import {
@@ -27,6 +33,7 @@ import {
   Link2,
   Search,
   Milestone,
+  Layers,
 } from "@/components/icons";
 
 const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
@@ -88,10 +95,14 @@ const labelCls = "mb-1 block text-[11.5px] font-medium text-tmuted";
 export function BlockEditor({
   lesson,
   catalog,
+  moduleCatalog,
+  initialCrossModuleIds,
   onClose,
 }: {
   lesson: Lesson;
   catalog: LessonLink[];
+  moduleCatalog: ModuleLink[];
+  initialCrossModuleIds: string[];
   onClose: () => void;
 }) {
   const router = useRouter();
@@ -324,6 +335,28 @@ export function BlockEditor({
             setPrereqLessonIds(ids);
             setDirty(true);
           }}
+        />
+      </div>
+
+      {/* Cross-listing */}
+      <div className="mb-2 rounded-xl border border-border bg-surface p-4">
+        <div className="mb-1 flex items-center gap-2">
+          <Layers className="h-4 w-4 text-gold" />
+          <span className="text-[13px] font-semibold text-tprimary">
+            Also list this chapter in…
+          </span>
+          <span className="text-[11.5px] text-tfaint">optional</span>
+        </div>
+        <p className="mb-3 text-[12px] text-tmuted">
+          Add this chapter to other courses or units. It stays a single page —
+          edits and student progress are shared everywhere it appears. Changes
+          here save immediately.
+        </p>
+        <CrossListEditor
+          lessonId={lesson.id}
+          homeModuleId={lesson.module_id}
+          moduleCatalog={moduleCatalog}
+          initialIds={initialCrossModuleIds}
         />
       </div>
 
@@ -574,6 +607,138 @@ function EditCard({
           <BlockPreview block={prepared} />
         </div>
       )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------- Cross-list editor */
+
+function CrossListEditor({
+  lessonId,
+  homeModuleId,
+  moduleCatalog,
+  initialIds,
+}: {
+  lessonId: string;
+  homeModuleId: string;
+  moduleCatalog: ModuleLink[];
+  initialIds: string[];
+}) {
+  const [ids, setIds] = useState<string[]>(initialIds);
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const [busy, startTransition] = useTransition();
+  const [err, setErr] = useState<string | null>(null);
+
+  const byId = new Map(moduleCatalog.map((m) => [m.id, m]));
+  const selected = ids
+    .map((id) => byId.get(id))
+    .filter((m): m is ModuleLink => !!m);
+
+  const needle = q.trim().toLowerCase();
+  const results = moduleCatalog
+    .filter(
+      (m) =>
+        m.id !== homeModuleId &&
+        !ids.includes(m.id) &&
+        (!needle ||
+          m.title.toLowerCase().includes(needle) ||
+          m.trackTitle.toLowerCase().includes(needle)),
+    )
+    .slice(0, 8);
+
+  function add(moduleId: string) {
+    setErr(null);
+    setQ("");
+    setIds((prev) => [...prev, moduleId]); // optimistic
+    startTransition(async () => {
+      const res = await addCrossListing(lessonId, moduleId);
+      if (!res.ok) {
+        setIds((prev) => prev.filter((x) => x !== moduleId));
+        setErr(res.error ?? "Could not add. Run supabase/cross-listings.sql.");
+      }
+    });
+  }
+  function remove(moduleId: string) {
+    setErr(null);
+    setIds((prev) => prev.filter((x) => x !== moduleId)); // optimistic
+    startTransition(async () => {
+      const res = await removeCrossListing(lessonId, moduleId);
+      if (!res.ok) {
+        setIds((prev) => [...prev, moduleId]);
+        setErr(res.error ?? "Could not remove.");
+      }
+    });
+  }
+
+  return (
+    <div>
+      <label className={labelCls}>Appears in these units {busy && "· saving…"}</label>
+
+      {selected.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-1.5">
+          {selected.map((m) => (
+            <span
+              key={m.id}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gold/40 bg-gold/10 py-1 pl-2 pr-1 text-[12px] text-tprimary"
+            >
+              <Layers className="h-3.5 w-3.5 text-gold" />
+              <span className="font-medium">{m.title}</span>
+              <span className="text-tfaint">· {m.trackTitle}</span>
+              <button
+                onClick={() => remove(m.id)}
+                title="Remove from this unit"
+                className="rounded p-0.5 text-tfaint transition-colors hover:bg-danger/10 hover:text-danger"
+              >
+                <Close className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="relative">
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2">
+          <Search className="h-4 w-4 text-tfaint" />
+          <input
+            value={q}
+            onFocus={() => setOpen(true)}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setOpen(true);
+            }}
+            onBlur={() => setTimeout(() => setOpen(false), 150)}
+            placeholder="Search a course/unit to add this chapter to…"
+            className="flex-1 bg-transparent text-[13px] text-tprimary outline-none placeholder:text-tfaint"
+          />
+        </div>
+        {open && results.length > 0 && (
+          <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-64 overflow-y-auto rounded-xl border border-border bg-surface py-1 shadow-lift">
+            {results.map((m) => (
+              <button
+                key={m.id}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  add(m.id);
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-bg"
+              >
+                <PlusIcon className="h-3.5 w-3.5 shrink-0 text-gold" />
+                <span className="min-w-0">
+                  <span className="block truncate text-[13px] font-medium text-tprimary">
+                    {m.title}
+                  </span>
+                  <span className="block truncate text-[11.5px] text-tmuted">
+                    {m.trackTitle}
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {err && <p className="mt-2 text-[12px] text-danger">{err}</p>}
     </div>
   );
 }

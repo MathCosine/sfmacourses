@@ -99,7 +99,7 @@ export async function getNavTree(): Promise<TrackWithModules[]> {
     const modulesByTrack = new Map<string, ModuleWithLessons[]>();
     for (const m of (modules ?? []) as Module[]) {
       const arr = modulesByTrack.get(m.track_id) ?? [];
-      arr.push({ ...m, lessons: lessonsByModule.get(m.id) ?? [] });
+      arr.push({ ...m, lessons: [...(lessonsByModule.get(m.id) ?? [])] });
       modulesByTrack.set(m.track_id, arr);
     }
 
@@ -113,10 +113,50 @@ export async function getNavTree(): Promise<TrackWithModules[]> {
   }
 }
 
-/** Learner-facing courses: the nav tree without the hidden Problem Bank track. */
+/**
+ * Place cross-listed lessons into their additional modules. The lesson row is
+ * the single source of truth (same id → shared content & progress); a
+ * cross-listing just makes it *also* appear under another course's unit.
+ * Mutates `tree` in place. `lessonsById` should span every lesson (so a lesson
+ * from any course — even the bank — can be cross-listed). No-ops if the table
+ * is missing.
+ */
+async function applyCrossListings(
+  tree: TrackWithModules[],
+  lessonsById: Map<string, Lesson>,
+): Promise<void> {
+  const moduleById = new Map<string, ModuleWithLessons>();
+  for (const t of tree) for (const m of t.modules) moduleById.set(m.id, m);
+  try {
+    const supabase = await createClient();
+    const { data: cross } = await supabase
+      .from("lesson_cross_listings")
+      .select("lesson_id, module_id, order_index")
+      .order("order_index", { ascending: true });
+    for (const row of cross ?? []) {
+      const mod = moduleById.get(row.module_id as string);
+      const les = lessonsById.get(row.lesson_id as string);
+      if (!mod || !les) continue;
+      if (mod.lessons.some((l) => l.id === les.id)) continue; // already present
+      mod.lessons.push(les);
+    }
+  } catch {
+    /* cross-listings table not present — ignore */
+  }
+}
+
+/**
+ * Learner-facing courses: the nav tree without the hidden Problem Bank track,
+ * with cross-listed lessons placed into their additional units.
+ */
 export async function getCourseTree(): Promise<TrackWithModules[]> {
-  const tree = await getNavTree();
-  return tree.filter((t) => t.slug !== PROBLEM_BANK_SLUG);
+  const full = await getNavTree();
+  const lessonsById = new Map<string, Lesson>();
+  for (const t of full)
+    for (const m of t.modules) for (const l of m.lessons) lessonsById.set(l.id, l);
+  const course = full.filter((t) => t.slug !== PROBLEM_BANK_SLUG);
+  await applyCrossListings(course, lessonsById);
+  return course;
 }
 
 export interface LessonLink {
@@ -153,6 +193,46 @@ export async function getLessonLinksByIds(
   const all = flattenLessons(await getNavTree());
   const byId = new Map(all.map((l) => [l.id, l]));
   return ids.map((id) => byId.get(id)).filter((l): l is LessonLink => !!l);
+}
+
+export interface ModuleLink {
+  id: string;
+  title: string;
+  trackTitle: string;
+  trackSlug: string;
+}
+
+/** Flatten a nav tree into a catalog of every unit/module (for cross-listing). */
+export function flattenModules(tree: TrackWithModules[]): ModuleLink[] {
+  const out: ModuleLink[] = [];
+  for (const t of tree)
+    for (const m of t.modules)
+      out.push({
+        id: m.id,
+        title: m.title,
+        trackTitle: t.title,
+        trackSlug: t.slug,
+      });
+  return out;
+}
+
+export interface CrossListing {
+  lesson_id: string;
+  module_id: string;
+}
+
+/** All cross-listing rows (lesson placed in an additional module). */
+export async function getCrossListings(): Promise<CrossListing[]> {
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("lesson_cross_listings")
+      .select("lesson_id, module_id");
+    return (data ?? []) as CrossListing[];
+  } catch (e) {
+    console.error("getCrossListings failed", e);
+    return [];
+  }
 }
 
 export interface ProblemView {
@@ -268,7 +348,9 @@ export async function getLessonContext(
   moduleSlug: string,
   lessonSlug: string,
 ): Promise<LessonContext | null> {
-  const tree = await getNavTree();
+  // Use the merged course tree so a cross-listed lesson resolves under each
+  // course it appears in (and prev/next follows that course's ordering).
+  const tree = await getCourseTree();
   const track = tree.find((t) => t.slug === trackSlug);
   if (!track) return null;
 
