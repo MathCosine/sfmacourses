@@ -75,6 +75,14 @@ create unique index if not exists modules_track_slug_key
   on public.modules (track_id, slug);
 create unique index if not exists lessons_module_slug_key
   on public.lessons (module_id, slug);
+
+-- Drop stray GLOBAL unique constraints on slug (from older `slug ... unique`
+-- column definitions). Slugs are meant to be unique per parent, not globally,
+-- so two courses can each have a "General" unit. No-ops on a clean DB.
+alter table public.modules drop constraint if exists modules_slug_key;
+alter table public.lessons drop constraint if exists lessons_slug_key;
+drop index if exists public.modules_slug_key;
+drop index if exists public.lessons_slug_key;
 create unique index if not exists progress_user_lesson_key
   on public.progress (user_id, lesson_id);
 create unique index if not exists problem_completions_user_lesson_idx_key

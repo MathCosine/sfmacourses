@@ -63,25 +63,20 @@ async function nextOrder(
 }
 
 /**
- * Build a slug that is unique among its siblings (same track/module). Slugs are
- * only unique *within* a parent in the schema, but two chapters can legitimately
- * share a title (e.g. "Introduction") — so on a collision we append -2, -3, …
- * rather than letting the unique index throw. `excludeId` skips the row being
- * edited so re-saving an unchanged title keeps its slug.
+ * Build a slug that won't collide with an existing one. For modules and lessons
+ * we make the slug **globally** unique (not just within the parent): some older
+ * databases still carry a global `modules_slug_key` / `lessons_slug_key` unique
+ * index, so a globally-unique slug is safe under either schema. `excludeId`
+ * skips the row being edited so re-saving an unchanged title keeps its slug.
  */
 async function uniqueSlug(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  table: "modules" | "lessons",
-  column: "track_id" | "module_id",
-  parentId: string,
+  table: "tracks" | "modules" | "lessons",
   title: string,
   excludeId?: string,
 ): Promise<string> {
   const base = slugify(title) || `${table.slice(0, -1)}-${Date.now()}`;
-  const { data } = await supabase
-    .from(table)
-    .select("id, slug")
-    .eq(column, parentId);
+  const { data } = await supabase.from(table).select("id, slug");
   const taken = new Set(
     (data ?? []).filter((r) => r.id !== excludeId).map((r) => r.slug),
   );
@@ -101,29 +96,31 @@ async function uniqueSlug(
  * and surfaces any DB error instead of pretending it succeeded.
  */
 async function moveItem(
-  table: "modules" | "lessons",
+  table: "tracks" | "modules" | "lessons",
   id: string,
   dir: -1 | 1,
 ): Promise<Result> {
   const { supabase, error } = await requireStaff();
   if (error) return { ok: false, error };
 
-  const parentCol = table === "modules" ? "track_id" : "module_id";
+  const parentCol =
+    table === "modules" ? "track_id" : table === "lessons" ? "module_id" : null;
 
-  const { data: row, error: rowErr } = await supabase
-    .from(table)
-    .select(`id, ${parentCol}`)
-    .eq("id", id)
-    .maybeSingle();
-  if (rowErr) return { ok: false, error: rowErr.message };
-  if (!row) return { ok: false, error: "Item not found" };
+  let parentId: string | null = null;
+  if (parentCol) {
+    const { data: row, error: rowErr } = await supabase
+      .from(table)
+      .select(`id, ${parentCol}`)
+      .eq("id", id)
+      .maybeSingle();
+    if (rowErr) return { ok: false, error: rowErr.message };
+    if (!row) return { ok: false, error: "Item not found" };
+    parentId = (row as Record<string, string>)[parentCol];
+  }
 
-  const parentId = (row as Record<string, string>)[parentCol];
-
-  const { data: siblings, error: sibErr } = await supabase
-    .from(table)
-    .select("id, order_index")
-    .eq(parentCol, parentId)
+  let q = supabase.from(table).select("id, order_index");
+  if (parentCol && parentId) q = q.eq(parentCol, parentId);
+  const { data: siblings, error: sibErr } = await q
     .order("order_index", { ascending: true })
     .order("id", { ascending: true }); // stable tiebreak for duplicate indices
   if (sibErr) return { ok: false, error: sibErr.message };
@@ -161,6 +158,57 @@ export async function moveLesson(id: string, dir: -1 | 1): Promise<Result> {
   return moveItem("lessons", id, dir);
 }
 
+export async function moveTrack(id: string, dir: -1 | 1): Promise<Result> {
+  return moveItem("tracks", id, dir);
+}
+
+/* ---------------- Tracks (courses) ---------------- */
+
+export async function createTrack(title: string): Promise<Result> {
+  const { supabase, error } = await requireStaff();
+  if (error) return { ok: false, error };
+  const { data: last } = await supabase
+    .from("tracks")
+    .select("order_index")
+    .order("order_index", { ascending: false })
+    .limit(1);
+  const order_index = (last?.[0]?.order_index ?? -1) + 1;
+  const slug = await uniqueSlug(supabase, "tracks", title);
+  const { data, error: e } = await supabase
+    .from("tracks")
+    .insert({ title, slug, order_index })
+    .select("id")
+    .single();
+  if (e) return { ok: false, error: e.message };
+  refresh();
+  return { ok: true, id: data.id };
+}
+
+export async function updateTrack(
+  id: string,
+  fields: { title?: string; description?: string },
+): Promise<Result> {
+  const { supabase, error } = await requireStaff();
+  if (error) return { ok: false, error };
+  const patch: Record<string, unknown> = { ...fields };
+  if (fields.title) {
+    patch.slug = await uniqueSlug(supabase, "tracks", fields.title, id);
+  }
+  const { error: e } = await supabase.from("tracks").update(patch).eq("id", id);
+  if (e) return { ok: false, error: e.message };
+  refresh();
+  return { ok: true };
+}
+
+export async function deleteTrack(id: string): Promise<Result> {
+  const { supabase, error } = await requireStaff();
+  if (error) return { ok: false, error };
+  const { error: e } = await supabase.from("tracks").delete().eq("id", id);
+  if (e) return { ok: false, error: e.message };
+  refresh();
+  return { ok: true };
+}
+
 /* ---------------- Modules ---------------- */
 
 export async function createModule(
@@ -170,7 +218,7 @@ export async function createModule(
   const { supabase, error } = await requireStaff();
   if (error) return { ok: false, error };
   const order_index = await nextOrder(supabase, "modules", "track_id", trackId);
-  const slug = await uniqueSlug(supabase, "modules", "track_id", trackId, title);
+  const slug = await uniqueSlug(supabase, "modules", title);
   const { data, error: e } = await supabase
     .from("modules")
     .insert({
@@ -194,21 +242,7 @@ export async function updateModule(
   if (error) return { ok: false, error };
   const patch: Record<string, unknown> = { ...fields };
   if (fields.title) {
-    const { data: row } = await supabase
-      .from("modules")
-      .select("track_id")
-      .eq("id", id)
-      .maybeSingle();
-    if (row?.track_id) {
-      patch.slug = await uniqueSlug(
-        supabase,
-        "modules",
-        "track_id",
-        row.track_id,
-        fields.title,
-        id,
-      );
-    }
+    patch.slug = await uniqueSlug(supabase, "modules", fields.title, id);
   }
   const { error: e } = await supabase.from("modules").update(patch).eq("id", id);
   if (e) return { ok: false, error: e.message };
@@ -244,7 +278,7 @@ export async function createLesson(
     author: "SFMA Staff",
     frequency: "important",
   };
-  const slug = await uniqueSlug(supabase, "lessons", "module_id", moduleId, title);
+  const slug = await uniqueSlug(supabase, "lessons", title);
   const { data, error: e } = await supabase
     .from("lessons")
     .insert({
@@ -276,21 +310,7 @@ export async function updateLesson(
   const patch: Record<string, unknown> = {};
   if (fields.title) {
     patch.title = fields.title;
-    const { data: row } = await supabase
-      .from("lessons")
-      .select("module_id")
-      .eq("id", id)
-      .maybeSingle();
-    if (row?.module_id) {
-      patch.slug = await uniqueSlug(
-        supabase,
-        "lessons",
-        "module_id",
-        row.module_id,
-        fields.title,
-        id,
-      );
-    }
+    patch.slug = await uniqueSlug(supabase, "lessons", fields.title, id);
   }
   if (fields.content) {
     const meta: MetaBlock = {

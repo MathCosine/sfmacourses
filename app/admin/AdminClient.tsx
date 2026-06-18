@@ -8,7 +8,12 @@ import type { Announcement, Lesson, Profile } from "@/lib/types";
 import { cn, formatDate, countProblems } from "@/lib/utils";
 import { BlockEditor } from "./BlockEditor";
 import {
+  createTrack,
+  updateTrack,
+  deleteTrack,
+  moveTrack,
   createModule,
+  updateModule,
   createLesson,
   deleteModule,
   deleteLesson,
@@ -129,11 +134,54 @@ function ContentTab({
 
   return (
     <div className="space-y-8">
-      {tree.map((track) => (
+      {tree.map((track, ti) => (
         <section key={track.id}>
-          <h2 className="mb-3 font-serif text-2xl text-tprimary">
-            {track.title}
-          </h2>
+          <div className="mb-3 flex items-center gap-2">
+            <h2 className="font-serif text-2xl text-tprimary">{track.title}</h2>
+            <span className="rounded-md bg-surface-2 px-2 py-0.5 text-[11px] font-medium text-tfaint">
+              /{track.slug}
+            </span>
+            <div className="ml-auto flex items-center gap-0.5">
+              <MiniBtn
+                onClick={() => run(() => moveTrack(track.id, -1))}
+                disabled={ti === 0}
+                title="Move course up"
+              >
+                <ArrowUp className="h-3.5 w-3.5" />
+              </MiniBtn>
+              <MiniBtn
+                onClick={() => run(() => moveTrack(track.id, 1))}
+                disabled={ti === tree.length - 1}
+                title="Move course down"
+              >
+                <ArrowDown className="h-3.5 w-3.5" />
+              </MiniBtn>
+              <MiniBtn
+                title="Rename course"
+                onClick={() => {
+                  const title = prompt("Course title", track.title)?.trim();
+                  if (title && title !== track.title)
+                    run(() => updateTrack(track.id, { title }));
+                }}
+              >
+                <span className="text-[11px] font-medium">Rename</span>
+              </MiniBtn>
+              <MiniBtn
+                danger
+                title="Delete course"
+                onClick={() => {
+                  if (
+                    confirm(
+                      `Delete course “${track.title}” and ALL its units and chapters? This cannot be undone.`,
+                    )
+                  )
+                    run(() => deleteTrack(track.id));
+                }}
+              >
+                <TrashIcon className="h-3.5 w-3.5" />
+              </MiniBtn>
+            </div>
+          </div>
 
           <div className="space-y-2.5">
             {track.modules.map((m, mi) => (
@@ -162,6 +210,16 @@ function ContentTab({
                       title="Move unit down"
                     >
                       <ArrowDown className="h-3.5 w-3.5" />
+                    </MiniBtn>
+                    <MiniBtn
+                      title="Rename unit"
+                      onClick={() => {
+                        const title = prompt("Unit title", m.title)?.trim();
+                        if (title && title !== m.title)
+                          run(() => updateModule(m.id, { title }));
+                      }}
+                    >
+                      <span className="text-[11px] font-medium">Rename</span>
                     </MiniBtn>
                     <MiniBtn
                       danger
@@ -254,6 +312,22 @@ function ContentTab({
           </div>
         </section>
       ))}
+
+      {/* Add course */}
+      <div className="rounded-2xl border-2 border-dashed border-border-strong bg-surface/50 px-4 py-4">
+        <div className="mb-1.5 text-[12.5px] font-semibold text-tprimary">
+          New course
+        </div>
+        <p className="mb-2.5 text-[12px] text-tmuted">
+          Add a top-level course (like “AMC 8” or “Geometry”). It appears in the
+          Learn menu once it has chapters.
+        </p>
+        <InlineAdd
+          placeholder="New course title…"
+          button="Add Course"
+          onAdd={(title) => run(() => createTrack(title))}
+        />
+      </div>
     </div>
   );
 }
