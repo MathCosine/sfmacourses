@@ -278,26 +278,30 @@ export default async function HomePage() {
                   <Link
                     href={user ? `/learn/${track.slug}` : "/auth"}
                     className="card-pop group flex h-full flex-col overflow-hidden"
+                    style={
+                      {
+                        "--accent": theme.accent,
+                        "--pop": `color-mix(in srgb, ${theme.banner} 22%, transparent)`,
+                      } as React.CSSProperties
+                    }
                   >
-                    <div className="relative overflow-hidden px-6 py-6 text-white" style={{ background: theme.gradient }}>
-                      <div className="graph-paper absolute inset-0 opacity-20" />
-                      <div className="relative">
-                        <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/80">{theme.tag}</div>
-                        <div className="mt-1 text-[1.6rem] font-extrabold tracking-tight">{track.title}</div>
+                    <div className="h-1.5 w-full" style={{ background: theme.gradient }} />
+                    <div className="flex flex-1 flex-col p-6" style={{ backgroundColor: theme.tint }}>
+                      <div className="text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: theme.banner }}>
+                        {theme.tag}
                       </div>
-                    </div>
-                    <div className="flex flex-1 flex-col p-6">
-                      <p className="flex-1 text-[14.5px] leading-relaxed text-tmuted">{info.blurb}</p>
+                      <div className="mt-1 text-[1.5rem] font-extrabold tracking-tight text-tprimary">{track.title}</div>
+                      <p className="mt-3 flex-1 text-[14.5px] leading-relaxed text-tmuted">{info.blurb}</p>
                       <div className="mt-4 flex flex-wrap gap-1.5">
                         {info.topics.map((t) => (
-                          <span key={t} className="rounded-md bg-bg px-2 py-0.5 text-[11.5px] font-medium text-tmuted">
+                          <span key={t} className="rounded-md bg-surface/70 px-2 py-0.5 text-[11.5px] font-medium text-tmuted">
                             {t}
                           </span>
                         ))}
                       </div>
                       <div className="mt-5 flex items-center justify-between border-t border-border pt-4 text-[12.5px]">
                         <span className="text-tfaint">{track.modules.length} units · {chapters} chapters</span>
-                        <span className="inline-flex items-center gap-1 font-semibold text-gold">
+                        <span className="inline-flex items-center gap-1 font-semibold" style={{ color: theme.banner }}>
                           Open
                           <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                         </span>
