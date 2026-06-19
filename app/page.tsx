@@ -5,6 +5,7 @@ import { trackTheme } from "@/lib/trackTheme";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { BrandMark } from "@/components/Brand";
+import { InteractiveGrid } from "@/components/InteractiveGrid";
 import { Faq } from "@/components/Faq";
 import { Reveal } from "@/components/Reveal";
 import { ArrowRight, ArrowUpRight, Check, Compass } from "@/components/icons";
@@ -31,7 +32,7 @@ const STEPS = [
   {
     n: "01",
     title: "Pick a course and follow the path",
-    body: "Each course is a sequence of units and chapters that build on each other, so you always know the next thing to learn — not a pile of disconnected handouts.",
+    body: "Each course is a sequence of units and chapters that build on each other, so you always know the next thing to learn — not a pile of disconnected handouts. More advanced courses generally assume you already know the material from the earlier ones, so start where you're comfortable and work up.",
     legend: false,
   },
   {
@@ -108,89 +109,73 @@ export default async function HomePage() {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
 
-      {/* ---------- Hero ---------- */}
+      {/* ---------- Hero (centered, interactive constellation backdrop) ---------- */}
       <section className="relative overflow-hidden border-b border-border bg-bg">
-        {/* Animated backdrop: graph paper, drifting dot grid, and floating blobs. */}
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="graph-paper-lg absolute inset-0 opacity-60" />
-          <div
-            className="dot-grid animate-drift-dots absolute inset-0 opacity-50"
-            style={{
-              maskImage: "linear-gradient(to bottom, black, transparent 80%)",
-              WebkitMaskImage: "linear-gradient(to bottom, black, transparent 80%)",
-            }}
-          />
-          <div className="animate-float-blob absolute -right-32 -top-24 h-96 w-96 rounded-full bg-gold/10 blur-3xl" />
-          <div
-            className="animate-float-blob absolute -left-24 top-44 h-72 w-72 rounded-full bg-green/10 blur-3xl"
-            style={{ animationDelay: "-5s" }}
-          />
-        </div>
+        <InteractiveGrid />
+        {/* Soft vignette so text stays legible over the grid. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(60% 60% at 50% 42%, color-mix(in srgb, var(--bg) 35%, transparent), var(--bg) 88%)",
+          }}
+        />
 
-        <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-6 py-16 sm:px-8 lg:grid-cols-[1.04fr_0.96fr] lg:py-24">
-          <div className="fade-up">
-            {/* Logo lockup */}
-            <div className="mb-7 flex items-center gap-3.5">
-              <div className="relative">
-                <div className="animate-logo-glow absolute -inset-2.5 rounded-[1.1rem] bg-gold/30 blur-xl" />
-                <BrandMark className="brand-sheen animate-logo-float relative h-16 w-16 rounded-2xl shadow-lift ring-1 ring-border" />
-              </div>
-              <div className="leading-tight">
-                <div className="text-[20px] font-extrabold tracking-tight text-tprimary">
-                  SFMA <span className="font-medium text-tmuted">courses</span>
-                </div>
-                <div className="text-[12.5px] text-tfaint">
-                  San Francisco Math Academy
-                </div>
-              </div>
-            </div>
-
-            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-[12.5px] font-medium text-tmuted shadow-xs">
+        <div className="relative mx-auto flex max-w-3xl flex-col items-center px-6 py-24 text-center sm:px-8 lg:py-32">
+          <div className="fade-up flex flex-col items-center">
+            <BrandMark className="animate-logo-float h-16 w-16" />
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3.5 py-1.5 text-[12.5px] font-medium text-tmuted shadow-xs backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-green" />
-              Free &amp; open · hosted by the San Francisco Math Initiative
+              Free &amp; open · by the San Francisco Math Initiative
             </div>
-            <h1 className="mt-6 text-[2.7rem] font-extrabold leading-[1.06] tracking-tight text-tprimary sm:text-[3.7rem]">
+            <h1 className="mt-6 text-[2.9rem] font-extrabold leading-[1.04] tracking-tight text-tprimary sm:text-[4.2rem]">
               The math you need,
               <br />
               in an order that{" "}
               <span className="marker whitespace-nowrap">makes sense.</span>
             </h1>
-            <p className="mt-6 max-w-lg text-[17.5px] leading-relaxed text-tmuted">
+            <p className="mt-6 max-w-xl text-[17.5px] leading-relaxed text-tmuted">
               A free, carefully sequenced guide of lessons and contest problems —
               from the AMC 8 to AP Calculus BC — with your progress tracked on
               every single chapter.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href={cta}
-                className="inline-flex items-center gap-2 rounded-xl bg-gold px-7 py-3.5 text-[15px] font-bold text-white shadow-accent transition-all duration-200 hover:-translate-y-0.5 hover:bg-gold-hover"
-              >
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3.5">
+              <Link href={cta} className="btn-3d px-7 py-3.5 text-[15px]">
                 {user ? "Go to your dashboard" : "Start learning — free"}
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href={user ? "/problems" : "/auth"}
-                className="inline-flex items-center gap-2 rounded-xl px-5 py-3.5 text-[15px] font-bold text-tprimary transition-colors hover:text-gold"
+                className="btn-3d-neutral px-6 py-3.5 text-[15px]"
               >
                 Browse the problem set
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <p className="mt-7 text-[13.5px] text-tfaint">
+            <p className="mt-8 text-[13.5px] text-tfaint">
               {tree.length} courses · {totalChapters} chapters · always $0
             </p>
           </div>
+        </div>
+      </section>
 
-          {/* Notebook-style excerpt with real rendered math + floating logo medallion */}
-          <div className="fade-up-1 relative">
-            <div className="absolute -left-4 -top-7 z-10 hidden sm:block">
-              <div className="animate-logo-float relative" style={{ animationDelay: "-2.5s" }}>
-                <div className="animate-logo-glow absolute -inset-2 rounded-2xl bg-gold/30 blur-lg" />
-                <BrandMark className="brand-sheen relative h-14 w-14 rounded-2xl shadow-lift ring-1 ring-border" />
+      {/* ---------- Peek inside a chapter (centered showcase) ---------- */}
+      <section className="border-b border-border bg-surface">
+        <div className="mx-auto max-w-2xl px-6 py-16 sm:px-8">
+          <Reveal>
+            <div className="mb-6 text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-tfaint">
+                Peek inside
               </div>
+              <h2 className="mt-1.5 text-[1.5rem] font-extrabold tracking-tight text-tprimary">
+                Real lessons, real contest math.
+              </h2>
             </div>
+          </Reveal>
+          <Reveal delay={80}>
             <HeroExcerpt qHtml={qHtml} aHtml={aHtml} formulaHtml={formulaHtml} />
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -292,7 +277,7 @@ export default async function HomePage() {
                 <Reveal key={track.id} delay={i * 80}>
                   <Link
                     href={user ? `/learn/${track.slug}` : "/auth"}
-                    className="hover-lift group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm"
+                    className="card-pop group flex h-full flex-col overflow-hidden"
                   >
                     <div className="relative overflow-hidden px-6 py-6 text-white" style={{ background: theme.gradient }}>
                       <div className="graph-paper absolute inset-0 opacity-20" />
@@ -360,7 +345,7 @@ export default async function HomePage() {
                 { k: "$0", v: "now and always" },
                 { k: "100%", v: "of solutions included" },
               ].map((s) => (
-                <div key={s.v} className="rounded-2xl border border-border bg-surface p-6">
+                <div key={s.v} className="card-pop p-6">
                   <div className="text-[2rem] font-extrabold tracking-tight text-tprimary">{s.k}</div>
                   <div className="mt-1 text-[13px] text-tmuted">{s.v}</div>
                 </div>
@@ -390,7 +375,7 @@ export default async function HomePage() {
                   href="https://sfmathacademy.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gold px-6 py-3 text-[14.5px] font-semibold text-white shadow-accent transition-all duration-200 hover:-translate-y-0.5 hover:bg-gold-hover"
+                  className="btn-3d mt-6 px-6 py-3 text-[14.5px]"
                 >
                   See the classes <ArrowUpRight className="h-4 w-4" />
                 </a>
@@ -431,10 +416,7 @@ export default async function HomePage() {
               Make a free account, open the first chapter, and let SFMA keep
               track of the rest.
             </p>
-            <Link
-              href={cta}
-              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gold px-8 py-3.5 text-[15px] font-bold text-white shadow-accent transition-all duration-200 hover:-translate-y-0.5 hover:bg-gold-hover"
-            >
+            <Link href={cta} className="btn-3d mt-8 px-8 py-3.5 text-[15px]">
               {user ? "Go to your dashboard" : "Get started for free"}
               <ArrowRight className="h-4 w-4" />
             </Link>

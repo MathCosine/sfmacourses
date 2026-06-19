@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#3b82f6"/>
-      <stop offset="0.55" stop-color="#2563eb"/>
-      <stop offset="1" stop-color="#1e3a8a"/>
-    </linearGradient>
-    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
-      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+    <linearGradient id="g" x1="6" y1="58" x2="58" y2="6" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#38bdf8"/>
     </linearGradient>
   </defs>
-  <rect x="0" y="0" width="64" height="64" rx="15" fill="url(#tile)"/>
-  <rect x="0" y="0" width="64" height="34" rx="15" fill="url(#sheen)"/>
-  <path d="M44 17 H22 L33 32 L22 47 H44" fill="none" stroke="#ffffff"
-        stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 50 L26 37 L40 43 L53 14" fill="none" stroke="url(#g)"
+        stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="url(#g)">
+    <circle cx="12" cy="50" r="5"/>
+    <circle cx="26" cy="37" r="5"/>
+    <circle cx="40" cy="43" r="5"/>
+    <circle cx="53" cy="14" r="6.5"/>
+  </g>
+  <circle cx="53" cy="14" r="2.4" fill="#fff"/>
 </svg>

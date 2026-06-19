@@ -106,7 +106,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
                 <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", learnOpen && "rotate-180")} />
               </button>
               {learnOpen && (
-                <div className="menu-pop panel absolute left-0 top-full mt-1.5 w-[320px] overflow-hidden rounded-2xl p-2">
+                <div className="menu-pop panel-pop absolute left-0 top-full mt-2 w-[320px] overflow-hidden p-2">
                   <div className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-tfaint">
                     Courses
                   </div>
@@ -185,7 +185,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
                 {initials(user.name, user.email)}
               </button>
               {profileOpen && (
-                <div className="menu-pop panel absolute right-0 top-full mt-1.5 w-60 overflow-hidden rounded-2xl py-1.5">
+                <div className="menu-pop panel-pop absolute right-0 top-full mt-2 w-60 overflow-hidden py-1.5">
                   <div className="border-b border-border px-4 py-2.5">
                     <div className="truncate text-[13.5px] font-semibold text-tprimary">{user.name}</div>
                     <div className="truncate text-[12px] text-tmuted">{user.email}</div>
