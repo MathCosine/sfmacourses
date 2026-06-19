@@ -12,6 +12,7 @@ import { BrandMark } from "@/components/Brand";
 import {
   Search,
   ChevronDown,
+  ChevronRight,
   Menu,
   Close,
   BookOpen,
@@ -81,9 +82,12 @@ export function TopNav({ tracks, user }: TopNavProps) {
           {/* Logo — always returns to the landing page. */}
           <Link href="/" className="group flex items-center gap-2.5 pr-2">
             <BrandMark className="h-9 w-9 shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-105" />
-            <span className="hidden text-[15.5px] font-extrabold tracking-tight text-tprimary sm:block">
-              SFMA
-              <span className="ml-1.5 font-medium text-tmuted">Math Academy</span>
+            <span className="hidden items-center gap-2 sm:flex">
+              <span className="text-[16px] font-extrabold tracking-tight text-tprimary">SFMA</span>
+              <span className="h-3.5 w-px bg-border-strong" />
+              <span className="text-[11.5px] font-semibold uppercase tracking-[0.13em] text-tmuted">
+                Math Academy
+              </span>
             </span>
           </Link>
 
@@ -96,18 +100,21 @@ export function TopNav({ tracks, user }: TopNavProps) {
               <button
                 onClick={() => setLearnOpen((o) => !o)}
                 className={cn(
-                  "flex items-center gap-1 rounded-lg px-3 py-2 text-[14px] font-medium transition-colors",
-                  learnOpen || pathname.startsWith("/learn")
-                    ? "text-tprimary"
-                    : "text-tmuted hover:text-tprimary",
+                  "relative flex items-center gap-1 rounded-lg px-3 py-2 text-[14px] transition-colors",
+                  pathname.startsWith("/learn")
+                    ? "font-semibold text-tprimary"
+                    : "font-medium text-tmuted hover:text-tprimary",
                 )}
               >
                 Learn
                 <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", learnOpen && "rotate-180")} />
+                {pathname.startsWith("/learn") && (
+                  <span className="absolute inset-x-3 -bottom-1 h-0.5 rounded-full bg-gold" />
+                )}
               </button>
               {learnOpen && (
-                <div className="menu-pop panel-pop absolute left-0 top-full mt-2 w-[320px] overflow-hidden p-2">
-                  <div className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-tfaint">
+                <div className="menu-pop panel-pop absolute left-0 top-full mt-2.5 w-[330px] overflow-hidden p-2">
+                  <div className="px-3 pb-1 pt-1.5 text-[11px] font-bold uppercase tracking-[0.13em] text-tfaint">
                     Courses
                   </div>
                   {tracks.map((t) => {
@@ -117,18 +124,21 @@ export function TopNav({ tracks, user }: TopNavProps) {
                       <Link
                         key={t.id}
                         href={user ? `/learn/${t.slug}` : "/auth"}
-                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-bg"
+                        className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-bg"
                       >
                         <span
-                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white"
-                          style={{ background: theme.banner }}
+                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset ring-border"
+                          style={{ backgroundColor: theme.tint, color: theme.banner }}
                         >
                           <BookOpen className="h-[18px] w-[18px]" />
                         </span>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="truncate text-[14px] font-semibold text-tprimary">{t.title}</div>
-                          <div className="text-[12px] text-tmuted">{theme.tag} · {chapters} chapters</div>
+                          <div className="text-[12px] text-tmuted">
+                            <span style={{ color: theme.banner }}>{theme.tag}</span> · {chapters} chapters
+                          </div>
                         </div>
+                        <ChevronRight className="h-4 w-4 shrink-0 -translate-x-1 text-tfaint opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
                       </Link>
                     );
                   })}
@@ -179,7 +189,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
             <div ref={profileRef} className="relative hidden lg:block">
               <button
                 onClick={() => setProfileOpen((o) => !o)}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/15 text-[12.5px] font-bold text-gold transition-transform hover:scale-105"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/15 text-[12.5px] font-bold text-gold ring-1 ring-inset ring-gold/25 transition-all hover:bg-gold/20 hover:scale-105"
                 aria-label="Account menu"
               >
                 {initials(user.name, user.email)}
@@ -286,11 +296,12 @@ function NavLink({ href, active, children }: { href: string; active: boolean; ch
     <Link
       href={href}
       className={cn(
-        "rounded-lg px-3 py-2 text-[14px] font-medium transition-colors",
-        active ? "text-tprimary" : "text-tmuted hover:text-tprimary",
+        "relative rounded-lg px-3 py-2 text-[14px] transition-colors",
+        active ? "font-semibold text-tprimary" : "font-medium text-tmuted hover:text-tprimary",
       )}
     >
       {children}
+      {active && <span className="absolute inset-x-3 -bottom-1 h-0.5 rounded-full bg-gold" />}
     </Link>
   );
 }
