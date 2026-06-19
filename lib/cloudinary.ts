@@ -66,3 +66,18 @@ export function optimizedImageUrl(url: string, width = 1600): string {
   if (/^(f_|q_|w_|c_)/.test(tail)) return url;
   return `${head}f_auto,q_auto,w_${width},c_limit/${tail}`;
 }
+
+/**
+ * Build a square, face-aware avatar URL from a Cloudinary upload.
+ * Non-Cloudinary URLs are returned unchanged.
+ */
+export function avatarUrl(url: string, size = 128): string {
+  if (!url) return url;
+  const marker = "/upload/";
+  const i = url.indexOf(marker);
+  if (!url.includes("res.cloudinary.com") || i === -1) return url;
+  const head = url.slice(0, i + marker.length);
+  const tail = url.slice(i + marker.length);
+  if (/^(f_|q_|w_|c_|g_)/.test(tail)) return url;
+  return `${head}c_fill,g_auto,w_${size},h_${size},f_auto,q_auto/${tail}`;
+}

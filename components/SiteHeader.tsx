@@ -13,6 +13,7 @@ export async function SiteHeader() {
         name: user.profile?.full_name || user.email,
         email: user.email,
         isStaff: user.isStaff,
+        avatarUrl: user.profile?.avatar_url ?? null,
       }
     : null;
   return <TopNav tracks={toNavTracks(tree)} user={navUser} />;

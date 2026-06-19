@@ -7,6 +7,7 @@ import type { NavTrack } from "@/lib/nav";
 import { trackTheme } from "@/lib/trackTheme";
 import { createClient } from "@/lib/supabase/client";
 import { cn, initials } from "@/lib/utils";
+import { avatarUrl } from "@/lib/cloudinary";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BrandMark } from "@/components/Brand";
 import {
@@ -26,6 +27,7 @@ export interface NavUser {
   name: string;
   email: string;
   isStaff: boolean;
+  avatarUrl?: string | null;
 }
 
 interface TopNavProps {
@@ -189,10 +191,19 @@ export function TopNav({ tracks, user }: TopNavProps) {
             <div ref={profileRef} className="relative hidden lg:block">
               <button
                 onClick={() => setProfileOpen((o) => !o)}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/15 text-[12.5px] font-bold text-gold ring-1 ring-inset ring-gold/25 transition-all hover:bg-gold/20 hover:scale-105"
+                className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gold/15 text-[12.5px] font-bold text-gold ring-1 ring-inset ring-gold/25 transition-all hover:bg-gold/20 hover:scale-105"
                 aria-label="Account menu"
               >
-                {initials(user.name, user.email)}
+                {user.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={avatarUrl(user.avatarUrl, 72)}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  initials(user.name, user.email)
+                )}
               </button>
               {profileOpen && (
                 <div className="menu-pop panel-pop absolute right-0 top-full mt-2 w-60 overflow-hidden py-1.5">

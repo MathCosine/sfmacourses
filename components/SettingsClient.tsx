@@ -1,25 +1,70 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { updateProfileName } from "@/app/settings/actions";
+import { useRouter } from "next/navigation";
+import { updateProfileName, updateProfileAvatar } from "@/app/settings/actions";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
+import { cn, initials } from "@/lib/utils";
+import {
+  uploadToCloudinary,
+  avatarUrl,
+  cloudinaryConfigured,
+} from "@/lib/cloudinary";
 import { Sun, Moon, Settings as SettingsIcon, LogOut, Check } from "@/components/icons";
 
 type ThemePref = "light" | "dark" | "system";
 
 export function SettingsClient({
   initialName,
+  initialAvatar,
   email,
   role,
 }: {
   initialName: string;
+  initialAvatar: string | null;
   email: string;
   role: string;
 }) {
+  const router = useRouter();
   const [name, setName] = useState(initialName);
+  const [avatar, setAvatar] = useState<string | null>(initialAvatar);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const [avatarErr, setAvatarErr] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
+  const configured = cloudinaryConfigured();
+
+  async function handleAvatar(files: FileList | null) {
+    const file = files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setAvatarErr("Please choose an image file.");
+      return;
+    }
+    setAvatarErr(null);
+    setAvatarBusy(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      const res = await updateProfileAvatar(url);
+      if (!res.ok) throw new Error(res.error);
+      setAvatar(url);
+      router.refresh();
+    } catch (e) {
+      setAvatarErr(e instanceof Error ? e.message : "Upload failed.");
+    } finally {
+      setAvatarBusy(false);
+    }
+  }
+
+  async function removeAvatar() {
+    setAvatarBusy(true);
+    const res = await updateProfileAvatar(null);
+    if (res.ok) {
+      setAvatar(null);
+      router.refresh();
+    }
+    setAvatarBusy(false);
+  }
   const [theme, setTheme] = useState<ThemePref>("system");
   const [mounted, setMounted] = useState(false);
 
@@ -71,7 +116,50 @@ export function SettingsClient({
       {/* Profile */}
       <section className="card rounded-2xl p-6">
         <h2 className="text-[16px] font-bold text-tprimary">Profile</h2>
-        <p className="mt-0.5 text-[13px] text-tmuted">How your name appears across SFMA.</p>
+        <p className="mt-0.5 text-[13px] text-tmuted">How your name and photo appear across SFMA.</p>
+
+        {/* Avatar */}
+        <div className="mt-5 flex items-center gap-4">
+          {avatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={avatarUrl(avatar, 128)}
+              alt=""
+              className="h-16 w-16 shrink-0 rounded-full object-cover ring-1 ring-inset ring-border"
+            />
+          ) : (
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gold/15 text-[18px] font-bold text-gold ring-1 ring-inset ring-gold/25">
+              {initials(name, email)}
+            </div>
+          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="cursor-pointer rounded-lg border border-border px-3 py-1.5 text-[12.5px] font-medium text-tmuted transition-colors hover:text-tprimary">
+              {avatarBusy ? "Uploading…" : avatar ? "Change photo" : "Upload photo"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                disabled={avatarBusy}
+                onChange={(e) => handleAvatar(e.target.files)}
+              />
+            </label>
+            {avatar && (
+              <button
+                onClick={removeAvatar}
+                disabled={avatarBusy}
+                className="rounded-lg border border-border px-3 py-1.5 text-[12.5px] font-medium text-tmuted transition-colors hover:text-danger disabled:opacity-60"
+              >
+                Remove
+              </button>
+            )}
+            {avatarErr && <span className="text-[12px] text-danger">{avatarErr}</span>}
+            {!configured && !avatar && (
+              <span className="text-[11.5px] text-tmuted">
+                Set the Cloudinary env vars to enable uploads.
+              </span>
+            )}
+          </div>
+        </div>
 
         <div className="mt-5 max-w-md space-y-4">
           <label className="block">

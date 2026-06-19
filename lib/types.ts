@@ -138,6 +138,7 @@ export interface Profile {
   full_name: string | null;
   role: Role;
   created_at: string;
+  avatar_url?: string | null;
 }
 
 export interface Track {

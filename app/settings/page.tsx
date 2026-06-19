@@ -18,6 +18,7 @@ export default async function SettingsPage() {
         <div className="mt-8">
           <SettingsClient
             initialName={user.profile?.full_name ?? ""}
+            initialAvatar={user.profile?.avatar_url ?? null}
             email={user.email}
             role={user.isStaff ? "staff" : "student"}
           />
