@@ -36,7 +36,7 @@ import {
   Layers,
 } from "@/components/icons";
 
-const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
+export const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
   text: "Text",
   resource: "Resource",
   problem: "Problem",
@@ -45,7 +45,7 @@ const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
   callout: "Environment",
 };
 
-const BLOCK_HINT: Record<ContentBlock["type"], string> = {
+export const BLOCK_HINT: Record<ContentBlock["type"], string> = {
   text: "Prose with markdown + LaTeX.",
   resource: "A linked reference card.",
   problem: "A practice problem with a status circle.",
@@ -54,7 +54,7 @@ const BLOCK_HINT: Record<ContentBlock["type"], string> = {
   callout: "A styled box: theorem, big idea, recipe, example, note or warning.",
 };
 
-const ADD_ORDER: ContentBlock["type"][] = [
+export const ADD_ORDER: ContentBlock["type"][] = [
   "text",
   "section",
   "callout",
@@ -99,6 +99,7 @@ export function BlockEditor({
   initialCrossModuleIds,
   onClose,
   onDirtyChange,
+  onRegisterAdd,
 }: {
   lesson: Lesson;
   catalog: LessonLink[];
@@ -106,6 +107,7 @@ export function BlockEditor({
   initialCrossModuleIds: string[];
   onClose: () => void;
   onDirtyChange?: (dirty: boolean) => void;
+  onRegisterAdd?: (fn: ((type: ContentBlock["type"]) => void) | null) => void;
 }) {
   const router = useRouter();
   const meta = extractMeta(lesson.content);
@@ -149,6 +151,14 @@ export function BlockEditor({
   useEffect(() => {
     onDirtyChange?.(dirty);
   }, [dirty, onDirtyChange]);
+
+  // Expose a "append a block and edit it" handler so the admin sidebar can
+  // act as the block palette while a chapter is open.
+  useEffect(() => {
+    onRegisterAdd?.((type) => add(type, blocks.length));
+    return () => onRegisterAdd?.(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blocks.length, onRegisterAdd]);
 
   function update(updater: (prev: ContentBlock[]) => ContentBlock[]) {
     setBlocks(updater);
@@ -265,24 +275,6 @@ export function BlockEditor({
             {pending ? "Saving…" : "Save"}
           </button>
         </div>
-      </div>
-
-      {/* Quick-add palette — one click appends a block, ready to edit. */}
-      <div className="mb-2 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5">
-        <span className="text-[11px] font-bold uppercase tracking-wide text-tfaint">
-          Add block
-        </span>
-        {ADD_ORDER.map((t) => (
-          <button
-            key={t}
-            onClick={() => add(t, blocks.length)}
-            title={BLOCK_HINT[t]}
-            className="flex items-center gap-1.5 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-[12px] font-medium text-tprimary transition-colors hover:border-gold/50 hover:text-gold"
-          >
-            <PlusIcon className="h-3 w-3 text-gold" />
-            {BLOCK_LABEL[t]}
-          </button>
-        ))}
       </div>
 
       {/* Chapter meta */}

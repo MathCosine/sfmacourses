@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type {
@@ -9,9 +9,9 @@ import type {
   ModuleLink,
   TrackWithModules,
 } from "@/lib/data";
-import type { Announcement, Lesson, Profile } from "@/lib/types";
+import type { Announcement, ContentBlock, Lesson, Profile } from "@/lib/types";
 import { cn, formatDate, countProblems } from "@/lib/utils";
-import { BlockEditor } from "./BlockEditor";
+import { BlockEditor, ADD_ORDER, BLOCK_LABEL, BLOCK_HINT } from "./BlockEditor";
 import {
   createTrack,
   updateTrack,
@@ -146,6 +146,7 @@ function ContentTab({
   });
   const [editorDirty, setEditorDirty] = useState(false);
   const [query, setQuery] = useState("");
+  const addBlockRef = useRef<((t: ContentBlock["type"]) => void) | null>(null);
 
   function run(fn: () => Promise<{ ok: boolean; error?: string }>) {
     startTransition(async () => {
@@ -186,7 +187,38 @@ function ContentTab({
     <div className="grid gap-6 lg:grid-cols-[270px_minmax(0,1fr)]">
       {/* Navigator — jump to any chapter instantly */}
       <aside className="lg:sticky lg:top-4 lg:self-start">
-        <div className="panel overflow-hidden rounded-xl">
+        {editing ? (
+          <div className="panel overflow-hidden rounded-xl">
+            <div className="border-b border-border px-3 py-2.5">
+              <div className="text-[11px] font-bold uppercase tracking-wide text-tfaint">
+                Add to chapter
+              </div>
+              <div className="mt-0.5 truncate text-[12.5px] font-medium text-tprimary">
+                {editing.title || "Untitled"}
+              </div>
+            </div>
+            <div className="p-2">
+              {ADD_ORDER.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => addBlockRef.current?.(t)}
+                  className="group mb-1 flex w-full items-start gap-2 rounded-lg border border-transparent px-2.5 py-2 text-left transition-colors hover:border-gold/40 hover:bg-bg"
+                >
+                  <PlusIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold" />
+                  <span className="min-w-0">
+                    <span className="block text-[13px] font-medium text-tprimary group-hover:text-gold">
+                      {BLOCK_LABEL[t]}
+                    </span>
+                    <span className="block text-[11px] leading-snug text-tfaint">
+                      {BLOCK_HINT[t]}
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="panel overflow-hidden rounded-xl">
           <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
             <Search className="h-4 w-4 shrink-0 text-tfaint" />
             <input
@@ -217,12 +249,7 @@ function ContentTab({
                     <li key={lesson.id}>
                       <button
                         onClick={() => pick(lesson)}
-                        className={cn(
-                          "w-full rounded-lg px-2.5 py-1.5 text-left transition-colors",
-                          editing?.id === lesson.id
-                            ? "bg-gold/12 text-gold"
-                            : "hover:bg-bg",
-                        )}
+                        className="w-full rounded-lg px-2.5 py-1.5 text-left transition-colors hover:bg-bg"
                       >
                         <div className="truncate text-[13px] font-medium text-tprimary">
                           {lesson.title || "Untitled"}
@@ -252,12 +279,7 @@ function ContentTab({
                             <li key={l.id}>
                               <button
                                 onClick={() => pick(l)}
-                                className={cn(
-                                  "flex w-full items-center gap-1.5 rounded-lg px-2.5 py-1 text-left transition-colors",
-                                  editing?.id === l.id
-                                    ? "bg-gold/12 text-gold"
-                                    : "text-tprimary hover:bg-bg",
-                                )}
+                                className="flex w-full items-center gap-1.5 rounded-lg px-2.5 py-1 text-left text-tprimary transition-colors hover:bg-bg"
                               >
                                 <ChevronRight className="h-3 w-3 shrink-0 text-tfaint" />
                                 <span className="truncate text-[12.5px]">
@@ -280,6 +302,7 @@ function ContentTab({
             )}
           </div>
         </div>
+        )}
         {editing && (
           <button
             onClick={() => {
@@ -288,7 +311,7 @@ function ContentTab({
             }}
             className="mt-2 w-full rounded-lg border border-border px-3 py-2 text-[12.5px] font-medium text-tmuted transition-colors hover:text-tprimary"
           >
-            ← Back to manage view
+            ← Back to chapter list
           </button>
         )}
       </aside>
@@ -309,6 +332,9 @@ function ContentTab({
               setEditorDirty(false);
             }}
             onDirtyChange={setEditorDirty}
+            onRegisterAdd={(fn) => {
+              addBlockRef.current = fn;
+            }}
           />
         ) : (
           <ManageList tree={tree} run={run} onEdit={pick} />
