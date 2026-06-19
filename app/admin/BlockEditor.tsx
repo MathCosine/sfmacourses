@@ -98,12 +98,14 @@ export function BlockEditor({
   moduleCatalog,
   initialCrossModuleIds,
   onClose,
+  onDirtyChange,
 }: {
   lesson: Lesson;
   catalog: LessonLink[];
   moduleCatalog: ModuleLink[];
   initialCrossModuleIds: string[];
   onClose: () => void;
+  onDirtyChange?: (dirty: boolean) => void;
 }) {
   const router = useRouter();
   const meta = extractMeta(lesson.content);
@@ -142,6 +144,11 @@ export function BlockEditor({
       clearTimeout(t);
     };
   }, [blocks]);
+
+  // Let a parent (the admin navigator) know when there are unsaved edits.
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
 
   function update(updater: (prev: ContentBlock[]) => ContentBlock[]) {
     setBlocks(updater);
@@ -258,6 +265,24 @@ export function BlockEditor({
             {pending ? "Saving…" : "Save"}
           </button>
         </div>
+      </div>
+
+      {/* Quick-add palette — one click appends a block, ready to edit. */}
+      <div className="mb-2 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5">
+        <span className="text-[11px] font-bold uppercase tracking-wide text-tfaint">
+          Add block
+        </span>
+        {ADD_ORDER.map((t) => (
+          <button
+            key={t}
+            onClick={() => add(t, blocks.length)}
+            title={BLOCK_HINT[t]}
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-[12px] font-medium text-tprimary transition-colors hover:border-gold/50 hover:text-gold"
+          >
+            <PlusIcon className="h-3 w-3 text-gold" />
+            {BLOCK_LABEL[t]}
+          </button>
+        ))}
       </div>
 
       {/* Chapter meta */}

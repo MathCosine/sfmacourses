@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type {
@@ -34,6 +34,8 @@ import {
   ChevronRight,
   ArrowUp,
   ArrowDown,
+  Search,
+  Close,
 } from "@/components/icons";
 
 type Tab = "content" | "students" | "announcements";
@@ -80,7 +82,7 @@ export function AdminClient({
         </Link>
       </header>
 
-      <div className="mx-auto max-w-[1000px] px-6 py-8 sm:px-10">
+      <div className="mx-auto max-w-[1320px] px-6 py-8 sm:px-10">
         {/* Tabs */}
         <div className="mb-7 flex gap-1 border-b border-border">
           {(["content", "students", "announcements"] as const).map((t) => (
@@ -142,6 +144,8 @@ function ContentTab({
         for (const l of m.lessons) if (l.id === openLessonId) return l;
     return null;
   });
+  const [editorDirty, setEditorDirty] = useState(false);
+  const [query, setQuery] = useState("");
 
   function run(fn: () => Promise<{ ok: boolean; error?: string }>) {
     startTransition(async () => {
@@ -151,20 +155,179 @@ function ContentTab({
     });
   }
 
-  if (editing) {
-    return (
-      <BlockEditor
-        lesson={editing}
-        catalog={catalog}
-        moduleCatalog={moduleCatalog}
-        initialCrossModuleIds={crossListings
-          .filter((c) => c.lesson_id === editing.id)
-          .map((c) => c.module_id)}
-        onClose={() => setEditing(null)}
-      />
-    );
+  function pick(l: Lesson) {
+    if (editing && editing.id !== l.id && editorDirty) {
+      if (!confirm("Switch chapters? Unsaved changes will be lost.")) return;
+    }
+    setEditorDirty(false);
+    setEditing(l);
   }
 
+  const flat = useMemo(() => {
+    const arr: { lesson: Lesson; track: string; module: string }[] = [];
+    for (const t of tree)
+      for (const m of t.modules)
+        for (const l of m.lessons)
+          arr.push({ lesson: l, track: t.title, module: m.title });
+    return arr;
+  }, [tree]);
+
+  const q = query.trim().toLowerCase();
+  const results = q
+    ? flat.filter(
+        (x) =>
+          x.lesson.title.toLowerCase().includes(q) ||
+          x.module.toLowerCase().includes(q) ||
+          x.track.toLowerCase().includes(q),
+      )
+    : [];
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[270px_minmax(0,1fr)]">
+      {/* Navigator — jump to any chapter instantly */}
+      <aside className="lg:sticky lg:top-4 lg:self-start">
+        <div className="panel overflow-hidden rounded-xl">
+          <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
+            <Search className="h-4 w-4 shrink-0 text-tfaint" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Find a chapter…"
+              className="min-w-0 flex-1 bg-transparent text-[13px] text-tprimary outline-none placeholder:text-tfaint"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                title="Clear"
+                className="shrink-0 text-tfaint transition-colors hover:text-tprimary"
+              >
+                <Close className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+          <div className="scroll-area max-h-[calc(100vh-13rem)] overflow-y-auto p-2">
+            {q ? (
+              results.length === 0 ? (
+                <p className="px-2 py-6 text-center text-[12.5px] text-tfaint">
+                  No chapters match “{query}”.
+                </p>
+              ) : (
+                <ul className="space-y-0.5">
+                  {results.map(({ lesson, track, module }) => (
+                    <li key={lesson.id}>
+                      <button
+                        onClick={() => pick(lesson)}
+                        className={cn(
+                          "w-full rounded-lg px-2.5 py-1.5 text-left transition-colors",
+                          editing?.id === lesson.id
+                            ? "bg-gold/12 text-gold"
+                            : "hover:bg-bg",
+                        )}
+                      >
+                        <div className="truncate text-[13px] font-medium text-tprimary">
+                          {lesson.title || "Untitled"}
+                        </div>
+                        <div className="truncate text-[11px] text-tfaint">
+                          {track} · {module}
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )
+            ) : (
+              <div className="space-y-3">
+                {tree.map((t) => (
+                  <div key={t.id}>
+                    <div className="px-2 pb-1 text-[11px] font-bold uppercase tracking-wide text-tfaint">
+                      {t.title}
+                    </div>
+                    {t.modules.map((m) => (
+                      <div key={m.id} className="mb-1.5">
+                        <div className="px-2 py-0.5 text-[11.5px] font-semibold text-tmuted">
+                          {m.title}
+                        </div>
+                        <ul className="space-y-0.5">
+                          {m.lessons.map((l) => (
+                            <li key={l.id}>
+                              <button
+                                onClick={() => pick(l)}
+                                className={cn(
+                                  "flex w-full items-center gap-1.5 rounded-lg px-2.5 py-1 text-left transition-colors",
+                                  editing?.id === l.id
+                                    ? "bg-gold/12 text-gold"
+                                    : "text-tprimary hover:bg-bg",
+                                )}
+                              >
+                                <ChevronRight className="h-3 w-3 shrink-0 text-tfaint" />
+                                <span className="truncate text-[12.5px]">
+                                  {l.title || "Untitled"}
+                                </span>
+                              </button>
+                            </li>
+                          ))}
+                          {m.lessons.length === 0 && (
+                            <li className="px-2.5 py-1 text-[11.5px] text-tfaint">
+                              No chapters
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        {editing && (
+          <button
+            onClick={() => {
+              setEditing(null);
+              setEditorDirty(false);
+            }}
+            className="mt-2 w-full rounded-lg border border-border px-3 py-2 text-[12.5px] font-medium text-tmuted transition-colors hover:text-tprimary"
+          >
+            ← Back to manage view
+          </button>
+        )}
+      </aside>
+
+      {/* Main pane: editor when a chapter is open, otherwise the manage view */}
+      <div className="min-w-0">
+        {editing ? (
+          <BlockEditor
+            key={editing.id}
+            lesson={editing}
+            catalog={catalog}
+            moduleCatalog={moduleCatalog}
+            initialCrossModuleIds={crossListings
+              .filter((c) => c.lesson_id === editing.id)
+              .map((c) => c.module_id)}
+            onClose={() => {
+              setEditing(null);
+              setEditorDirty(false);
+            }}
+            onDirtyChange={setEditorDirty}
+          />
+        ) : (
+          <ManageList tree={tree} run={run} onEdit={pick} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** The course/unit/chapter management list (create, rename, reorder, delete). */
+function ManageList({
+  tree,
+  run,
+  onEdit,
+}: {
+  tree: TrackWithModules[];
+  run: (fn: () => Promise<{ ok: boolean; error?: string }>) => void;
+  onEdit: (l: Lesson) => void;
+}) {
   return (
     <div className="space-y-8">
       {tree.map((track, ti) => (
@@ -278,7 +441,7 @@ function ContentTab({
                       className="flex items-center gap-2 px-3 py-2 hover:bg-bg/40"
                     >
                       <button
-                        onClick={() => setEditing(l)}
+                        onClick={() => onEdit(l)}
                         className="group flex min-w-0 flex-1 items-center gap-2 text-left"
                       >
                         <ChevronRight className="h-3.5 w-3.5 shrink-0 text-tfaint" />
@@ -305,7 +468,7 @@ function ContentTab({
                           <ArrowDown className="h-3.5 w-3.5" />
                         </MiniBtn>
                         <MiniBtn
-                          onClick={() => setEditing(l)}
+                          onClick={() => onEdit(l)}
                           title="Edit chapter"
                         >
                           <span className="text-[11px] font-medium">Edit</span>
