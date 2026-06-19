@@ -3,6 +3,7 @@
 import type { PreparedBlock } from "@/lib/prepare";
 import { ResourceBlock } from "@/components/blocks/ResourceBlock";
 import { VideoBlock } from "@/components/blocks/VideoBlock";
+import { ImageBlock } from "@/components/blocks/ImageBlock";
 import { CalloutBlock } from "@/components/blocks/CalloutBlock";
 
 const DIFFICULTY_COLOR: Record<string, string> = {
@@ -32,6 +33,12 @@ export function BlockPreview({ block }: { block: PreparedBlock }) {
         <VideoBlock block={block.block} />
       ) : (
         <p className="text-[13px] italic text-tfaint">Video — add a URL.</p>
+      );
+    case "image":
+      return block.block.url ? (
+        <ImageBlock block={block.block} />
+      ) : (
+        <p className="text-[13px] italic text-tfaint">Image — upload a file.</p>
       );
     case "callout":
       return <CalloutBlock block={block.prepared} />;

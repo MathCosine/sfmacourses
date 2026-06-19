@@ -12,7 +12,12 @@ import type {
 import { CALLOUT_LABELS, CALLOUT_VARIANTS, DIFFICULTIES } from "@/lib/types";
 import type { PreparedBlock } from "@/lib/prepare";
 import type { LessonLink, ModuleLink } from "@/lib/data";
-import { contentBlocks, extractMeta } from "@/lib/utils";
+import { contentBlocks, extractMeta, cn } from "@/lib/utils";
+import {
+  uploadToCloudinary,
+  cloudinaryConfigured,
+  optimizedImageUrl,
+} from "@/lib/cloudinary";
 import {
   updateLesson,
   deleteLesson,
@@ -34,6 +39,7 @@ import {
   Search,
   Milestone,
   Layers,
+  ImageIcon,
 } from "@/components/icons";
 
 export const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
@@ -42,6 +48,7 @@ export const BLOCK_LABEL: Record<ContentBlock["type"], string> = {
   problem: "Problem",
   section: "Section",
   video: "Video",
+  image: "Image",
   callout: "Environment",
 };
 
@@ -51,6 +58,7 @@ export const BLOCK_HINT: Record<ContentBlock["type"], string> = {
   problem: "A practice problem with a status circle.",
   section: "A heading that appears in the contents and carries its own status.",
   video: "An embedded YouTube or Vimeo video.",
+  image: "An uploaded diagram or figure (PNG/JPG/SVG).",
   callout: "A styled box: theorem, big idea, recipe, example, note or warning.",
 };
 
@@ -59,6 +67,7 @@ export const ADD_ORDER: ContentBlock["type"][] = [
   "section",
   "callout",
   "problem",
+  "image",
   "resource",
   "video",
 ];
@@ -83,6 +92,8 @@ function emptyBlock(type: ContentBlock["type"]): ContentBlock {
       return { type: "section", title: "" };
     case "video":
       return { type: "video", url: "", title: "", caption: "" };
+    case "image":
+      return { type: "image", url: "", alt: "", caption: "" };
     case "callout":
       return { type: "callout", variant: "theorem", title: "", body: "" };
   }
@@ -901,6 +912,113 @@ function IconBtn({
   );
 }
 
+/** Drag/drop + click-to-upload image field, backed by Cloudinary. */
+function ImageField({
+  url,
+  onUploaded,
+}: {
+  url: string;
+  onUploaded: (url: string) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [drag, setDrag] = useState(false);
+  const configured = cloudinaryConfigured();
+
+  async function handleFiles(files: FileList | null) {
+    const file = files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setErr("That doesn't look like an image file.");
+      return;
+    }
+    setErr(null);
+    setBusy(true);
+    try {
+      onUploaded(await uploadToCloudinary(file));
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Upload failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (url) {
+    return (
+      <div>
+        <div className="overflow-hidden rounded-xl border border-border bg-bg">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={optimizedImageUrl(url, 800)}
+            alt=""
+            className="mx-auto block max-h-64 w-auto"
+          />
+        </div>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <label className="cursor-pointer rounded-lg border border-border px-3 py-1.5 text-[12px] font-medium text-tmuted transition-colors hover:text-tprimary">
+            {busy ? "Uploading…" : "Replace"}
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              disabled={busy}
+              onChange={(e) => handleFiles(e.target.files)}
+            />
+          </label>
+          <button
+            onClick={() => onUploaded("")}
+            className="rounded-lg border border-border px-3 py-1.5 text-[12px] font-medium text-tmuted transition-colors hover:text-danger"
+          >
+            Remove
+          </button>
+          {err && <span className="text-[12px] text-danger">{err}</span>}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <label
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDrag(true);
+        }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDrag(false);
+          handleFiles(e.dataTransfer.files);
+        }}
+        className={cn(
+          "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-10 text-center transition-colors",
+          drag ? "border-gold bg-gold/5" : "border-border-strong hover:border-gold/50",
+        )}
+      >
+        <ImageIcon className="h-6 w-6 text-tfaint" />
+        <div className="text-[13px] font-medium text-tprimary">
+          {busy ? "Uploading…" : "Click to upload or drag an image here"}
+        </div>
+        <div className="text-[11.5px] text-tfaint">PNG, JPG, SVG or GIF</div>
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          disabled={busy}
+          onChange={(e) => handleFiles(e.target.files)}
+        />
+      </label>
+      {!configured && (
+        <p className="mt-2 text-[11.5px] text-tmuted">
+          Heads up: image uploads aren't configured yet — set the Cloudinary env
+          vars (see <span className="font-mono">.env.example</span>).
+        </p>
+      )}
+      {err && <p className="mt-2 text-[12px] text-danger">{err}</p>}
+    </div>
+  );
+}
+
 function BlockFields({
   block,
   onChange,
@@ -1000,6 +1118,37 @@ function BlockFields({
             value={block.caption ?? ""}
             onChange={(e) => onChange({ caption: e.target.value })}
           />
+        </div>
+      </div>
+    );
+  }
+
+  if (block.type === "image") {
+    return (
+      <div className="grid gap-3">
+        <ImageField
+          url={block.url}
+          onUploaded={(url) => onChange({ url })}
+        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className={labelCls}>Alt text (for accessibility)</label>
+            <input
+              className={inputCls}
+              value={block.alt ?? ""}
+              onChange={(e) => onChange({ alt: e.target.value })}
+              placeholder="Describe the diagram"
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Caption (optional)</label>
+            <input
+              className={inputCls}
+              value={block.caption ?? ""}
+              onChange={(e) => onChange({ caption: e.target.value })}
+              placeholder="Shown beneath the image"
+            />
+          </div>
         </div>
       </div>
     );

@@ -60,6 +60,16 @@ export interface VideoBlock {
   caption?: string;
 }
 
+export interface ImageBlock {
+  type: "image";
+  /** Hosted image URL (Cloudinary secure_url). */
+  url: string;
+  /** Alt text for accessibility. */
+  alt?: string;
+  /** Optional caption shown beneath the image. */
+  caption?: string;
+}
+
 /** Styled "environment" box: theorem, big idea, recipe, example, etc. */
 export type CalloutVariant =
   | "theorem"
@@ -117,6 +127,7 @@ export type ContentBlock =
   | ProblemBlock
   | SectionBlock
   | VideoBlock
+  | ImageBlock
   | CalloutBlock;
 
 export type Block = ContentBlock | MetaBlock;

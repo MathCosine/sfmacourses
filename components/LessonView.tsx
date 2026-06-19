@@ -6,6 +6,7 @@ import { TextBlock } from "@/components/blocks/TextBlock";
 import { ResourceBlock } from "@/components/blocks/ResourceBlock";
 import { ProblemBlock } from "@/components/blocks/ProblemBlock";
 import { VideoBlock } from "@/components/blocks/VideoBlock";
+import { ImageBlock } from "@/components/blocks/ImageBlock";
 import { SectionBlock } from "@/components/blocks/SectionBlock";
 import { CalloutBlock } from "@/components/blocks/CalloutBlock";
 import { LessonStatusControl } from "@/components/LessonStatusControl";
@@ -38,6 +39,8 @@ export function LessonView({
               return <ResourceBlock key={i} block={block.block} />;
             case "video":
               return <VideoBlock key={i} block={block.block} />;
+            case "image":
+              return <ImageBlock key={i} block={block.block} />;
             case "callout":
               return <CalloutBlock key={i} block={block.prepared} />;
             case "section":

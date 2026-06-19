@@ -1,5 +1,5 @@
 import "server-only";
-import type { ContentBlock, ResourceBlock, VideoBlock } from "./types";
+import type { ContentBlock, ImageBlock, ResourceBlock, VideoBlock } from "./types";
 import { CALLOUT_LABELS } from "./types";
 import { renderMarkdown } from "./markdown";
 import { headingId } from "./utils";
@@ -10,6 +10,7 @@ export type PreparedBlock =
   | { kind: "text"; html: string }
   | { kind: "resource"; block: ResourceBlock }
   | { kind: "video"; block: VideoBlock }
+  | { kind: "image"; block: ImageBlock }
   | { kind: "section"; id: string; title: string; sectionIndex: number }
   | { kind: "callout"; prepared: PreparedCallout }
   | { kind: "problem"; problemIndex: number; prepared: PreparedProblem };
@@ -32,6 +33,8 @@ export async function prepareBlocks(
       out.push({ kind: "resource", block });
     } else if (block.type === "video") {
       out.push({ kind: "video", block });
+    } else if (block.type === "image") {
+      out.push({ kind: "image", block });
     } else if (block.type === "callout") {
       out.push({
         kind: "callout",
