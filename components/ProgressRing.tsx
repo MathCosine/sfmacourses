@@ -4,6 +4,8 @@ interface ProgressRingProps {
   size?: number;
   stroke?: number;
   showFraction?: boolean;
+  /** Arc color for the in-progress state (defaults to the gold accent). */
+  color?: string;
 }
 
 export function ProgressRing({
@@ -12,6 +14,7 @@ export function ProgressRing({
   size = 56,
   stroke = 5,
   showFraction = true,
+  color,
 }: ProgressRingProps) {
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -38,7 +41,7 @@ export function ProgressRing({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke={complete ? "var(--color-green)" : "var(--color-gold)"}
+          stroke={complete ? "var(--color-green)" : (color ?? "var(--color-gold)")}
           strokeWidth={stroke}
           strokeDasharray={circumference}
           strokeDashoffset={offset}
