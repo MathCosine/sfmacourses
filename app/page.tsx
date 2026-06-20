@@ -447,40 +447,62 @@ function HeroExcerpt({
     not_started: "#aeb4bf",
   };
   return (
-    <div className="rotate-[0.6deg] rounded-2xl border border-border bg-surface shadow-lift transition-transform duration-300 hover:rotate-0">
-      <div className="flex items-center justify-between border-b border-border px-5 py-3">
-        <span className="text-[12px] font-bold uppercase tracking-[0.12em] text-gold">AMC 8 · Number Theory</span>
-        <span className="flex items-center gap-0.5">
-          {[0, 1, 2].map((i) => (
-            <span key={i} className="h-1.5 w-1.5 rounded-full" style={{ background: i < 3 ? "#15a34a" : "var(--color-border-strong)" }} />
-          ))}
-        </span>
-      </div>
-      <div className="px-5 py-5">
-        <div className="prose-sfma text-[15px]" dangerouslySetInnerHTML={{ __html: qHtml }} />
-        <div className="mt-2 rounded-xl border border-border bg-bg px-4 py-3">
-          <div className="prose-sfma text-[14px]" dangerouslySetInnerHTML={{ __html: aHtml }} />
-        </div>
-        <div className="mt-3 flex items-center gap-2 text-[12.5px] text-tmuted">
-          <span className="font-semibold text-tprimary">Divisor count:</span>
-          <span className="prose-sfma" dangerouslySetInnerHTML={{ __html: formulaHtml }} />
+    <div className="group relative mx-auto max-w-md">
+      {/* Soft accent glow so the card reads as a floating element */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-8 -z-10 rounded-[2.5rem] opacity-50 blur-3xl"
+        style={{ background: "radial-gradient(55% 55% at 50% 42%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 75%)" }}
+      />
+      {/* Skewed 3D "app window" — straightens on hover (flat on mobile) */}
+      <div
+        className="overflow-hidden rounded-2xl border border-border transition-transform duration-500 ease-out will-change-transform sm:[transform:perspective(1700px)_rotateY(-15deg)_rotateX(6deg)] sm:hover:[transform:perspective(1700px)_rotateY(0deg)_rotateX(0deg)]"
+        style={{
+          background: "linear-gradient(180deg, var(--color-surface), color-mix(in srgb, var(--surface-2) 55%, var(--color-surface)))",
+          boxShadow: "var(--shadow-5), inset 0 1px 0 0 rgba(255,255,255,0.6)",
+        }}
+      >
+        {/* Window chrome */}
+        <div className="flex items-center gap-3 border-b border-border bg-surface-2 px-4 py-2.5">
+          <span className="flex shrink-0 gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#f87171]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#fbbf24]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#34d399]" />
+          </span>
+          <span className="flex flex-1 items-center justify-center rounded-md bg-bg px-2.5 py-1 text-[11px] font-medium text-tfaint">
+            sfma.org/learn/amc-8/number-theory
+          </span>
         </div>
 
-        <div className="mt-5 border-t border-border pt-4">
-          <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-tfaint">Your progress</div>
-          <div className="space-y-1.5">
-            {rows.map((r) => {
-              const c = colorOf[r.status];
-              const filled = r.status !== "not_started";
-              return (
-                <div key={r.title} className="flex items-center gap-2.5">
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full border-2" style={{ borderColor: c, background: filled ? c : "transparent" }}>
-                    {r.status === "complete" && <Check className="h-2.5 w-2.5 text-white" />}
-                  </span>
-                  <span className="text-[13.5px] font-medium text-tprimary">{r.title}</span>
-                </div>
-              );
-            })}
+        <div className="px-5 py-5">
+          <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
+            AMC 8 · Number Theory
+          </div>
+          <div className="prose-sfma text-[15px]" dangerouslySetInnerHTML={{ __html: qHtml }} />
+          <div className="mt-2 rounded-xl border border-border bg-bg px-4 py-3">
+            <div className="prose-sfma text-[14px]" dangerouslySetInnerHTML={{ __html: aHtml }} />
+          </div>
+          <div className="mt-3 flex items-center gap-2 text-[12.5px] text-tmuted">
+            <span className="font-semibold text-tprimary">Divisor count:</span>
+            <span className="prose-sfma" dangerouslySetInnerHTML={{ __html: formulaHtml }} />
+          </div>
+
+          <div className="mt-5 border-t border-border pt-4">
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-tfaint">Your progress</div>
+            <div className="space-y-1.5">
+              {rows.map((r) => {
+                const c = colorOf[r.status];
+                const filled = r.status !== "not_started";
+                return (
+                  <div key={r.title} className="flex items-center gap-2.5">
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full border-2" style={{ borderColor: c, background: filled ? c : "transparent" }}>
+                      {r.status === "complete" && <Check className="h-2.5 w-2.5 text-white" />}
+                    </span>
+                    <span className="text-[13.5px] font-medium text-tprimary">{r.title}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
