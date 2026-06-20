@@ -30,7 +30,7 @@ export function ShellFrame({
     <div className="min-h-screen">
       <TopNav tracks={tracks} user={user} />
 
-      <div className="mx-auto flex max-w-[1500px]">
+      <div className="flex w-full">
         {/* Desktop module tree */}
         <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-[290px] shrink-0 border-r border-border bg-sidebar lg:block">
           <Sidebar

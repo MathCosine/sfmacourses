@@ -20,8 +20,7 @@ import {
 import { prepareBlocks } from "@/lib/prepare";
 import { renderMarkdown } from "@/lib/markdown";
 import { contentBlocks, countProblems, extractMeta } from "@/lib/utils";
-import { FREQUENCY_LABELS } from "@/lib/types";
-import { ArrowLeft, ArrowRight, ListChecks, Pencil } from "@/components/icons";
+import { ArrowLeft, ArrowRight, ListChecks } from "@/components/icons";
 
 interface Params {
   track: string;
@@ -87,7 +86,7 @@ export default async function LessonPage({
 
   return (
     <AppShell activeTrackSlug={ctx.track.slug} activeLessonId={ctx.lesson.id}>
-      <div className="mx-auto flex max-w-[1180px] gap-10 px-6 py-8 sm:px-10">
+      <div className="flex max-w-[1180px] gap-10 px-6 py-8 sm:px-10 xl:px-14">
         <article className="min-w-0 max-w-[760px] flex-1">
           {/* Breadcrumb + nav */}
           <div className="mb-5 flex items-center justify-between gap-3">
@@ -155,27 +154,18 @@ export default async function LessonPage({
             </div>
           )}
 
-          {/* Compact meta line — left-aligned, icon-led, no heavy box */}
-          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-tmuted">
-            <span className="inline-flex items-center gap-2" title={FREQUENCY_BLURB[meta.frequency] ?? ""}>
+          {/* Compact meta line — left-aligned, icon-led, generously spaced */}
+          <div className="mt-5 flex flex-wrap items-center gap-x-7 gap-y-2 text-[13px] text-tmuted">
+            <span title={FREQUENCY_BLURB[meta.frequency] ?? ""}>
               <FrequencyDots frequency={meta.frequency} />
-              <span className="font-semibold text-tprimary">{FREQUENCY_LABELS[meta.frequency]}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex items-center gap-2">
               <ListChecks className="h-[18px] w-[18px] text-gold" />
               {problemCount} problem{problemCount === 1 ? "" : "s"}
             </span>
             <span>
               by <span className="font-medium text-tprimary">{meta.author}</span>
             </span>
-            {isStaff && (
-              <Link
-                href={`/admin?lesson=${ctx.lesson.id}`}
-                className="inline-flex items-center gap-1.5 font-medium text-gold hover:underline"
-              >
-                <Pencil className="h-3.5 w-3.5" /> Edit page
-              </Link>
-            )}
           </div>
 
           <Prerequisites noteHtml={prereqNoteHtml} links={prereqLinks} />

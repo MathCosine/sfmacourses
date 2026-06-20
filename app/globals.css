@@ -249,10 +249,9 @@ body::-webkit-scrollbar-thumb:hover {
    hover/active/disabled states, no gimmicky offset shadows.
 --------------------------------------------------------------------------- */
 
-/* Primary button: dark pill with a blue→purple gradient border, a soft accent
-   glow, and a light sheen that sweeps across on hover. */
+/* Primary button: a blue→indigo gradient pill (brand colors), glossy top edge,
+   soft accent glow, and a light sheen that sweeps across on hover. */
 .btn-3d {
-  --btn-dark: #1a2236;
   position: relative;
   isolation: isolate;
   display: inline-flex;
@@ -260,14 +259,12 @@ body::-webkit-scrollbar-thumb:hover {
   justify-content: center;
   gap: 0.55rem;
   border-radius: 9999px;
-  border: 1.5px solid transparent;
-  background:
-    linear-gradient(var(--btn-dark), var(--btn-dark)) padding-box,
-    linear-gradient(130deg, #5b9dff, #9b6cf2) border-box;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 62%, #6366f1));
   color: #fff;
   font-weight: 600;
   overflow: hidden;
-  box-shadow: 0 4px 16px -6px color-mix(in srgb, var(--accent) 50%, transparent);
+  box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--accent) 55%, transparent),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
   transition: transform 130ms var(--ease-out-soft),
     box-shadow 240ms var(--ease-out-soft), filter 180ms ease;
 }
@@ -283,8 +280,9 @@ body::-webkit-scrollbar-thumb:hover {
 }
 .btn-3d:hover {
   transform: translateY(-1px);
-  filter: brightness(1.08);
-  box-shadow: 0 10px 26px -8px color-mix(in srgb, var(--accent) 60%, transparent);
+  filter: brightness(1.06);
+  box-shadow: 0 11px 28px -8px color-mix(in srgb, var(--accent) 66%, transparent),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.28);
 }
 .btn-3d:hover::after { transform: translateX(130%); }
 .btn-3d:active { transform: scale(0.97); }
