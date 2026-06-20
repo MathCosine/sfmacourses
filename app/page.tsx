@@ -213,11 +213,11 @@ export default async function HomePage() {
             keep track of where you are, and practice with solutions on hand.
           </p>
         </Reveal>
-        <div className="mt-10 space-y-px overflow-hidden rounded-2xl border border-border">
+        <div className="mt-10 space-y-4">
           {STEPS.map((s, i) => (
             <Reveal key={s.n} delay={i * 70}>
-              <div className="grid items-start gap-5 bg-surface px-6 py-7 sm:grid-cols-[auto_1fr] sm:px-9 sm:py-9">
-                <div className="font-mono text-[2.4rem] font-bold leading-none text-gold/30">
+              <div className="card-pop grid items-start gap-5 p-6 sm:grid-cols-[auto_1fr] sm:p-8">
+                <div className="font-mono text-[2rem] font-bold leading-none text-gold">
                   {s.n}
                 </div>
                 <div>

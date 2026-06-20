@@ -12,14 +12,15 @@
 :root {
   color-scheme: light;
 
-  /* Faintly blue-tinted neutrals (no pure white) so the UI reads intentional. */
-  --bg: #f3f5fa;
+  /* Faintly blue-tinted neutrals (no pure white), kept as a clear lightness
+     ladder: surface (lightest) > surface-2 > bg (darkest page). */
+  --bg: #eef2f9;
   --sidebar: #fbfcfe;
-  --surface: #fdfdff;
-  --surface-2: #f3f5fa;
-  --highlight: #eaf1ff;
-  --border: #e4e8f0;
-  --border-strong: #cdd5e2;
+  --surface: #fcfdff;
+  --surface-2: #f4f7fd;
+  --highlight: #e7eeff;
+  --border: #e2e7f0;
+  --border-strong: #ccd4e2;
 
   --accent: #2563eb;
   --accent-hover: #1d4ed8;
