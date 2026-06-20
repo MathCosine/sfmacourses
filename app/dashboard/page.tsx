@@ -122,9 +122,9 @@ export default async function DashboardPage() {
                   <div className="mt-0.5 text-[12.5px] text-tmuted">{resume.track}</div>
                 </div>
               </div>
-              <span className="mr-5 hidden shrink-0 items-center gap-1.5 rounded-xl bg-gold px-5 py-2.5 text-[13.5px] font-semibold text-white shadow-accent transition-transform group-hover:translate-x-0.5 sm:flex">
+              <span className="btn-3d mr-5 hidden px-5 py-2.5 text-[13.5px] sm:inline-flex">
                 Resume
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
             </Link>
           )}

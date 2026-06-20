@@ -249,41 +249,64 @@ body::-webkit-scrollbar-thumb:hover {
    hover/active/disabled states, no gimmicky offset shadows.
 --------------------------------------------------------------------------- */
 
-/* Primary button: solid accent, gentle lift on hover, tactile press. */
+/* Primary button: dark pill with a blue→purple gradient border, a soft accent
+   glow, and a light sheen that sweeps across on hover. */
 .btn-3d {
+  --btn-dark: #1a2236;
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  border-radius: 0.625rem;
-  background: var(--accent);
+  gap: 0.55rem;
+  border-radius: 9999px;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--btn-dark), var(--btn-dark)) padding-box,
+    linear-gradient(130deg, #5b9dff, #9b6cf2) border-box;
   color: #fff;
   font-weight: 600;
-  box-shadow: var(--shadow-1);
-  transition: background-color 150ms ease, box-shadow 200ms var(--ease-out-soft),
-    transform 90ms var(--ease-out-soft);
+  overflow: hidden;
+  box-shadow: 0 4px 16px -6px color-mix(in srgb, var(--accent) 50%, transparent);
+  transition: transform 130ms var(--ease-out-soft),
+    box-shadow 240ms var(--ease-out-soft), filter 180ms ease;
 }
-.btn-3d:hover { background: var(--accent-hover); box-shadow: var(--shadow-accent); }
-.btn-3d:active { transform: translateY(1px); box-shadow: var(--shadow-1); }
-.btn-3d:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; }
+.btn-3d::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(100deg, transparent 32%, rgba(255, 255, 255, 0.18) 50%, transparent 68%);
+  transform: translateX(-130%);
+  transition: transform 650ms var(--ease-out-soft);
+  pointer-events: none;
+}
+.btn-3d:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 10px 26px -8px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.btn-3d:hover::after { transform: translateX(130%); }
+.btn-3d:active { transform: scale(0.97); }
+.btn-3d:disabled { opacity: 0.5; box-shadow: none; filter: none; cursor: not-allowed; }
 
-/* Neutral button: surface fill, hairline border, accent border on hover. */
+/* Neutral button: clean pill, surface fill, accent border on hover. */
 .btn-3d-neutral {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.625rem;
+  border-radius: 9999px;
   background: var(--color-surface);
   color: var(--color-tprimary);
   font-weight: 600;
   border: 1px solid var(--color-border-strong);
   box-shadow: var(--shadow-1);
   transition: background-color 150ms ease, border-color 150ms ease,
-    box-shadow 200ms var(--ease-out-soft), transform 90ms var(--ease-out-soft);
+    box-shadow 200ms var(--ease-out-soft), transform 120ms var(--ease-out-soft);
 }
-.btn-3d-neutral:hover { background: var(--color-surface-2); border-color: var(--accent); }
-.btn-3d-neutral:active { transform: translateY(1px); }
+.btn-3d-neutral:hover { background: var(--color-surface-2); border-color: var(--accent); transform: translateY(-1px); }
+.btn-3d-neutral:active { transform: scale(0.98); }
 .btn-3d-neutral:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Radius scale: containers (cards/panels) 12px, controls (buttons/inputs) 10px. */

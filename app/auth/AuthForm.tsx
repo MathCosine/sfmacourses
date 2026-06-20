@@ -145,7 +145,7 @@ export function AuthForm({ redirectTo }: { redirectTo?: string }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-gold py-2.5 text-[14px] font-semibold text-white shadow-accent transition-colors hover:bg-gold-hover disabled:opacity-60"
+          className="btn-3d w-full py-3 text-[14px]"
         >
           {loading
             ? "Please wait…"

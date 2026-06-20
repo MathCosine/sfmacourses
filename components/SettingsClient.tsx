@@ -183,7 +183,7 @@ export function SettingsClient({
             <button
               onClick={save}
               disabled={pending}
-              className="rounded-lg bg-gold px-5 py-2.5 text-[13.5px] font-semibold text-white transition-colors hover:bg-gold-hover disabled:opacity-60"
+              className="btn-3d px-5 py-2.5 text-[13.5px]"
             >
               {pending ? "Saving…" : "Save changes"}
             </button>
