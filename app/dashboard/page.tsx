@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/SiteShell";
 import { ProgressRing } from "@/components/ProgressRing";
-import { InteractiveGrid } from "@/components/InteractiveGrid";
 import {
   getAnnouncements,
   getLessonStatuses,
@@ -78,9 +77,9 @@ export default async function DashboardPage() {
 
   return (
     <SiteShell footer={false}>
-      {/* ---- Grid-backed hero: greeting + stats + resume ---- */}
+      {/* ---- Notebook-paper hero: greeting + resume + stats ---- */}
       <section className="relative overflow-hidden border-b border-border bg-bg">
-        <InteractiveGrid />
+        <div aria-hidden className="graph-paper pointer-events-none absolute inset-0 opacity-60" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-bg" />
         <div className="relative mx-auto max-w-6xl px-6 pb-12 pt-10 sm:px-8">
           <div className="fade-up">
@@ -264,17 +263,24 @@ function StatCard({
   tint: string;
 }) {
   return (
-    <div className="card-pop p-5">
+    <div className="group flex items-center gap-4 rounded-xl border border-border bg-surface p-4 shadow-sm transition-transform duration-200 hover:-translate-y-0.5">
       <span
-        className="flex h-10 w-10 items-center justify-center rounded-[10px]"
-        style={{ background: `color-mix(in srgb, ${tint} 14%, transparent)`, color: tint }}
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset transition-transform duration-200 group-hover:-rotate-6"
+        style={{
+          background: `color-mix(in srgb, ${tint} 14%, transparent)`,
+          color: tint,
+          // @ts-expect-error ring color via CSS var
+          "--tw-ring-color": `color-mix(in srgb, ${tint} 25%, transparent)`,
+        }}
       >
         {icon}
       </span>
-      <div className="mt-4 text-[2rem] font-extrabold leading-none tracking-[-0.02em] text-tprimary">
-        {value}
+      <div className="min-w-0">
+        <div className="font-serif text-[1.9rem] font-bold leading-none text-tprimary">
+          {value}
+        </div>
+        <div className="mt-1 text-[12.5px] text-tmuted">{label}</div>
       </div>
-      <div className="mt-1.5 text-[12.5px] text-tmuted">{label}</div>
     </div>
   );
 }

@@ -112,7 +112,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
                 Learn
                 <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", learnOpen && "rotate-180")} />
                 {pathname.startsWith("/learn") && (
-                  <span className="absolute inset-x-3 -bottom-1 h-0.5 rounded-full bg-gold" />
+                  <span className="nav-underline absolute inset-x-3 -bottom-1 h-0.5 rounded-full bg-gold" />
                 )}
               </button>
               {learnOpen && (
@@ -328,7 +328,7 @@ function NavLink({ href, active, children }: { href: string; active: boolean; ch
       )}
     >
       {children}
-      {active && <span className="absolute inset-x-3 -bottom-1 h-0.5 rounded-full bg-gold" />}
+      {active && <span className="nav-underline absolute inset-x-3 -bottom-1 h-0.5 rounded-full bg-gold" />}
     </Link>
   );
 }

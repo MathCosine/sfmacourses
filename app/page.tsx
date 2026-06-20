@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getSessionUser, getCourseTree } from "@/lib/data";
-import { renderMarkdown } from "@/lib/markdown";
 import { trackTheme } from "@/lib/trackTheme";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -93,17 +92,6 @@ export default async function HomePage() {
     0,
   );
 
-  // Real, server-rendered math for the hero excerpt — this is a math site.
-  const [qHtml, aHtml, formulaHtml] = await Promise.all([
-    renderMarkdown(
-      "Why is $\\overline{ABCABC}$ always divisible by $7$, $11$, and $13$?",
-    ),
-    renderMarkdown(
-      "$\\overline{ABCABC} = \\overline{ABC}\\cdot 1001 = \\overline{ABC}\\cdot 7\\cdot 11\\cdot 13.$",
-    ),
-    renderMarkdown("$\\tau(n) = (e_1+1)(e_2+1)\\cdots(e_k+1)$"),
-  ]);
-
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
@@ -162,7 +150,7 @@ export default async function HomePage() {
 
           {/* Right — the live chapter card (skewed) */}
           <div className="fade-up-1">
-            <HeroExcerpt qHtml={qHtml} aHtml={aHtml} formulaHtml={formulaHtml} />
+            <HeroExcerpt />
           </div>
         </div>
       </section>
@@ -420,37 +408,26 @@ export default async function HomePage() {
   );
 }
 
-/** A faux open-notebook chapter excerpt with real, server-rendered math. */
-function HeroExcerpt({
-  qHtml,
-  aHtml,
-  formulaHtml,
-}: {
-  qHtml: string;
-  aHtml: string;
-  formulaHtml: string;
-}) {
-  const rows = [
-    { title: "Divisibility Rules", status: "complete" },
-    { title: "Prime Factorization & GCD/LCM", status: "reading" },
-    { title: "Counting Methods", status: "not_started" },
+/** A skewed "app window" showing a course-progress snapshot (the core feature). */
+function HeroExcerpt() {
+  const courses = [
+    { name: "AMC 8", color: "#0d9488", pct: 67 },
+    { name: "AMC 10/12", color: "#2563eb", pct: 23 },
+    { name: "AIME", color: "#b45309", pct: 12 },
   ];
-  const colorOf: Record<string, string> = {
-    complete: "#15a34a",
-    reading: "#2563eb",
-    not_started: "#aeb4bf",
-  };
+  const overall = 41;
+  const deg = Math.round(overall * 3.6);
   return (
     <div className="group relative mx-auto max-w-md">
       {/* Soft accent glow so the card reads as a floating element */}
       <div
         aria-hidden
         className="pointer-events-none absolute -inset-8 -z-10 rounded-[2.5rem] opacity-50 blur-3xl"
-        style={{ background: "radial-gradient(55% 55% at 50% 42%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 75%)" }}
+        style={{ background: "radial-gradient(55% 55% at 50% 42%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 75%)" }}
       />
       {/* Skewed 3D "app window" — straightens on hover (flat on mobile) */}
       <div
-        className="overflow-hidden rounded-2xl border border-border transition-transform duration-500 ease-out will-change-transform sm:[transform:perspective(1700px)_rotateY(-15deg)_rotateX(6deg)] sm:hover:[transform:perspective(1700px)_rotateY(0deg)_rotateX(0deg)]"
+        className="overflow-hidden rounded-2xl border border-border transition-transform duration-500 ease-out will-change-transform sm:[transform:perspective(1700px)_rotateY(-14deg)_rotateX(6deg)] sm:hover:[transform:perspective(1700px)_rotateY(0deg)_rotateX(0deg)]"
         style={{
           background: "linear-gradient(180deg, var(--color-surface), color-mix(in srgb, var(--surface-2) 55%, var(--color-surface)))",
           boxShadow: "var(--shadow-5), inset 0 1px 0 0 rgba(255,255,255,0.6)",
@@ -459,43 +436,57 @@ function HeroExcerpt({
         {/* Window chrome */}
         <div className="flex items-center gap-3 border-b border-border bg-surface-2 px-4 py-2.5">
           <span className="flex shrink-0 gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#f87171]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#fbbf24]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#34d399]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#e0775a]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#e8b04a]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#7bb38a]" />
           </span>
           <span className="flex flex-1 items-center justify-center rounded-md bg-bg px-2.5 py-1 text-[11px] font-medium text-tfaint">
-            sfma.org/learn/amc-8/number-theory
+            sfma.org/dashboard
           </span>
         </div>
 
         <div className="px-5 py-5">
-          <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
-            AMC 8 · Number Theory
-          </div>
-          <div className="prose-sfma text-[15px]" dangerouslySetInnerHTML={{ __html: qHtml }} />
-          <div className="mt-2 rounded-xl border border-border bg-bg px-4 py-3">
-            <div className="prose-sfma text-[14px]" dangerouslySetInnerHTML={{ __html: aHtml }} />
-          </div>
-          <div className="mt-3 flex items-center gap-2 text-[12.5px] text-tmuted">
-            <span className="font-semibold text-tprimary">Divisor count:</span>
-            <span className="prose-sfma" dangerouslySetInnerHTML={{ __html: formulaHtml }} />
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Your progress</div>
+              <div className="mt-1 font-serif text-[1.45rem] font-bold leading-tight text-tprimary">Welcome back, Ada</div>
+              <div className="mt-0.5 text-[12.5px] text-tmuted">3 chapters completed this week</div>
+            </div>
+            <div className="relative h-16 w-16 shrink-0">
+              <div
+                className="h-16 w-16 rounded-full"
+                style={{ background: `conic-gradient(var(--accent) 0 ${deg}deg, color-mix(in srgb, var(--color-border-strong) 50%, transparent) ${deg}deg 360deg)` }}
+              />
+              <div className="absolute inset-[6px] flex items-center justify-center rounded-full bg-surface text-[13px] font-bold text-tprimary">
+                {overall}%
+              </div>
+            </div>
           </div>
 
-          <div className="mt-5 border-t border-border pt-4">
-            <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-tfaint">Your progress</div>
-            <div className="space-y-1.5">
-              {rows.map((r) => {
-                const c = colorOf[r.status];
-                const filled = r.status !== "not_started";
-                return (
-                  <div key={r.title} className="flex items-center gap-2.5">
-                    <span className="flex h-4 w-4 items-center justify-center rounded-full border-2" style={{ borderColor: c, background: filled ? c : "transparent" }}>
-                      {r.status === "complete" && <Check className="h-2.5 w-2.5 text-white" />}
-                    </span>
-                    <span className="text-[13.5px] font-medium text-tprimary">{r.title}</span>
-                  </div>
-                );
-              })}
+          <div className="mt-5 space-y-3">
+            {courses.map((c) => (
+              <div key={c.name}>
+                <div className="flex items-center justify-between text-[12.5px]">
+                  <span className="inline-flex items-center gap-2 font-medium text-tprimary">
+                    <span className="h-2 w-2 rounded-full" style={{ background: c.color }} />
+                    {c.name}
+                  </span>
+                  <span className="font-semibold" style={{ color: c.color }}>{c.pct}%</span>
+                </div>
+                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "color-mix(in srgb, var(--color-border-strong) 45%, transparent)" }}>
+                  <div className="h-full rounded-full" style={{ width: `${c.pct}%`, background: c.color }} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5 flex items-center gap-2.5 rounded-xl border border-border bg-bg px-3.5 py-2.5">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gold/15 text-gold">
+              <ArrowRight className="h-4 w-4" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-[10.5px] font-bold uppercase tracking-wide text-tfaint">Continue</div>
+              <div className="truncate text-[13px] font-semibold text-tprimary">Divisibility Rules · AMC 8</div>
             </div>
           </div>
         </div>
