@@ -208,10 +208,24 @@ export function TopNav({ tracks, user }: TopNavProps) {
                 )}
               </button>
               {profileOpen && (
-                <div className="menu-pop panel-pop absolute right-0 top-full mt-2 w-60 overflow-hidden py-1.5">
-                  <div className="border-b border-border px-4 py-2.5">
-                    <div className="truncate text-[13.5px] font-semibold text-tprimary">{user.name}</div>
-                    <div className="truncate text-[12px] text-tmuted">{user.email}</div>
+                <div className="menu-pop panel-pop absolute right-0 top-full mt-2 w-64 overflow-hidden py-1.5">
+                  <div className="flex items-center gap-3 border-b border-border px-3.5 py-3">
+                    {user.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={avatarUrl(user.avatarUrl, 80)}
+                        alt=""
+                        className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-inset ring-border"
+                      />
+                    ) : (
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold/15 text-[13px] font-bold text-gold ring-1 ring-inset ring-gold/25">
+                        {initials(user.name, user.email)}
+                      </span>
+                    )}
+                    <div className="min-w-0">
+                      <div className="truncate text-[13.5px] font-semibold text-tprimary">{user.name}</div>
+                      <div className="truncate text-[12px] text-tmuted">{user.email}</div>
+                    </div>
                   </div>
                   <MenuLink href="/dashboard" icon={<GraduationCap className="h-4 w-4" />}>Dashboard</MenuLink>
                   <MenuLink href="/settings" icon={<Settings className="h-4 w-4" />}>Settings</MenuLink>

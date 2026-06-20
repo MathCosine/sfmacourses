@@ -224,7 +224,7 @@ export function BlockEditor({
         maturity,
       });
       if (res.ok) {
-        setMsg("Saved ✓");
+        setMsg("Saved");
         setDirty(false);
         router.refresh();
       } else {
@@ -268,10 +268,11 @@ export function BlockEditor({
         <div className="flex items-center gap-2">
           {msg && (
             <span
-              className={`text-[12.5px] ${
+              className={`inline-flex items-center gap-1 text-[12.5px] ${
                 msg.startsWith("Saved") ? "text-green" : "text-danger"
               }`}
             >
+              {msg.startsWith("Saved") && <Check className="h-3.5 w-3.5" />}
               {msg}
             </span>
           )}
@@ -326,9 +327,9 @@ export function BlockEditor({
               setDirty(true);
             }}
           >
-            <option value="essential">● Essential</option>
-            <option value="important">●● Important</option>
-            <option value="supplemental">●●● Supplemental</option>
+            <option value="essential">Essential</option>
+            <option value="important">Important</option>
+            <option value="supplemental">Supplemental</option>
           </select>
         </div>
         <div>
