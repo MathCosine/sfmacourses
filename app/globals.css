@@ -204,11 +204,14 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 /* ----- Cards & surfaces ----- */
+/* Premium: a whisper-subtle top-lit gradient + a 1px inner highlight along the
+   top edge (light catching glass), over a soft brand-tinted shadow. */
 .card {
-  background: var(--color-surface);
+  background: linear-gradient(180deg, var(--color-surface), color-mix(in srgb, var(--surface-2) 55%, var(--color-surface)));
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--shadow-2), inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
 }
+.dark .card { box-shadow: var(--shadow-2), inset 0 1px 0 0 rgba(255, 255, 255, 0.05); }
 .shadow-card { box-shadow: var(--shadow-2); }
 .shadow-lift { box-shadow: var(--shadow-4); }
 .hover-lift { transition: transform 220ms var(--ease-spring), box-shadow 220ms ease, border-color 220ms ease; }
@@ -285,20 +288,23 @@ body::-webkit-scrollbar-thumb:hover {
 
 /* Radius scale: containers (cards/panels) 12px, controls (buttons/inputs) 10px. */
 
-/* Card: clean surface, hairline border, soft elevation that lifts subtly. */
+/* Card: top-lit gradient surface, hairline border, inner top highlight, soft
+   tinted elevation; lifts subtly with a deeper shadow on hover. */
 .card-pop {
-  background: var(--color-surface);
+  background: linear-gradient(180deg, var(--color-surface), color-mix(in srgb, var(--surface-2) 55%, var(--color-surface)));
   border: 1px solid var(--color-border);
   border-radius: 0.75rem;
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--shadow-2), inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
   transition: box-shadow 240ms var(--ease-out-soft),
     border-color 240ms ease, transform 240ms var(--ease-out-soft);
 }
+.dark .card-pop { box-shadow: var(--shadow-2), inset 0 1px 0 0 rgba(255, 255, 255, 0.05); }
 .card-pop:hover {
-  box-shadow: var(--shadow-3);
+  box-shadow: var(--shadow-4), inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
   border-color: var(--color-border-strong);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
+.dark .card-pop:hover { box-shadow: var(--shadow-4), inset 0 1px 0 0 rgba(255, 255, 255, 0.05); }
 
 /* Floating menu / popover — sits higher than flat cards (per guideline). */
 .panel-pop {

@@ -21,7 +21,7 @@ import { prepareBlocks } from "@/lib/prepare";
 import { renderMarkdown } from "@/lib/markdown";
 import { contentBlocks, countProblems, extractMeta } from "@/lib/utils";
 import { FREQUENCY_LABELS } from "@/lib/types";
-import { ArrowLeft, ArrowRight, ListChecks } from "@/components/icons";
+import { ArrowLeft, ArrowRight, ListChecks, Pencil } from "@/components/icons";
 
 interface Params {
   track: string;
@@ -155,34 +155,27 @@ export default async function LessonPage({
             </div>
           )}
 
-          {/* Meta box — hairline-divided columns */}
-          <div className="mt-5 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-3">
-            <div className="bg-surface-2 px-5 py-4">
-              <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Frequency</div>
-              <div className="mt-1.5">
-                <FrequencyDots frequency={meta.frequency} />
-              </div>
-              <p className="mt-1.5 text-[11.5px] leading-snug text-tmuted">
-                {FREQUENCY_BLURB[meta.frequency] ?? ""}
-              </p>
-            </div>
-            <div className="bg-surface-2 px-5 py-4">
-              <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Author</div>
-              <div className="mt-1.5 text-[13.5px] font-medium text-tprimary">{meta.author}</div>
-              <div className="mt-0.5 text-[11.5px] text-tmuted">{FREQUENCY_LABELS[meta.frequency]} topic</div>
-            </div>
-            <div className="bg-surface-2 px-5 py-4">
-              <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Practice</div>
-              <div className="mt-1.5 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-tprimary">
-                <ListChecks className="h-[18px] w-[18px] text-gold" />
-                {problemCount} problem{problemCount === 1 ? "" : "s"}
-              </div>
-              {isStaff && (
-                <Link href={`/admin?lesson=${ctx.lesson.id}`} className="mt-1.5 block text-[11.5px] font-medium text-gold hover:underline">
-                  Edit this page →
-                </Link>
-              )}
-            </div>
+          {/* Compact meta line — left-aligned, icon-led, no heavy box */}
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-tmuted">
+            <span className="inline-flex items-center gap-2" title={FREQUENCY_BLURB[meta.frequency] ?? ""}>
+              <FrequencyDots frequency={meta.frequency} />
+              <span className="font-semibold text-tprimary">{FREQUENCY_LABELS[meta.frequency]}</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <ListChecks className="h-[18px] w-[18px] text-gold" />
+              {problemCount} problem{problemCount === 1 ? "" : "s"}
+            </span>
+            <span>
+              by <span className="font-medium text-tprimary">{meta.author}</span>
+            </span>
+            {isStaff && (
+              <Link
+                href={`/admin?lesson=${ctx.lesson.id}`}
+                className="inline-flex items-center gap-1.5 font-medium text-gold hover:underline"
+              >
+                <Pencil className="h-3.5 w-3.5" /> Edit page
+              </Link>
+            )}
           </div>
 
           <Prerequisites noteHtml={prereqNoteHtml} links={prereqLinks} />

@@ -180,7 +180,12 @@ export default async function DashboardPage() {
                   } as React.CSSProperties
                 }
               >
-                <div className="flex flex-1 flex-col p-6" style={{ backgroundColor: theme.tint }}>
+                <div
+                  className="flex flex-1 flex-col p-6"
+                  style={{
+                    background: `linear-gradient(180deg, color-mix(in srgb, ${theme.banner} 9%, var(--color-surface)), color-mix(in srgb, ${theme.banner} 3%, var(--color-surface)))`,
+                  }}
+                >
                   <div className="flex items-center gap-4">
                     <ProgressRing value={done} total={total} size={64} stroke={6} color={theme.banner} />
                     <div className="min-w-0">
