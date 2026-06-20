@@ -617,7 +617,7 @@ function InlineAdd({
       {value.trim() && (
         <button
           type="submit"
-          className="shrink-0 rounded-md bg-gold px-2.5 py-1 text-[11.5px] font-semibold text-white transition-colors hover:bg-gold-hover"
+          className="btn-3d shrink-0 px-3 py-1 text-[11.5px]"
         >
           {button}
         </button>
@@ -777,7 +777,7 @@ function AnnouncementsTab({
         <button
           type="submit"
           disabled={pending}
-          className="mt-3 rounded-lg bg-gold px-5 py-2 text-[13.5px] font-semibold text-white transition-colors hover:bg-gold-hover disabled:opacity-60"
+          className="btn-3d mt-3 px-5 py-2 text-[13.5px]"
         >
           {pending ? "Posting…" : "Post"}
         </button>

@@ -45,7 +45,7 @@ export function ShellFrame({
         <div className="fixed bottom-5 left-5 z-30 lg:hidden">
           <button
             onClick={() => setOpen(true)}
-            className="flex items-center gap-2 rounded-full bg-gold px-4 py-2.5 text-[13px] font-semibold text-white shadow-lift"
+            className="btn-3d px-4 py-2.5 text-[13px] shadow-lift"
           >
             <Menu className="h-4 w-4" /> Chapters
           </button>

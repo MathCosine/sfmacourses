@@ -32,7 +32,7 @@ export default function Error({
       <div className="mt-6 flex items-center gap-3">
         <button
           onClick={reset}
-          className="rounded-md bg-gold px-5 py-2.5 text-[14px] font-semibold text-white shadow-accent transition-colors hover:bg-gold-hover"
+          className="btn-3d px-5 py-2.5 text-[14px]"
         >
           Try again
         </button>

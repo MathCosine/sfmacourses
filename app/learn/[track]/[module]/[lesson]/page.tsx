@@ -86,7 +86,7 @@ export default async function LessonPage({
 
   return (
     <AppShell activeTrackSlug={ctx.track.slug} activeLessonId={ctx.lesson.id}>
-      <div className="flex max-w-[1180px] gap-10 px-6 py-8 sm:px-10 xl:px-14">
+      <div className="mx-auto flex max-w-[1180px] gap-10 px-6 py-8 sm:px-10">
         <article className="min-w-0 max-w-[760px] flex-1">
           {/* Breadcrumb + nav */}
           <div className="mb-5 flex items-center justify-between gap-3">

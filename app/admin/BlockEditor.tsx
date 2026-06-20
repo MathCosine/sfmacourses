@@ -285,7 +285,7 @@ export function BlockEditor({
           <button
             onClick={save}
             disabled={pending}
-            className="rounded-lg bg-gold px-4 py-1.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-gold-hover disabled:opacity-60"
+            className="btn-3d px-4 py-1.5 text-[12.5px]"
           >
             {pending ? "Saving…" : "Save"}
           </button>
@@ -641,7 +641,7 @@ function EditCard({
           </IconBtn>
           <button
             onClick={onDone}
-            className="ml-1 inline-flex items-center gap-1.5 rounded-lg bg-gold px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-gold-hover"
+            className="btn-3d ml-1 px-3 py-1.5 text-[12px]"
           >
             <Check className="h-3.5 w-3.5" /> Done
           </button>

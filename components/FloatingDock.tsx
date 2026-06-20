@@ -83,7 +83,7 @@ export function FloatingDock() {
 
         <button
           onClick={() => setOpen(true)}
-          className="group flex items-center gap-2 rounded-full bg-gold py-2.5 pl-3.5 pr-4 text-[13.5px] font-semibold text-white shadow-accent transition-all duration-200 hover:-translate-y-0.5 hover:bg-gold-hover"
+          className="btn-3d group py-2.5 pl-3.5 pr-4 text-[13.5px]"
         >
           <MessageCircle className="h-[18px] w-[18px]" />
           <span className="hidden sm:inline">Feedback</span>
@@ -249,7 +249,7 @@ function FeedbackModal({ onClose }: { onClose: () => void }) {
           <button
             onClick={submit}
             disabled={sending}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-[13.5px] font-semibold text-white shadow-accent transition-all hover:bg-gold-hover disabled:opacity-60"
+            className="btn-3d px-4 py-2 text-[13.5px]"
           >
             <Send className="h-3.5 w-3.5" />
             {sending ? "Sending…" : "Send"}

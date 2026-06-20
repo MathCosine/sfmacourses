@@ -234,7 +234,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
           ) : (
             <Link
               href="/auth"
-              className="ml-1.5 hidden rounded-lg bg-gold px-4 py-2 text-[13.5px] font-semibold text-white shadow-accent transition-colors hover:bg-gold-hover lg:block"
+              className="btn-3d ml-1.5 hidden px-4 py-2 text-[13.5px] lg:inline-flex"
             >
               Sign in
             </Link>
@@ -288,7 +288,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
                   <LogOut className="h-4 w-4" /> Sign out
                 </button>
               ) : (
-                <Link href="/auth" className="rounded-lg bg-gold px-4 py-2 text-[13.5px] font-semibold text-white">
+                <Link href="/auth" className="btn-3d px-4 py-2 text-[13.5px]">
                   Sign in
                 </Link>
               )}
