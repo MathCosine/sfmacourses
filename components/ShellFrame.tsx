@@ -81,8 +81,11 @@ export function ShellFrame({
           />
         </aside>
 
-        {/* Content */}
-        <div className="min-w-0 flex-1">{children}</div>
+        {/* Content — faint notebook paper behind the reading area */}
+        <div className="relative min-w-0 flex-1">
+          <div aria-hidden className="graph-paper pointer-events-none absolute inset-0 opacity-40" />
+          <div className="relative">{children}</div>
+        </div>
       </div>
     </div>
   );
