@@ -129,7 +129,7 @@ export default async function HomePage() {
               <span className="h-1.5 w-1.5 rounded-full bg-green" />
               Free &amp; open · by the San Francisco Math Initiative
             </div>
-            <h1 className="mt-7 text-[2.9rem] font-extrabold leading-[1.06] tracking-[-0.03em] text-tprimary sm:text-[4.1rem]">
+            <h1 className="mt-7 text-[3rem] font-bold leading-[1.08] tracking-[-0.015em] text-tprimary sm:text-[4.2rem]">
               The math you need,
               <br />
               in an order that{" "}
