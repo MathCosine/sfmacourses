@@ -326,7 +326,7 @@ export async function updateLesson(
       prereqLessonIds: fields.prereqLessonIds?.length
         ? fields.prereqLessonIds
         : undefined,
-      maturity: fields.maturity ?? "stable",
+      maturity: fields.maturity ?? "draft",
     };
     patch.content = [meta, ...fields.content] as Block[];
   }

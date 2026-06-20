@@ -27,9 +27,9 @@ export const MATURITY_META: Record<Maturity, MaturityMeta> = {
 };
 
 export const MATURITY_OPTIONS: Maturity[] = ["stable", "developing", "draft"];
-export const DEFAULT_MATURITY: Maturity = "stable";
+export const DEFAULT_MATURITY: Maturity = "draft";
 
-/** Coerce any stored value to a valid maturity (defaults to "stable"). */
+/** Coerce any stored value to a valid maturity (defaults to "draft"). */
 export function maturityOf(value: string | null | undefined): Maturity {
-  return value === "developing" || value === "draft" ? value : "stable";
+  return value === "stable" || value === "developing" ? value : "draft";
 }

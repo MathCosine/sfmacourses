@@ -82,9 +82,9 @@ export function extractMeta(content: Block[] | null | undefined): {
       ? meta!.prereqLessonIds
       : [],
     maturity:
-      meta?.maturity === "developing" || meta?.maturity === "draft"
+      meta?.maturity === "stable" || meta?.maturity === "developing"
         ? meta.maturity
-        : "stable",
+        : "draft",
   };
 }
 

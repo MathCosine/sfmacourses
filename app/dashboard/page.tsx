@@ -10,8 +10,9 @@ import {
   getSessionUser,
 } from "@/lib/data";
 import { trackTheme } from "@/lib/trackTheme";
-import { formatDate } from "@/lib/utils";
-import type { LessonStatus } from "@/lib/types";
+import { formatDate, extractMeta } from "@/lib/utils";
+import { MATURITY_META, MATURITY_OPTIONS } from "@/lib/maturity";
+import type { LessonStatus, Maturity } from "@/lib/types";
 import {
   ArrowRight,
   CheckCircle,
@@ -159,6 +160,14 @@ export default async function DashboardPage() {
             );
             const pct = total ? Math.round((done / total) * 100) : 0;
             const theme = trackTheme(t.slug);
+            const readiness: Record<Maturity, number> = {
+              stable: 0,
+              developing: 0,
+              draft: 0,
+            };
+            for (const m of t.modules)
+              for (const l of m.lessons)
+                readiness[extractMeta(l.content).maturity]++;
             return (
               <Link
                 key={t.id}
@@ -190,6 +199,21 @@ export default async function DashboardPage() {
                     <span>{done} of {total} chapters</span>
                     <span className="font-semibold" style={{ color: theme.banner }}>{pct}%</span>
                   </div>
+                  {total > 0 && (
+                    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border/70 pt-3 text-[11.5px] text-tmuted">
+                      {MATURITY_OPTIONS.map((mk) =>
+                        readiness[mk] > 0 ? (
+                          <span key={mk} className="inline-flex items-center gap-1.5">
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{ background: MATURITY_META[mk].color }}
+                            />
+                            {readiness[mk]} {MATURITY_META[mk].label}
+                          </span>
+                        ) : null,
+                      )}
+                    </div>
+                  )}
                 </div>
               </Link>
             );
