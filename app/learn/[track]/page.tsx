@@ -160,7 +160,7 @@ export default async function TrackPage({
                             )}
                           </div>
                         </div>
-                        <ArrowRight className="h-4 w-4 shrink-0 text-tfaint transition-all group-hover:translate-x-0.5 group-hover:text-gold" />
+                        <ArrowRight className="h-[18px] w-[18px] shrink-0 -translate-x-1.5 text-gold opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
                       </Link>
                     );
                   })}

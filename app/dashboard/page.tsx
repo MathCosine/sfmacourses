@@ -191,6 +191,10 @@ export default async function DashboardPage() {
                         {t.title}
                       </div>
                     </div>
+                    <ArrowRight
+                      className="ml-auto h-[18px] w-[18px] shrink-0 -translate-x-1.5 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100"
+                      style={{ color: theme.banner }}
+                    />
                   </div>
                   <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "color-mix(in srgb, var(--color-border-strong) 60%, transparent)" }}>
                     <div className="progress-fill h-full rounded-full" style={{ width: `${pct}%`, background: theme.banner }} />
