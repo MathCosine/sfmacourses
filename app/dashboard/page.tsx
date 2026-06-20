@@ -172,34 +172,24 @@ export default async function DashboardPage() {
               <Link
                 key={t.id}
                 href={`/learn/${t.slug}`}
-                className="card-pop group flex flex-col overflow-hidden"
-                style={
-                  {
-                    "--accent": theme.accent,
-                    "--pop": `color-mix(in srgb, ${theme.banner} 20%, transparent)`,
-                  } as React.CSSProperties
-                }
+                className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-surface p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                style={{ ["--c" as string]: theme.banner } as React.CSSProperties}
               >
-                <div
-                  className="flex flex-1 flex-col p-6"
-                  style={{
-                    background: `linear-gradient(180deg, color-mix(in srgb, ${theme.banner} 9%, var(--color-surface)), color-mix(in srgb, ${theme.banner} 3%, var(--color-surface)))`,
-                  }}
-                >
+                <span aria-hidden className="absolute inset-x-0 top-0 h-1.5" style={{ background: theme.gradient }} />
+                <div className="flex flex-1 flex-col pt-1">
                   <div className="flex items-center gap-4">
                     <ProgressRing value={done} total={total} size={64} stroke={6} color={theme.banner} />
                     <div className="min-w-0">
-                      <div className="text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: theme.banner }}>
+                      <div className="text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: theme.banner }}>
                         {theme.tag}
                       </div>
-                      <div className="mt-0.5 truncate text-[17px] font-extrabold tracking-tight text-tprimary">
+                      <div className="mt-1 truncate font-serif text-[1.3rem] font-bold leading-tight text-tprimary">
                         {t.title}
                       </div>
                     </div>
-                    <ArrowRight
-                      className="ml-auto h-[18px] w-[18px] shrink-0 -translate-x-1.5 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100"
-                      style={{ color: theme.banner }}
-                    />
+                    <span className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-[1.5px] border-[color:var(--c)] text-[color:var(--c)] transition-all duration-200 group-hover:border-transparent group-hover:bg-[var(--c)] group-hover:text-white">
+                      <ArrowRight className="h-[18px] w-[18px]" />
+                    </span>
                   </div>
                   <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "color-mix(in srgb, var(--color-border-strong) 60%, transparent)" }}>
                     <div className="progress-fill h-full rounded-full" style={{ width: `${pct}%`, background: theme.banner }} />

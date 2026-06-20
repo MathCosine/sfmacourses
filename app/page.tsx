@@ -4,7 +4,6 @@ import { renderMarkdown } from "@/lib/markdown";
 import { trackTheme } from "@/lib/trackTheme";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { BrandMark } from "@/components/Brand";
 import { InteractiveGrid } from "@/components/InteractiveGrid";
 import { Faq } from "@/components/Faq";
 import { Reveal } from "@/components/Reveal";
@@ -109,38 +108,35 @@ export default async function HomePage() {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
 
-      {/* ---------- Hero (centered, interactive constellation backdrop) ---------- */}
+      {/* ---------- Hero (asymmetric: copy left, live chapter card right) ---------- */}
       <section className="relative overflow-hidden border-b border-border bg-bg">
         <InteractiveGrid />
-        {/* Soft vignette so text stays legible over the grid. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(60% 60% at 50% 42%, color-mix(in srgb, var(--bg) 35%, transparent), var(--bg) 88%)",
+              "radial-gradient(80% 70% at 30% 35%, color-mix(in srgb, var(--bg) 25%, transparent), var(--bg) 92%)",
           }}
         />
 
-        <div className="relative mx-auto flex max-w-3xl flex-col items-center px-6 py-24 text-center sm:px-8 lg:py-32">
-          <div className="fade-up flex flex-col items-center">
-            <BrandMark className="h-14 w-14" />
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3.5 py-1.5 text-[12.5px] font-medium text-tmuted shadow-xs backdrop-blur-sm">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-y-14 px-6 py-20 sm:px-8 lg:grid-cols-[1.04fr_0.96fr] lg:gap-x-12 lg:py-28">
+          {/* Left — copy */}
+          <div className="fade-up max-w-xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3.5 py-1.5 text-[12.5px] font-medium text-tmuted shadow-xs backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-green" />
               Free &amp; open · by the San Francisco Math Initiative
             </div>
-            <h1 className="mt-7 text-[3rem] font-bold leading-[1.08] tracking-[-0.015em] text-tprimary sm:text-[4.2rem]">
-              The math you need,
-              <br />
-              in an order that{" "}
-              <span className="marker whitespace-nowrap">makes sense.</span>
+            <h1 className="mt-6 text-[2.9rem] font-bold leading-[1.06] tracking-[-0.015em] text-tprimary sm:text-[4rem]">
+              The math you need, in an order that{" "}
+              <span className="marker">makes sense.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-[17.5px] leading-relaxed text-tmuted">
+            <p className="mt-6 max-w-lg text-[17px] leading-relaxed text-tmuted">
               A free, carefully sequenced guide of lessons and contest problems —
               from the AMC 8 to AP Calculus BC — with your progress tracked on
               every single chapter.
             </p>
-            <div className="mt-9 flex flex-wrap items-center justify-center gap-3.5">
+            <div className="mt-8 flex flex-wrap items-center gap-3.5">
               <Link href={cta} className="btn-3d px-7 py-3.5 text-[15px]">
                 <span className="btn-slide">
                   <span>{user ? "Go to your dashboard" : "Start learning — free"}</span>
@@ -163,25 +159,11 @@ export default async function HomePage() {
               {tree.length} courses · {totalChapters} chapters · always $0
             </p>
           </div>
-        </div>
-      </section>
 
-      {/* ---------- Peek inside a chapter (centered showcase) ---------- */}
-      <section className="border-b border-border bg-surface">
-        <div className="mx-auto max-w-2xl px-6 py-16 sm:px-8">
-          <Reveal>
-            <div className="mb-6 text-center">
-              <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-tfaint">
-                Peek inside
-              </div>
-              <h2 className="mt-1.5 text-[1.5rem] font-extrabold tracking-tight text-tprimary">
-                Real lessons, real contest math.
-              </h2>
-            </div>
-          </Reveal>
-          <Reveal delay={80}>
+          {/* Right — the live chapter card (skewed) */}
+          <div className="fade-up-1">
             <HeroExcerpt qHtml={qHtml} aHtml={aHtml} formulaHtml={formulaHtml} />
-          </Reveal>
+          </div>
         </div>
       </section>
 
@@ -293,28 +275,24 @@ export default async function HomePage() {
                 <Reveal key={track.id} delay={i * 80}>
                   <Link
                     href={user ? `/learn/${track.slug}` : "/auth"}
-                    className="card-pop group flex h-full flex-col overflow-hidden"
-                    style={{
-                      background: `linear-gradient(180deg, color-mix(in srgb, ${theme.banner} 10%, var(--color-surface)), color-mix(in srgb, ${theme.banner} 3%, var(--color-surface)))`,
-                    }}
+                    className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-surface p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                    style={{ ["--c" as string]: theme.banner } as React.CSSProperties}
                   >
-                    <div className="h-1 w-full" style={{ background: theme.gradient }} />
-                    <div className="flex flex-1 flex-col p-6">
-                      <div className="text-[11px] font-bold uppercase tracking-[0.16em]" style={{ color: theme.banner }}>
-                        {theme.tag}
-                      </div>
-                      <div className="mt-2 text-[1.5rem] font-extrabold tracking-[-0.02em] text-tprimary">{track.title}</div>
-                      <p className="mt-2.5 flex-1 text-[14.5px] leading-relaxed text-tmuted">{info.blurb}</p>
-                      <div
-                        className="mt-6 flex items-center justify-between pt-4 text-[12.5px]"
-                        style={{ borderTop: `1px solid color-mix(in srgb, ${theme.banner} 16%, transparent)` }}
-                      >
-                        <span className="font-medium text-tmuted">{track.modules.length} units · {chapters} chapters</span>
-                        <span className="inline-flex items-center gap-1.5 font-semibold" style={{ color: theme.banner }}>
-                          Open
-                          <ArrowRight className="h-4 w-4 -translate-x-1 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
-                        </span>
-                      </div>
+                    <span aria-hidden className="absolute inset-x-0 top-0 h-1.5" style={{ background: theme.gradient }} />
+                    <div className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: theme.banner }}>
+                      {theme.tag}
+                    </div>
+                    <h3 className="mt-2.5 font-serif text-[1.7rem] font-bold leading-[1.1] text-tprimary">
+                      {track.title}
+                    </h3>
+                    <p className="mt-3 flex-1 text-[14.5px] leading-relaxed text-tmuted">{info.blurb}</p>
+                    <div className="mt-7 flex items-center justify-between">
+                      <span className="text-[12.5px] font-medium text-tmuted">
+                        {track.modules.length} units · {chapters} chapters
+                      </span>
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full border-[1.5px] border-[color:var(--c)] text-[color:var(--c)] transition-all duration-200 group-hover:border-transparent group-hover:bg-[var(--c)] group-hover:text-white">
+                        <ArrowRight className="h-[18px] w-[18px]" />
+                      </span>
                     </div>
                   </Link>
                 </Reveal>
