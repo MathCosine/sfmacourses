@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { SiteShell } from "@/components/SiteShell";
 import { FrequencyDots } from "@/components/FrequencyDots";
+import { MaturityBadge } from "@/components/MaturityBadge";
 import { getLessonStatuses, getCourseTree, getSessionUser } from "@/lib/data";
 import { extractMeta, countProblems } from "@/lib/utils";
 import { trackTheme } from "@/lib/trackTheme";
@@ -144,8 +145,13 @@ export default async function TrackPage({
                           {s === "complete" && <Check className="h-3 w-3 text-white" />}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <div className="text-[14.5px] font-semibold text-tprimary group-hover:text-gold">
-                            {l.title}
+                          <div className="flex items-center gap-2">
+                            <span className="truncate text-[14.5px] font-semibold text-tprimary group-hover:text-gold">
+                              {l.title}
+                            </span>
+                            {meta.maturity !== "stable" && (
+                              <MaturityBadge maturity={meta.maturity} className="shrink-0" />
+                            )}
                           </div>
                           <div className="mt-0.5 flex items-center gap-3">
                             <FrequencyDots frequency={meta.frequency} />

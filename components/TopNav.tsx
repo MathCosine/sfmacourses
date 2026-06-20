@@ -8,6 +8,7 @@ import { trackTheme } from "@/lib/trackTheme";
 import { createClient } from "@/lib/supabase/client";
 import { cn, initials } from "@/lib/utils";
 import { avatarUrl } from "@/lib/cloudinary";
+import { MaturityDot } from "@/components/MaturityBadge";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BrandMark } from "@/components/Brand";
 import {
@@ -358,7 +359,12 @@ function SearchModal({
   }, [onClose]);
 
   const results = useMemo(() => {
-    const flat: { title: string; track: string; href: string }[] = [];
+    const flat: {
+      title: string;
+      track: string;
+      href: string;
+      maturity: NavTrack["modules"][number]["lessons"][number]["maturity"];
+    }[] = [];
     for (const t of tracks)
       for (const m of t.modules)
         for (const l of m.lessons)
@@ -366,6 +372,7 @@ function SearchModal({
             title: l.title,
             track: `${t.title} · ${m.title}`,
             href: loggedIn ? `/learn/${t.slug}/${m.slug}/${l.slug}` : "/auth",
+            maturity: l.maturity,
           });
     const needle = q.trim().toLowerCase();
     if (!needle) return flat.slice(0, 8);
@@ -406,10 +413,11 @@ function SearchModal({
                 className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-bg"
               >
                 <BookOpen className="h-4 w-4 shrink-0 text-gold" />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="truncate text-[14px] font-medium text-tprimary">{r.title}</div>
                   <div className="truncate text-[12px] text-tmuted">{r.track}</div>
                 </div>
+                {r.maturity !== "stable" && <MaturityDot maturity={r.maturity} />}
               </button>
             ))
           )}

@@ -10,7 +10,8 @@ import type {
   TrackWithModules,
 } from "@/lib/data";
 import type { Announcement, ContentBlock, Lesson, Profile } from "@/lib/types";
-import { cn, formatDate, countProblems } from "@/lib/utils";
+import { cn, formatDate, countProblems, extractMeta } from "@/lib/utils";
+import { MaturityBadge } from "@/components/MaturityBadge";
 import { BlockEditor, ADD_ORDER, BLOCK_LABEL, BLOCK_HINT } from "./BlockEditor";
 import {
   createTrack,
@@ -474,6 +475,10 @@ function ManageList({
                         <span className="truncate text-[13.5px] text-tprimary group-hover:text-gold">
                           {l.title}
                         </span>
+                        <MaturityBadge
+                          maturity={extractMeta(l.content).maturity}
+                          className="shrink-0"
+                        />
                         <span className="shrink-0 text-[11.5px] text-tfaint">
                           {countProblems(l.content)} problems
                         </span>

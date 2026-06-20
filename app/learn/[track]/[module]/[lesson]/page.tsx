@@ -6,6 +6,8 @@ import { LessonView } from "@/components/LessonView";
 import { LessonStatusControl } from "@/components/LessonStatusControl";
 import { TableOfContents } from "@/components/TableOfContents";
 import { FrequencyDots } from "@/components/FrequencyDots";
+import { MaturityBadge } from "@/components/MaturityBadge";
+import { MATURITY_META } from "@/lib/maturity";
 import { Prerequisites } from "@/components/Prerequisites";
 import {
   getLessonContext,
@@ -112,13 +114,46 @@ export default async function LessonPage({
 
           {/* Title + status */}
           <div className="flex items-start justify-between gap-4">
-            <h1 className="text-[2.4rem] font-extrabold leading-tight tracking-tight text-tprimary">
-              {ctx.lesson.title}
-            </h1>
+            <div className="min-w-0">
+              <MaturityBadge maturity={meta.maturity} className="mb-2" />
+              <h1 className="text-[2.4rem] font-extrabold leading-tight tracking-tight text-tprimary">
+                {ctx.lesson.title}
+              </h1>
+            </div>
             <div className="shrink-0 pt-1">
               <LessonStatusControl lessonId={ctx.lesson.id} initial={lessonStatus} />
             </div>
           </div>
+
+          {/* Heads-up banner for chapters that aren't finished */}
+          {meta.maturity !== "stable" && (
+            <div
+              className="mt-4 flex items-start gap-3 rounded-xl border px-4 py-3"
+              style={{
+                borderColor: `color-mix(in srgb, ${MATURITY_META[meta.maturity].color} 35%, transparent)`,
+                background: `color-mix(in srgb, ${MATURITY_META[meta.maturity].color} 8%, transparent)`,
+              }}
+            >
+              <span
+                className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
+                style={{ background: MATURITY_META[meta.maturity].color }}
+              />
+              <div>
+                <div
+                  className="text-[13.5px] font-bold"
+                  style={{ color: MATURITY_META[meta.maturity].color }}
+                >
+                  {meta.maturity === "draft"
+                    ? "Draft chapter"
+                    : "Chapter in progress"}
+                </div>
+                <p className="mt-0.5 text-[13px] leading-snug text-tmuted">
+                  {MATURITY_META[meta.maturity].desc} Check back soon for the
+                  finished version.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Meta box (usaco-style) */}
           <div className="mt-5 rounded-2xl border border-border bg-surface-2 px-5 py-4">

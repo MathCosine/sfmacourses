@@ -1,9 +1,12 @@
 import type { TrackWithModules } from "./data";
+import type { Maturity } from "./types";
+import { extractMeta } from "./utils";
 
 export interface NavLesson {
   id: string;
   title: string;
   slug: string;
+  maturity: Maturity;
 }
 export interface NavModule {
   id: string;
@@ -32,6 +35,7 @@ export function toNavTracks(tree: TrackWithModules[]): NavTrack[] {
         id: l.id,
         title: l.title,
         slug: l.slug,
+        maturity: extractMeta(l.content).maturity,
       })),
     })),
   }));

@@ -8,8 +8,10 @@ import type {
   Difficulty,
   Frequency,
   Lesson,
+  Maturity,
 } from "@/lib/types";
 import { CALLOUT_LABELS, CALLOUT_VARIANTS, DIFFICULTIES } from "@/lib/types";
+import { MATURITY_META, MATURITY_OPTIONS } from "@/lib/maturity";
 import type { PreparedBlock } from "@/lib/prepare";
 import type { LessonLink, ModuleLink } from "@/lib/data";
 import { contentBlocks, extractMeta, cn } from "@/lib/utils";
@@ -129,6 +131,7 @@ export function BlockEditor({
   const [prereqLessonIds, setPrereqLessonIds] = useState<string[]>(
     meta.prereqLessonIds,
   );
+  const [maturity, setMaturity] = useState<Maturity>(meta.maturity);
   const [blocks, setBlocks] = useState<ContentBlock[]>(
     contentBlocks(lesson.content),
   );
@@ -218,6 +221,7 @@ export function BlockEditor({
         frequency,
         prereqNote,
         prereqLessonIds,
+        maturity,
       });
       if (res.ok) {
         setMsg("Saved ✓");
@@ -301,7 +305,7 @@ export function BlockEditor({
             }}
           />
         </div>
-        <div className="sm:col-span-2">
+        <div>
           <label className={labelCls}>Author</label>
           <input
             className={inputCls}
@@ -326,6 +330,26 @@ export function BlockEditor({
             <option value="important">●● Important</option>
             <option value="supplemental">●●● Supplemental</option>
           </select>
+        </div>
+        <div>
+          <label className={labelCls}>Readiness</label>
+          <select
+            className={inputCls}
+            value={maturity}
+            onChange={(e) => {
+              setMaturity(e.target.value as Maturity);
+              setDirty(true);
+            }}
+          >
+            {MATURITY_OPTIONS.map((m) => (
+              <option key={m} value={m}>
+                {MATURITY_META[m].label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-[11px] leading-snug text-tfaint">
+            {MATURITY_META[maturity].desc}
+          </p>
         </div>
       </div>
 

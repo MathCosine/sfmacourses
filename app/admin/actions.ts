@@ -6,7 +6,7 @@ import { slugify } from "@/lib/utils";
 import { renderMarkdown } from "@/lib/markdown";
 import { prepareBlocks, type PreparedBlock } from "@/lib/prepare";
 import { isSuperAdmin } from "@/lib/admin";
-import type { Block, ContentBlock, MetaBlock, Frequency } from "@/lib/types";
+import type { Block, ContentBlock, MetaBlock, Frequency, Maturity } from "@/lib/types";
 
 type Result = { ok: boolean; error?: string; id?: string };
 
@@ -277,6 +277,8 @@ export async function createLesson(
     type: "meta",
     author: "SFMA Staff",
     frequency: "important",
+    // New chapters start as a draft until staff mark them ready.
+    maturity: "draft",
   };
   const slug = await uniqueSlug(supabase, "lessons", title);
   const { data, error: e } = await supabase
@@ -304,6 +306,7 @@ export async function updateLesson(
     frequency?: Frequency;
     prereqNote?: string;
     prereqLessonIds?: string[];
+    maturity?: Maturity;
   },
 ): Promise<Result> {
   const { supabase, error } = await requireStaff();
@@ -323,6 +326,7 @@ export async function updateLesson(
       prereqLessonIds: fields.prereqLessonIds?.length
         ? fields.prereqLessonIds
         : undefined,
+      maturity: fields.maturity ?? "stable",
     };
     patch.content = [meta, ...fields.content] as Block[];
   }

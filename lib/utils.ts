@@ -1,4 +1,4 @@
-import type { Block, ContentBlock, Frequency, MetaBlock } from "./types";
+import type { Block, ContentBlock, Frequency, Maturity, MetaBlock } from "./types";
 
 /** Join class names, skipping falsy values. */
 export function cn(...classes: (string | false | null | undefined)[]): string {
@@ -71,6 +71,7 @@ export function extractMeta(content: Block[] | null | undefined): {
   frequency: Frequency;
   prereqNote: string;
   prereqLessonIds: string[];
+  maturity: Maturity;
 } {
   const meta = asBlocks(content).find((b): b is MetaBlock => b.type === "meta");
   return {
@@ -80,6 +81,10 @@ export function extractMeta(content: Block[] | null | undefined): {
     prereqLessonIds: Array.isArray(meta?.prereqLessonIds)
       ? meta!.prereqLessonIds
       : [],
+    maturity:
+      meta?.maturity === "developing" || meta?.maturity === "draft"
+        ? meta.maturity
+        : "stable",
   };
 }
 

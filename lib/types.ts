@@ -119,7 +119,12 @@ export interface MetaBlock {
   prereqNote?: string;
   /** Optional ids of other lessons recommended as prerequisites. */
   prereqLessonIds?: string[];
+  /** Editorial maturity, set by staff. Defaults to "stable" when absent. */
+  maturity?: Maturity;
 }
+
+/** How finished/polished a chapter is — staff-set, shown to everyone. */
+export type Maturity = "stable" | "developing" | "draft";
 
 export type ContentBlock =
   | TextBlock

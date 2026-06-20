@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { NavTrack } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 import { statusMeta } from "@/lib/status";
+import { MaturityDot } from "@/components/MaturityBadge";
 import { trackTheme } from "@/lib/trackTheme";
 import { ChevronRight, ChevronDown, Check } from "@/components/icons";
 
@@ -147,6 +148,11 @@ export function Sidebar({
                             {status === "complete" && <Check className="h-2 w-2 text-white" />}
                           </span>
                           <span className="truncate">{l.title}</span>
+                          {l.maturity !== "stable" && (
+                            <span className="ml-auto shrink-0">
+                              <MaturityDot maturity={l.maturity} />
+                            </span>
+                          )}
                         </Link>
                       </li>
                     );
