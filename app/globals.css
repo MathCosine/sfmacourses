@@ -12,13 +12,14 @@
 :root {
   color-scheme: light;
 
-  --bg: #f5f6f8;
-  --sidebar: #ffffff;
-  --surface: #ffffff;
-  --surface-2: #f9fafb;
-  --highlight: #eef4ff;
-  --border: #e6e8ec;
-  --border-strong: #d3d8df;
+  /* Faintly blue-tinted neutrals (no pure white) so the UI reads intentional. */
+  --bg: #f3f5fa;
+  --sidebar: #fbfcfe;
+  --surface: #fdfdff;
+  --surface-2: #f3f5fa;
+  --highlight: #eaf1ff;
+  --border: #e4e8f0;
+  --border-strong: #cdd5e2;
 
   --accent: #2563eb;
   --accent-hover: #1d4ed8;

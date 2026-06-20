@@ -104,8 +104,8 @@ export function ProblemsExplorer({
   return (
     <div>
       {/* Controls */}
-      <div className="card rounded-2xl p-4">
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-bg px-3.5 py-2.5">
+      <div className="card rounded-xl p-4">
+        <div className="flex items-center gap-3 rounded-[10px] border border-border bg-bg px-3.5 py-2.5">
           <Search className="h-[18px] w-[18px] text-tfaint" />
           <input
             value={q}
@@ -161,8 +161,8 @@ export function ProblemsExplorer({
       </div>
 
       {/* Table */}
-      <div className="mt-2 overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
-        <div className="hidden grid-cols-[44px_1fr_140px_120px_160px] items-center gap-3 border-b border-border bg-surface-2 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-tfaint sm:grid">
+      <div className="mt-2 overflow-hidden rounded-xl border border-border bg-surface shadow-sm">
+        <div className="hidden grid-cols-[44px_1fr_140px_120px_160px] items-center gap-3 bg-surface-2 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-tfaint sm:grid">
           <span>Status</span>
           <button onClick={() => toggleSort("title")} className="flex items-center gap-1 text-left hover:text-tprimary">
             Problem {sortKey === "title" && (sortAsc ? "↑" : "↓")}
@@ -174,13 +174,13 @@ export function ProblemsExplorer({
           <span>Course</span>
         </div>
 
-        <div className="divide-y divide-border">
+        <div>
           {filtered.map((r) => {
             const ds = DIFFICULTY_STYLE[r.difficulty];
             return (
               <div
                 key={r.key}
-                className="grid grid-cols-[44px_1fr] items-center gap-3 px-4 py-3 transition-colors hover:bg-bg sm:grid-cols-[44px_1fr_140px_120px_160px]"
+                className="grid grid-cols-[44px_1fr] items-center gap-3 px-4 py-3 transition-colors odd:bg-surface-2/60 hover:bg-highlight sm:grid-cols-[44px_1fr_140px_120px_160px]"
               >
                 <StatusControl
                   value={r.status}
