@@ -99,7 +99,7 @@ export default async function DashboardPage() {
           {resume && (
             <Link
               href={resume.href}
-              className="card-pop group mt-7 flex items-center justify-between gap-4 overflow-hidden rounded-2xl"
+              className="card-pop group mt-7 flex items-center justify-between gap-4 overflow-hidden"
               style={
                 {
                   "--accent": "var(--color-gold)",
@@ -172,7 +172,7 @@ export default async function DashboardPage() {
               <Link
                 key={t.id}
                 href={`/learn/${t.slug}`}
-                className="card-pop group flex flex-col overflow-hidden rounded-2xl"
+                className="card-pop group flex flex-col overflow-hidden"
                 style={
                   {
                     "--accent": theme.accent,
@@ -232,7 +232,7 @@ export default async function DashboardPage() {
           </div>
         </div>
         {announcements.length === 0 ? (
-          <div className="mt-5 flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-strong bg-surface/60 px-5 py-12 text-center">
+          <div className="mt-5 flex flex-col items-center justify-center rounded-xl border border-dashed border-border-strong bg-surface-2 px-5 py-12 text-center">
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gold/12 text-gold">
               <Compass className="h-5 w-5" />
             </span>
@@ -242,7 +242,7 @@ export default async function DashboardPage() {
         ) : (
           <div className="mt-5 space-y-3">
             {announcements.map((a) => (
-              <article key={a.id} className="card-pop rounded-2xl px-5 py-4">
+              <article key={a.id} className="card-pop px-5 py-4">
                 <div className="flex items-baseline justify-between gap-3">
                   <h3 className="text-[16px] font-bold text-tprimary">{a.title}</h3>
                   <time className="shrink-0 text-[11.5px] text-tfaint">{formatDate(a.created_at)}</time>
@@ -269,24 +269,17 @@ function StatCard({
   tint: string;
 }) {
   return (
-    <div
-      className="card-pop rounded-2xl p-5"
-      style={{
-        background: "color-mix(in srgb, var(--color-surface) 80%, transparent)",
-        backdropFilter: "blur(6px)",
-        WebkitBackdropFilter: "blur(6px)",
-      }}
-    >
+    <div className="card-pop p-5">
       <span
-        className="flex h-10 w-10 items-center justify-center rounded-xl"
-        style={{ background: `color-mix(in srgb, ${tint} 16%, transparent)`, color: tint }}
+        className="flex h-10 w-10 items-center justify-center rounded-[10px]"
+        style={{ background: `color-mix(in srgb, ${tint} 14%, transparent)`, color: tint }}
       >
         {icon}
       </span>
-      <div className="mt-3.5 text-[1.85rem] font-extrabold leading-none tracking-tight text-tprimary">
+      <div className="mt-4 text-[2rem] font-extrabold leading-none tracking-[-0.02em] text-tprimary">
         {value}
       </div>
-      <div className="mt-1 text-[12.5px] text-tmuted">{label}</div>
+      <div className="mt-1.5 text-[12.5px] text-tmuted">{label}</div>
     </div>
   );
 }
