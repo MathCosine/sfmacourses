@@ -385,7 +385,7 @@ function SearchModal({
     <div className="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-[12vh]" onClick={onClose}>
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
       <div
-        className="panel menu-pop relative w-full max-w-xl overflow-hidden rounded-2xl"
+        className="glass menu-pop relative w-full max-w-xl overflow-hidden rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 border-b border-border px-4 py-3.5">

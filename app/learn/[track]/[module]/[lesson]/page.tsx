@@ -155,35 +155,33 @@ export default async function LessonPage({
             </div>
           )}
 
-          {/* Meta box (usaco-style) */}
-          <div className="mt-5 rounded-2xl border border-border bg-surface-2 px-5 py-4">
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Frequency</div>
-                <div className="mt-1">
-                  <FrequencyDots frequency={meta.frequency} />
-                </div>
-                <p className="mt-1 text-[11.5px] leading-snug text-tmuted">
-                  {FREQUENCY_BLURB[meta.frequency] ?? ""}
-                </p>
+          {/* Meta box — hairline-divided columns */}
+          <div className="mt-5 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-3">
+            <div className="bg-surface-2 px-5 py-4">
+              <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Frequency</div>
+              <div className="mt-1.5">
+                <FrequencyDots frequency={meta.frequency} />
               </div>
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Author</div>
-                <div className="mt-1 text-[13.5px] font-medium text-tprimary">{meta.author}</div>
-                <div className="mt-0.5 text-[11.5px] text-tmuted">{FREQUENCY_LABELS[meta.frequency]} topic</div>
+              <p className="mt-1.5 text-[11.5px] leading-snug text-tmuted">
+                {FREQUENCY_BLURB[meta.frequency] ?? ""}
+              </p>
+            </div>
+            <div className="bg-surface-2 px-5 py-4">
+              <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Author</div>
+              <div className="mt-1.5 text-[13.5px] font-medium text-tprimary">{meta.author}</div>
+              <div className="mt-0.5 text-[11.5px] text-tmuted">{FREQUENCY_LABELS[meta.frequency]} topic</div>
+            </div>
+            <div className="bg-surface-2 px-5 py-4">
+              <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Practice</div>
+              <div className="mt-1.5 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-tprimary">
+                <ListChecks className="h-[18px] w-[18px] text-gold" />
+                {problemCount} problem{problemCount === 1 ? "" : "s"}
               </div>
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-tfaint">Practice</div>
-                <div className="mt-1 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-tprimary">
-                  <ListChecks className="h-4 w-4 text-gold" />
-                  {problemCount} problem{problemCount === 1 ? "" : "s"}
-                </div>
-                {isStaff && (
-                  <Link href={`/admin?lesson=${ctx.lesson.id}`} className="mt-1 block text-[11.5px] font-medium text-gold hover:underline">
-                    Edit this page →
-                  </Link>
-                )}
-              </div>
+              {isStaff && (
+                <Link href={`/admin?lesson=${ctx.lesson.id}`} className="mt-1.5 block text-[11.5px] font-medium text-gold hover:underline">
+                  Edit this page →
+                </Link>
+              )}
             </div>
           </div>
 
