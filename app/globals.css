@@ -43,11 +43,12 @@
   --resource: #f0fdf4;
   --resource-border: #bbf7d0;
 
-  --shadow-1: 0 1px 2px rgba(15, 27, 46, 0.04);
-  --shadow-2: 0 1px 2px rgba(15, 27, 46, 0.05), 0 2px 6px rgba(15, 27, 46, 0.04);
-  --shadow-3: 0 2px 6px rgba(15, 27, 46, 0.05), 0 8px 24px rgba(15, 27, 46, 0.06);
-  --shadow-4: 0 4px 12px rgba(15, 27, 46, 0.06), 0 16px 48px rgba(15, 27, 46, 0.10);
-  --shadow-5: 0 24px 70px rgba(15, 27, 46, 0.16);
+  /* Soft, brand-tinted shadows (a touch of blue, never harsh black). */
+  --shadow-1: 0 1px 2px rgba(23, 47, 110, 0.05);
+  --shadow-2: 0 1px 2px rgba(23, 47, 110, 0.06), 0 2px 6px rgba(23, 47, 110, 0.05);
+  --shadow-3: 0 2px 6px rgba(23, 47, 110, 0.06), 0 8px 24px rgba(23, 47, 110, 0.08);
+  --shadow-4: 0 4px 12px rgba(23, 47, 110, 0.08), 0 16px 48px rgba(23, 47, 110, 0.12);
+  --shadow-5: 0 24px 70px rgba(23, 47, 110, 0.18);
   --shadow-accent-raw: 0 6px 20px -4px rgba(37, 99, 235, 0.30);
 }
 
@@ -503,8 +504,68 @@ body::-webkit-scrollbar-thumb:hover {
   transform: none;
 }
 
+/* Shimmer gradient stroke — a slow accent highlight orbiting the border. */
+@property --shimmer-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes shimmerSpin { to { --shimmer-angle: 360deg; } }
+.shimmer-border { position: relative; }
+.shimmer-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--shimmer-angle),
+    transparent 0deg,
+    color-mix(in srgb, var(--accent) 80%, transparent) 55deg,
+    color-mix(in srgb, var(--accent) 20%, transparent) 110deg,
+    transparent 150deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: shimmerSpin 5s linear infinite;
+  pointer-events: none;
+}
+
+/* Delayed, spring-in tooltip for icon-only controls. Add data-tip="Label". */
+[data-tip] { position: relative; }
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px) scale(0.9);
+  background: var(--color-tprimary);
+  color: var(--color-bg);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  padding: 5px 8px;
+  border-radius: 7px;
+  box-shadow: var(--shadow-3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 220ms var(--ease-spring);
+  z-index: 70;
+}
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+  transition-delay: 650ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .shimmer-border::before { animation: none !important; }
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
   .fade-up, .fade-up-1, .fade-up-2, .fade-up-3,
   .progress-fill, .hover-lift,

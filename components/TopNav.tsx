@@ -192,15 +192,16 @@ export function TopNav({ tracks, user }: TopNavProps) {
             <div ref={profileRef} className="relative hidden lg:block">
               <button
                 onClick={() => setProfileOpen((o) => !o)}
-                className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gold/15 text-[12.5px] font-bold text-gold ring-1 ring-inset ring-gold/25 transition-all hover:bg-gold/20 hover:scale-105"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gold/15 text-[12.5px] font-bold text-gold ring-1 ring-inset ring-gold/25 transition-all hover:scale-105 hover:bg-gold/20"
                 aria-label="Account menu"
+                data-tip="Account"
               >
                 {user.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={avatarUrl(user.avatarUrl, 72)}
                     alt=""
-                    className="h-full w-full object-cover"
+                    className="h-full w-full rounded-full object-cover"
                   />
                 ) : (
                   initials(user.name, user.email)

@@ -99,7 +99,7 @@ export default async function DashboardPage() {
           {resume && (
             <Link
               href={resume.href}
-              className="card-pop group mt-7 flex items-center justify-between gap-4 overflow-hidden"
+              className="card-pop shimmer-border group mt-7 flex items-center justify-between gap-4 overflow-hidden"
               style={
                 {
                   "--accent": "var(--color-gold)",
