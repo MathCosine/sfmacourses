@@ -41,12 +41,12 @@
   --resource: #f0fdf4;
   --resource-border: #bbf7d0;
 
-  --shadow-1: 0 1px 2px rgba(15, 27, 46, 0.05);
-  --shadow-2: 0 1px 3px rgba(15, 27, 46, 0.08), 0 1px 2px rgba(15, 27, 46, 0.04);
-  --shadow-3: 0 4px 14px rgba(15, 27, 46, 0.08), 0 2px 4px rgba(15, 27, 46, 0.05);
-  --shadow-4: 0 12px 32px rgba(15, 27, 46, 0.12), 0 4px 10px rgba(15, 27, 46, 0.06);
-  --shadow-5: 0 24px 60px rgba(15, 27, 46, 0.18);
-  --shadow-accent-raw: 0 6px 18px rgba(37, 99, 235, 0.28);
+  --shadow-1: 0 1px 2px rgba(15, 27, 46, 0.04);
+  --shadow-2: 0 1px 2px rgba(15, 27, 46, 0.05), 0 2px 6px rgba(15, 27, 46, 0.04);
+  --shadow-3: 0 2px 6px rgba(15, 27, 46, 0.05), 0 8px 24px rgba(15, 27, 46, 0.06);
+  --shadow-4: 0 4px 12px rgba(15, 27, 46, 0.06), 0 16px 48px rgba(15, 27, 46, 0.10);
+  --shadow-5: 0 24px 70px rgba(15, 27, 46, 0.16);
+  --shadow-accent-raw: 0 6px 20px -4px rgba(37, 99, 235, 0.30);
 }
 
 /* ---------------------------------------------------------------------------
@@ -84,12 +84,12 @@
   --resource: #0c2a1f;
   --resource-border: #14532d;
 
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-2: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-3: 0 4px 14px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
-  --shadow-4: 0 12px 32px rgba(0, 0, 0, 0.6), 0 4px 10px rgba(0, 0, 0, 0.4);
-  --shadow-5: 0 24px 60px rgba(0, 0, 0, 0.7);
-  --shadow-accent-raw: 0 6px 18px rgba(79, 140, 247, 0.35);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-3: 0 2px 6px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-4: 0 4px 12px rgba(0, 0, 0, 0.35), 0 16px 48px rgba(0, 0, 0, 0.45);
+  --shadow-5: 0 24px 70px rgba(0, 0, 0, 0.55);
+  --shadow-accent-raw: 0 6px 20px -4px rgba(79, 140, 247, 0.32);
 }
 
 /* ---------------------------------------------------------------------------
@@ -163,7 +163,9 @@ body {
 h1, h2, h3, h4 {
   font-family: var(--font-sans);
   font-weight: 800;
-  letter-spacing: -0.022em;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  text-wrap: balance;
 }
 
 ::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--color-tprimary); }
@@ -224,71 +226,68 @@ body::-webkit-scrollbar-thumb:hover {
 }
 
 /* ---------------------------------------------------------------------------
-   "Chunky" design language — solid offset shadows + tactile press. Gives the
-   UI a deliberate, hand-built feel instead of generic soft-shadow cards.
+   Interactive surfaces — restrained, professional. Subtle elevation, clear
+   hover/active/disabled states, no gimmicky offset shadows.
 --------------------------------------------------------------------------- */
 
-/* Primary pressable button: solid fill with a hard 3D edge that depresses. */
+/* Primary button: solid accent, gentle lift on hover, tactile press. */
 .btn-3d {
-  --edge: color-mix(in srgb, var(--accent) 62%, #000);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.85rem;
+  border-radius: 0.625rem;
   background: var(--accent);
   color: #fff;
-  font-weight: 700;
-  box-shadow: 0 5px 0 0 var(--edge), 0 10px 20px -8px color-mix(in srgb, var(--accent) 60%, transparent);
-  transition: transform 90ms var(--ease-out-soft), box-shadow 90ms var(--ease-out-soft), background-color 140ms ease;
+  font-weight: 600;
+  box-shadow: var(--shadow-1);
+  transition: background-color 150ms ease, box-shadow 200ms var(--ease-out-soft),
+    transform 90ms var(--ease-out-soft);
 }
-.btn-3d:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 0 0 var(--edge), 0 14px 24px -8px color-mix(in srgb, var(--accent) 60%, transparent); }
-.btn-3d:active { transform: translateY(4px); box-shadow: 0 1px 0 0 var(--edge); }
+.btn-3d:hover { background: var(--accent-hover); box-shadow: var(--shadow-accent); }
+.btn-3d:active { transform: translateY(1px); box-shadow: var(--shadow-1); }
+.btn-3d:disabled { opacity: 0.5; box-shadow: none; cursor: not-allowed; }
 
-/* Neutral pressable button: surface fill, hard edge in the strong border tone. */
+/* Neutral button: surface fill, hairline border, accent border on hover. */
 .btn-3d-neutral {
-  --edge: var(--color-border-strong);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.85rem;
+  border-radius: 0.625rem;
   background: var(--color-surface);
   color: var(--color-tprimary);
-  font-weight: 700;
-  border: 1.5px solid var(--color-border-strong);
-  box-shadow: 0 4px 0 0 var(--edge);
-  transition: transform 90ms var(--ease-out-soft), box-shadow 90ms var(--ease-out-soft), border-color 140ms ease;
+  font-weight: 600;
+  border: 1px solid var(--color-border-strong);
+  box-shadow: var(--shadow-1);
+  transition: background-color 150ms ease, border-color 150ms ease,
+    box-shadow 200ms var(--ease-out-soft), transform 90ms var(--ease-out-soft);
 }
-.btn-3d-neutral:hover { transform: translateY(-1px); box-shadow: 0 5px 0 0 var(--edge); border-color: var(--accent); }
-.btn-3d-neutral:active { transform: translateY(3px); box-shadow: 0 1px 0 0 var(--edge); }
+.btn-3d-neutral:hover { background: var(--color-surface-2); border-color: var(--accent); }
+.btn-3d-neutral:active { transform: translateY(1px); }
+.btn-3d-neutral:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* The global press transform would fight the 3D shadow — opt these out. */
-button.btn-3d:not(:disabled):active,
-button.btn-3d-neutral:not(:disabled):active { transform: translateY(3px); }
-
-/* Sticker card: thicker border + hard offset shadow that lifts on hover. */
+/* Card: clean surface, hairline border, soft elevation that lifts subtly. */
 .card-pop {
-  --pop: color-mix(in srgb, var(--tprimary) 14%, transparent);
   background: var(--color-surface);
-  border: 1.5px solid var(--color-border-strong);
-  border-radius: 1rem;
-  box-shadow: 5px 5px 0 0 var(--pop);
-  transition: transform 200ms var(--ease-spring), box-shadow 200ms var(--ease-out-soft), border-color 200ms ease;
+  border: 1px solid var(--color-border);
+  border-radius: 0.875rem;
+  box-shadow: var(--shadow-2);
+  transition: box-shadow 240ms var(--ease-out-soft),
+    border-color 240ms ease, transform 240ms var(--ease-out-soft);
 }
 .card-pop:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 8px 8px 0 0 var(--pop);
-  border-color: var(--accent);
+  box-shadow: var(--shadow-3);
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
 }
 
-/* Dropdown / menu with the same hard-edge treatment. */
+/* Floating menu / popover — sits higher than flat cards (per guideline). */
 .panel-pop {
   background: var(--color-surface);
-  border: 1.5px solid var(--color-border-strong);
-  border-radius: 1rem;
-  box-shadow: 5px 6px 0 0 color-mix(in srgb, var(--tprimary) 12%, transparent),
-    var(--shadow-3);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-4);
 }
 
 .scroll-area { scrollbar-width: thin; scrollbar-color: var(--color-border-strong) transparent; }
