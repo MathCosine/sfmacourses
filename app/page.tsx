@@ -124,12 +124,12 @@ export default async function HomePage() {
 
         <div className="relative mx-auto flex max-w-3xl flex-col items-center px-6 py-24 text-center sm:px-8 lg:py-32">
           <div className="fade-up flex flex-col items-center">
-            <BrandMark className="animate-logo-float h-16 w-16" />
+            <BrandMark className="h-14 w-14" />
             <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3.5 py-1.5 text-[12.5px] font-medium text-tmuted shadow-xs backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-green" />
               Free &amp; open · by the San Francisco Math Initiative
             </div>
-            <h1 className="mt-6 text-[2.9rem] font-extrabold leading-[1.04] tracking-tight text-tprimary sm:text-[4.2rem]">
+            <h1 className="mt-7 text-[2.9rem] font-extrabold leading-[1.06] tracking-[-0.03em] text-tprimary sm:text-[4.1rem]">
               The math you need,
               <br />
               in an order that{" "}
