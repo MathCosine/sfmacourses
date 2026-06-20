@@ -142,14 +142,20 @@ export default async function HomePage() {
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3.5">
               <Link href={cta} className="btn-3d px-7 py-3.5 text-[15px]">
-                {user ? "Go to your dashboard" : "Start learning — free"}
+                <span className="btn-slide">
+                  <span>{user ? "Go to your dashboard" : "Start learning — free"}</span>
+                  <span aria-hidden>{user ? "Go to your dashboard" : "Start learning — free"}</span>
+                </span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href={user ? "/problems" : "/auth"}
                 className="btn-3d-neutral px-6 py-3.5 text-[15px]"
               >
-                Browse the problem set
+                <span className="btn-slide">
+                  <span>Browse the problem set</span>
+                  <span aria-hidden>Browse the problem set</span>
+                </span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -213,24 +219,34 @@ export default async function HomePage() {
             keep track of where you are, and practice with solutions on hand.
           </p>
         </Reveal>
-        <div className="mt-10 space-y-4">
+        <div className="mt-12 max-w-2xl">
           {STEPS.map((s, i) => (
             <Reveal key={s.n} delay={i * 70}>
-              <div className="card-pop grid items-start gap-5 p-6 sm:grid-cols-[auto_1fr] sm:p-8">
-                <div className="font-mono text-[2rem] font-bold leading-none text-gold">
-                  {s.n}
+              <div className="flex gap-5 sm:gap-7">
+                {/* Numbered marker + timeline connector (whitespace, no card) */}
+                <div className="flex flex-col items-center">
+                  <span
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-mono text-[16px] font-bold text-gold"
+                    style={{ background: "color-mix(in srgb, var(--accent) 11%, transparent)" }}
+                  >
+                    {s.n}
+                  </span>
+                  {i < STEPS.length - 1 && (
+                    <span
+                      className="mt-2 w-px flex-1"
+                      style={{ background: "linear-gradient(var(--color-border-strong), transparent)" }}
+                    />
+                  )}
                 </div>
-                <div>
-                  <h3 className="text-[19px] font-bold text-tprimary">{s.title}</h3>
-                  <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-tmuted">
-                    {s.body}
-                  </p>
+                <div className="pb-12 pt-1">
+                  <h3 className="text-[19px] font-bold tracking-[-0.01em] text-tprimary">{s.title}</h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-tmuted">{s.body}</p>
                   {s.legend && (
                     <div className="mt-4 flex flex-wrap gap-2">
                       {STATUS_LEGEND.map((st) => (
                         <span
                           key={st.label}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-2.5 py-1 text-[12px] font-medium text-tmuted"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-2.5 py-1 text-[12px] font-medium text-tmuted"
                         >
                           <span
                             className="flex h-3.5 w-3.5 items-center justify-center rounded-full border-2"

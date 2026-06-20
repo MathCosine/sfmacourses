@@ -103,7 +103,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
               <button
                 onClick={() => setLearnOpen((o) => !o)}
                 className={cn(
-                  "relative flex items-center gap-1 rounded-lg px-3 py-2 text-[14px] transition-colors",
+                  "relative flex items-center gap-1 rounded-lg px-3 py-2 text-[14px] transition-colors hover:bg-surface-2",
                   pathname.startsWith("/learn")
                     ? "font-semibold text-tprimary"
                     : "font-medium text-tmuted hover:text-tprimary",
@@ -323,7 +323,7 @@ function NavLink({ href, active, children }: { href: string; active: boolean; ch
     <Link
       href={href}
       className={cn(
-        "relative rounded-lg px-3 py-2 text-[14px] transition-colors",
+        "relative rounded-lg px-3 py-2 text-[14px] transition-colors hover:bg-surface-2",
         active ? "font-semibold text-tprimary" : "font-medium text-tmuted hover:text-tprimary",
       )}
     >

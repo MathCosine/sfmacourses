@@ -307,6 +307,16 @@ body::-webkit-scrollbar-thumb:hover {
 .btn-3d-neutral:active { transform: scale(0.98); }
 .btn-3d-neutral:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* Sliding-label micro-interaction: the label swaps upward on hover.
+   Markup: <span class="btn-slide"><span>Label</span><span aria-hidden>Label</span></span> */
+.btn-slide { display: inline-grid; overflow: hidden; line-height: 1.25; }
+.btn-slide > span { grid-area: 1 / 1; transition: transform 300ms var(--ease-out-soft); }
+.btn-slide > span:nth-child(2) { transform: translateY(125%); }
+.btn-3d:hover .btn-slide > span:nth-child(1),
+.btn-3d-neutral:hover .btn-slide > span:nth-child(1) { transform: translateY(-125%); }
+.btn-3d:hover .btn-slide > span:nth-child(2),
+.btn-3d-neutral:hover .btn-slide > span:nth-child(2) { transform: translateY(0); }
+
 /* Radius scale: containers (cards/panels) 12px, controls (buttons/inputs) 10px. */
 
 /* Card: top-lit gradient surface, hairline border, inner top highlight, soft
