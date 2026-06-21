@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import type { LessonStatus, ProblemStatus } from "@/lib/types";
 import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
 import { LessonView } from "@/components/LessonView";
@@ -54,9 +55,9 @@ export default async function LessonPage({
   if (!ctx) notFound();
 
   const user = await getSessionUser();
-  if (!user) redirect("/auth");
-  const userId = user.id;
-  const isStaff = user.isStaff;
+  const userId = user?.id ?? null;
+  const isStaff = user?.isStaff ?? false;
+  const signedIn = !!user;
 
   const meta = extractMeta(ctx.lesson.content);
   const blocks = contentBlocks(ctx.lesson.content);
@@ -69,9 +70,15 @@ export default async function LessonPage({
     prereqLinks,
   ] = await Promise.all([
     prepareBlocks(blocks),
-    getLessonStatus(userId, ctx.lesson.id),
-    getProblemStatuses(userId, ctx.lesson.id),
-    getSectionStatuses(userId, ctx.lesson.id),
+    userId
+      ? getLessonStatus(userId, ctx.lesson.id)
+      : Promise.resolve("not_started" as LessonStatus),
+    userId
+      ? getProblemStatuses(userId, ctx.lesson.id)
+      : Promise.resolve({} as Record<number, ProblemStatus>),
+    userId
+      ? getSectionStatuses(userId, ctx.lesson.id)
+      : Promise.resolve({} as Record<number, LessonStatus>),
     meta.prereqNote ? renderMarkdown(meta.prereqNote) : Promise.resolve(""),
     getLessonLinksByIds(meta.prereqLessonIds),
   ]);
@@ -120,7 +127,7 @@ export default async function LessonPage({
               </h1>
             </div>
             <div className="shrink-0 pt-1">
-              <LessonStatusControl lessonId={ctx.lesson.id} initial={lessonStatus} />
+              <LessonStatusControl lessonId={ctx.lesson.id} initial={lessonStatus} signedIn={signedIn} />
             </div>
           </div>
 
@@ -178,6 +185,7 @@ export default async function LessonPage({
               lessonStatus={lessonStatus}
               problemStatuses={problemStatuses}
               sectionStatuses={sectionStatuses}
+              signedIn={signedIn}
             />
           </div>
 

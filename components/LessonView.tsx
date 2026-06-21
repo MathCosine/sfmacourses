@@ -18,6 +18,7 @@ interface LessonViewProps {
   lessonStatus: LessonStatus;
   problemStatuses: Record<number, ProblemStatus>;
   sectionStatuses: Record<number, LessonStatus>;
+  signedIn?: boolean;
 }
 
 export function LessonView({
@@ -27,6 +28,7 @@ export function LessonView({
   lessonStatus,
   problemStatuses,
   sectionStatuses,
+  signedIn = true,
 }: LessonViewProps) {
   return (
     <>
@@ -54,6 +56,7 @@ export function LessonView({
                   initialStatus={
                     sectionStatuses[block.sectionIndex] ?? "not_started"
                   }
+                  signedIn={signedIn}
                 />
               );
             case "problem":
@@ -66,6 +69,7 @@ export function LessonView({
                   initialStatus={
                     problemStatuses[block.problemIndex] ?? "not_started"
                   }
+                  signedIn={signedIn}
                 />
               );
           }
@@ -81,6 +85,7 @@ export function LessonView({
           lessonId={lessonId}
           initial={lessonStatus}
           align="left"
+          signedIn={signedIn}
         />
       </div>
     </>

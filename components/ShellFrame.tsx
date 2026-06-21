@@ -1,18 +1,39 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Sidebar } from "@/components/Sidebar";
 import { TopNav, type NavUser } from "@/components/TopNav";
 import type { NavTrack } from "@/lib/nav";
-import { Menu, Close } from "@/components/icons";
+import { Menu, Close, GraduationCap } from "@/components/icons";
 import { cn } from "@/lib/utils";
+
+function GuestBanner() {
+  return (
+    <div className="border-b border-border bg-highlight">
+      <div className="mx-auto flex max-w-[1180px] flex-wrap items-center gap-x-3 gap-y-2 px-6 py-3 sm:px-10">
+        <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gold/15 text-gold">
+          <GraduationCap className="h-[18px] w-[18px]" />
+        </span>
+        <p className="text-[13px] text-tmuted">
+          You&apos;re previewing as a guest.{" "}
+          <span className="font-semibold text-tprimary">Sign in</span> to track
+          your progress and save your place.
+        </p>
+        <Link href="/auth" className="btn-3d ml-auto px-4 py-1.5 text-[12.5px]">
+          Sign in
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 interface ShellFrameProps {
   tracks: NavTrack[];
   statuses: Record<string, string>;
   activeTrackSlug?: string;
   activeLessonId?: string;
-  user: NavUser;
+  user: NavUser | null;
   children: React.ReactNode;
 }
 
@@ -84,7 +105,10 @@ export function ShellFrame({
         {/* Content — faint notebook paper behind the reading area */}
         <div className="relative min-w-0 flex-1">
           <div aria-hidden className="graph-paper pointer-events-none absolute inset-0 opacity-40" />
-          <div className="relative">{children}</div>
+          <div className="relative">
+            {!user && <GuestBanner />}
+            {children}
+          </div>
         </div>
       </div>
     </div>

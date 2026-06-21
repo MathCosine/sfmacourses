@@ -30,6 +30,7 @@ interface ProblemBlockProps {
   lessonId: string;
   problemIndex: number;
   initialStatus: ProblemStatus;
+  signedIn?: boolean;
 }
 
 export function ProblemBlock({
@@ -37,6 +38,7 @@ export function ProblemBlock({
   lessonId,
   problemIndex,
   initialStatus,
+  signedIn = true,
 }: ProblemBlockProps) {
   const [open, setOpen] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -74,6 +76,7 @@ export function ProblemBlock({
           options={PROBLEM_STATUS_OPTIONS}
           onChange={changeStatus}
           size={22}
+          signedIn={signedIn}
         />
 
         <button

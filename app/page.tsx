@@ -133,7 +133,7 @@ export default async function HomePage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href={user ? "/problems" : "/auth"}
+                href="/problems"
                 className="btn-3d-neutral px-6 py-3.5 text-[15px]"
               >
                 <span className="btn-slide">
@@ -262,7 +262,7 @@ export default async function HomePage() {
               return (
                 <Reveal key={track.id} delay={i * 80}>
                   <Link
-                    href={user ? `/learn/${track.slug}` : "/auth"}
+                    href={`/learn/${track.slug}`}
                     className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-surface p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
                     style={{ ["--c" as string]: theme.banner } as React.CSSProperties}
                   >

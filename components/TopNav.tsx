@@ -126,7 +126,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
                     return (
                       <Link
                         key={t.id}
-                        href={user ? `/learn/${t.slug}` : "/auth"}
+                        href={`/learn/${t.slug}`}
                         className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-bg"
                       >
                         <span
@@ -280,7 +280,7 @@ export function TopNav({ tracks, user }: TopNavProps) {
               {user && <MobileLink href="/dashboard">Dashboard</MobileLink>}
               <div className="px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.12em] text-tfaint">Courses</div>
               {tracks.map((t) => (
-                <MobileLink key={t.id} href={user ? `/learn/${t.slug}` : "/auth"}>{t.title}</MobileLink>
+                <MobileLink key={t.id} href={`/learn/${t.slug}`}>{t.title}</MobileLink>
               ))}
               <div className="my-2 border-t border-border" />
               <MobileLink href="/problems">Problems</MobileLink>
@@ -386,7 +386,7 @@ function SearchModal({
           flat.push({
             title: l.title,
             track: `${t.title} · ${m.title}`,
-            href: loggedIn ? `/learn/${t.slug}/${m.slug}/${l.slug}` : "/auth",
+            href: `/learn/${t.slug}/${m.slug}/${l.slug}`,
             maturity: l.maturity,
           });
     const needle = q.trim().toLowerCase();

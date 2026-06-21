@@ -13,6 +13,8 @@ interface StatusControlProps {
   variant?: "circle" | "pill";
   size?: number;
   align?: "left" | "right";
+  /** When false, clicking sends the user to sign in instead of opening the menu. */
+  signedIn?: boolean;
 }
 
 const RING = "#cbd2dc";
@@ -29,8 +31,18 @@ export function StatusControl({
   variant = "circle",
   size = 22,
   align = "left",
+  signedIn = true,
 }: StatusControlProps) {
   const [open, setOpen] = useState(false);
+
+  function toggle(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!signedIn) {
+      window.location.href = "/auth";
+      return;
+    }
+    setOpen((o) => !o);
+  }
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(
     null,
   );
@@ -144,11 +156,8 @@ export function StatusControl({
       {variant === "circle" ? (
         <button
           ref={triggerRef}
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpen((o) => !o);
-          }}
-          title={meta.label}
+          onClick={toggle}
+          title={signedIn ? meta.label : "Sign in to track your progress"}
           aria-haspopup="menu"
           aria-expanded={open}
           aria-label={`Status: ${meta.label}`}
@@ -169,10 +178,8 @@ export function StatusControl({
       ) : (
         <button
           ref={triggerRef}
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpen((o) => !o);
-          }}
+          onClick={toggle}
+          title={signedIn ? undefined : "Sign in to track your progress"}
           aria-haspopup="menu"
           aria-expanded={open}
           className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-[13px] font-medium shadow-card transition-colors hover:border-border-strong"

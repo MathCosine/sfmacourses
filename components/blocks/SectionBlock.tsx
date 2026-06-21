@@ -12,12 +12,14 @@ export function SectionBlock({
   lessonId,
   sectionIndex,
   initialStatus,
+  signedIn = true,
 }: {
   id: string;
   title: string;
   lessonId: string;
   sectionIndex: number;
   initialStatus: LessonStatus;
+  signedIn?: boolean;
 }) {
   const [status, setStatus] = useState<LessonStatus>(initialStatus);
   const [, startTransition] = useTransition();
@@ -50,6 +52,7 @@ export function SectionBlock({
           onChange={change}
           variant="pill"
           align="right"
+          signedIn={signedIn}
         />
       </div>
     </div>

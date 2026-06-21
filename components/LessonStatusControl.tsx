@@ -11,10 +11,12 @@ export function LessonStatusControl({
   lessonId,
   initial,
   align = "right",
+  signedIn = true,
 }: {
   lessonId: string;
   initial: LessonStatus;
   align?: "left" | "right";
+  signedIn?: boolean;
 }) {
   const [status, setStatus] = useState<LessonStatus>(initial);
   const [, startTransition] = useTransition();
@@ -39,6 +41,7 @@ export function LessonStatusControl({
       onChange={change}
       variant="pill"
       align={align}
+      signedIn={signedIn}
     />
   );
 }
