@@ -19,13 +19,13 @@ export default function GlobalError({
           justifyContent: "center",
           fontFamily:
             "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
-          background: "#f0f4f8",
-          color: "#1a2332",
+          background: "#f5efe4",
+          color: "#2b2419",
           textAlign: "center",
           padding: "0 24px",
         }}
       >
-        <div style={{ fontSize: 44, color: "#2563eb" }}>∑</div>
+        <div style={{ fontSize: 44, color: "#c2552e" }}>∑</div>
         <h1 style={{ fontSize: 26, margin: "16px 0 8px" }}>
           Something went wrong
         </h1>
@@ -37,10 +37,10 @@ export default function GlobalError({
           onClick={reset}
           style={{
             marginTop: 20,
-            background: "#2563eb",
+            background: "#c2552e",
             color: "#fff",
             border: "none",
-            borderRadius: 6,
+            borderRadius: 999,
             padding: "10px 20px",
             fontWeight: 600,
             cursor: "pointer",

@@ -15,9 +15,10 @@ export function LogoMark({ className }: { className?: string }) {
       aria-label="SFMA"
     >
       <defs>
+        {/* Follows the theme accent (terracotta light / ember dark) via CSS vars. */}
         <linearGradient id="sfma-grad" x1="6" y1="58" x2="58" y2="6" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#2563eb" />
-          <stop offset="1" stopColor="#38bdf8" />
+          <stop offset="0" stopColor="var(--accent, #c2552e)" />
+          <stop offset="1" stopColor="#e9a23f" />
         </linearGradient>
       </defs>
       {/* rising path */}

@@ -71,7 +71,11 @@ export function AuthForm({ redirectTo }: { redirectTo?: string }) {
   }
 
   return (
-    <div className="card w-full max-w-[400px] rounded-3xl p-8">
+    <div className="card relative w-full max-w-[400px] rounded-xl p-8">
+      {/* Playful academic touch: a hand-placed sticker, not another box. */}
+      <span className="absolute -right-3 -top-3 rotate-6 rounded-lg bg-yellow-tint px-2.5 py-1 font-serif text-[12px] font-bold italic text-yellow shadow-sm ring-1 ring-inset ring-yellow/30">
+        Always free
+      </span>
       <h1 className="font-serif text-3xl text-tprimary">Welcome to SFMA</h1>
       <p className="mt-1 text-[13.5px] text-tmuted">
         {mode === "signin"

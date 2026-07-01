@@ -192,7 +192,7 @@ export default async function LessonPage({
           {/* Bottom prev/next */}
           <div className="mt-10 grid gap-3 border-t border-border pt-6 sm:grid-cols-2">
             {prevHref ? (
-              <Link href={prevHref} className="group card hover-lift rounded-2xl px-5 py-4 hover:border-gold/40">
+              <Link href={prevHref} className="group card hover-lift rounded-xl px-5 py-4 hover:border-gold/40">
                 <div className="text-[11px] font-semibold uppercase tracking-wide text-tfaint">← Previous</div>
                 <div className="mt-0.5 text-[14px] font-semibold text-tprimary group-hover:text-gold">{ctx.prev!.title}</div>
               </Link>
@@ -200,7 +200,7 @@ export default async function LessonPage({
               <span />
             )}
             {nextHref && (
-              <Link href={nextHref} className="group card hover-lift rounded-2xl px-5 py-4 text-right hover:border-gold/40">
+              <Link href={nextHref} className="group card hover-lift rounded-xl px-5 py-4 text-right hover:border-gold/40">
                 <div className="text-[11px] font-semibold uppercase tracking-wide text-tfaint">Next →</div>
                 <div className="mt-0.5 text-[14px] font-semibold text-tprimary group-hover:text-gold">{ctx.next!.title}</div>
               </Link>

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/data";
 import { AuthForm } from "./AuthForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BrandMark } from "@/components/Brand";
 
 export const metadata = { title: "Sign In" };
 
@@ -25,11 +26,13 @@ export default async function AuthPage({
 
       <div className="relative flex flex-col items-center">
         <Link href="/" className="mb-7 flex items-center gap-2.5 transition-opacity hover:opacity-80">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold text-[20px] font-bold text-white shadow-accent">
-            ∑
-          </span>
-          <span className="text-[18px] font-extrabold tracking-tight text-tprimary">
-            SFMA <span className="font-medium text-tmuted">Math Academy</span>
+          <BrandMark className="h-10 w-10 shrink-0" />
+          <span className="flex items-center gap-2">
+            <span className="text-[17px] font-extrabold tracking-tight text-tprimary">SFMA</span>
+            <span className="h-3.5 w-px bg-border-strong" />
+            <span className="text-[11.5px] font-semibold uppercase tracking-[0.13em] text-tmuted">
+              Math Academy
+            </span>
           </span>
         </Link>
         <Suspense>

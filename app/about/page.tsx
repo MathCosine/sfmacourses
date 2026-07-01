@@ -162,8 +162,11 @@ export default async function AboutPage() {
               </a>
             </div>
           </div>
-          <div className="relative overflow-hidden rounded-2xl p-8 text-white" style={{ background: "linear-gradient(135deg, #2563eb, #7c3aed)" }}>
-            <div className="dot-grid absolute inset-0 opacity-25" />
+          <div
+            className="relative overflow-hidden rounded-xl p-8 text-white"
+            style={{ background: "linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 65%, #3f1d0d))" }}
+          >
+            <div className="graph-paper absolute inset-0 opacity-15" />
             <div className="relative">
               <h3 className="text-[18px] font-bold">Ready to start?</h3>
               <p className="mt-2 max-w-sm text-[14.5px] leading-relaxed text-white/85">
@@ -172,7 +175,8 @@ export default async function AboutPage() {
               </p>
               <Link
                 href={user ? "/dashboard" : "/auth"}
-                className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-[14px] font-bold text-[#1d4ed8] shadow-lg transition-transform hover:-translate-y-0.5"
+                className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[14px] font-bold shadow-lg transition-transform hover:-translate-y-0.5"
+                style={{ color: "var(--accent)" }}
               >
                 {user ? "Go to dashboard" : "Get started"}
                 <ArrowRight className="h-4 w-4" />
