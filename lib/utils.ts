@@ -5,6 +5,17 @@ export function cn(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
+/**
+ * Sanitize a user-supplied post-login destination: only same-origin paths are
+ * allowed. Rejects absolute URLs ("https://evil.com"), protocol-relative
+ * ("//evil.com") and backslash tricks, so ?redirect= can never leave the site.
+ */
+export function safeInternalPath(path: string | null | undefined): string | null {
+  if (!path || !path.startsWith("/")) return null;
+  if (path.startsWith("//") || path.includes("\\")) return null;
+  return path;
+}
+
 export function slugify(input: string): string {
   return input
     .toLowerCase()

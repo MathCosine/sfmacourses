@@ -38,7 +38,8 @@ export function StatusControl({
   function toggle(e: React.MouseEvent) {
     e.stopPropagation();
     if (!signedIn) {
-      window.location.href = "/auth";
+      // Come back to this page after signing in.
+      window.location.href = `/auth?redirect=${encodeURIComponent(window.location.pathname)}`;
       return;
     }
     setOpen((o) => !o);

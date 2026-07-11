@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { TopNav, type NavUser } from "@/components/TopNav";
 import type { NavTrack } from "@/lib/nav";
@@ -9,6 +10,9 @@ import { Menu, Close, GraduationCap } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 function GuestBanner() {
+  // Send the guest back to this exact page after they sign in.
+  const pathname = usePathname() || "/dashboard";
+  const signInHref = `/auth?redirect=${encodeURIComponent(pathname)}`;
   return (
     <div className="border-b border-border bg-highlight">
       <div className="mx-auto flex max-w-[1180px] flex-wrap items-center gap-x-3 gap-y-2 px-6 py-3 sm:px-10">
@@ -20,7 +24,7 @@ function GuestBanner() {
           <span className="font-semibold text-tprimary">Sign in</span> to track
           your progress and save your place.
         </p>
-        <Link href="/auth" className="btn-3d ml-auto px-4 py-1.5 text-[12.5px]">
+        <Link href={signInHref} className="btn-3d ml-auto px-4 py-1.5 text-[12.5px]">
           Sign in
         </Link>
       </div>

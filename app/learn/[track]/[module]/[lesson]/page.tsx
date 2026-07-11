@@ -151,7 +151,7 @@ export default async function LessonPage({
                 >
                   {meta.maturity === "draft"
                     ? "Draft chapter"
-                    : "Chapter in progress"}
+                    : "Content in progress"}
                 </div>
                 <p className="mt-0.5 text-[13px] leading-snug text-tmuted">
                   {MATURITY_META[meta.maturity].desc} Check back soon for the

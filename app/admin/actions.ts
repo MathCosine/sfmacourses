@@ -12,6 +12,8 @@ type Result = { ok: boolean; error?: string; id?: string };
 
 /** Render markdown + LaTeX to HTML for the live editor preview. */
 export async function previewMarkdown(md: string): Promise<string> {
+  const { error } = await requireStaff();
+  if (error) return "";
   return renderMarkdown(md ?? "");
 }
 
@@ -19,6 +21,8 @@ export async function previewMarkdown(md: string): Promise<string> {
 export async function renderLessonPreview(
   blocks: ContentBlock[],
 ): Promise<PreparedBlock[]> {
+  const { error } = await requireStaff();
+  if (error) return [];
   return prepareBlocks(blocks ?? []);
 }
 

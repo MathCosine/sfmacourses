@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/data";
+import { safeInternalPath } from "@/lib/utils";
 import { AuthForm } from "./AuthForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BrandMark } from "@/components/Brand";
@@ -13,7 +14,9 @@ export default async function AuthPage({
 }: {
   searchParams: Promise<{ redirect?: string }>;
 }) {
-  const { redirect: redirectTo } = await searchParams;
+  const { redirect: rawRedirect } = await searchParams;
+  // Only allow same-origin paths — blocks open-redirect phishing links.
+  const redirectTo = safeInternalPath(rawRedirect) ?? undefined;
   const user = await getSessionUser();
   if (user) redirect(redirectTo || "/dashboard");
 
